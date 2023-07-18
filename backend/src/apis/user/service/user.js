@@ -18,7 +18,6 @@ const Project = require("../../project/model/project");
 const {
   AlreadyExistError,
   UnauthorizedError,
-  NotFoundError,
   BadRequestError,
 } = require("../../../errorHandler/customErrorHandlers");
 const { signToken } = require("../../../helpers/auth");
@@ -28,9 +27,11 @@ const {
 } = require("../../../helpers/passwordHash");
 const { customUpdate } = require("../../sync/sequelizeQuery/sync");
 
+// eslint-disable-next-line consistent-return
 const registration = async (req) => {
   let transaction;
   try {
+    // eslint-disable-next-line camelcase
     const { email, username, password, first_name, last_name } = req.body;
     // validation
     const { error } = registrationValidation(req.body);
@@ -46,7 +47,7 @@ const registration = async (req) => {
 
     if (isExistData) {
       const message =
-        isExistData.username == username
+        isExistData.username === username
           ? "This username is already registered"
           : "This email is already registered";
       throw new AlreadyExistError(message);
@@ -57,12 +58,11 @@ const registration = async (req) => {
 
     transaction = await sequelize.transaction();
     // Inserting data
-    const registerData = await customInsert(
-      User,
-      { ...req.body, password: hashPassword },
-      { transaction },
-    );
+    // eslint-disable-next-line
+    const data = Object.assign({}, req.body, { password: hashPassword });
+    const registerData = await customInsert(User, data, { transaction });
     delete registerData.dataValues.password;
+    // eslint-disable-next-line camelcase
     const fullName = `${first_name} ${last_name}`;
     // sending mail
     await registerMail(email, fullName, username);
@@ -100,9 +100,9 @@ const login = async (req) => {
   let getLoginData = await dataExist(User, { username });
 
   if (getLoginData) {
-    if (getLoginData.status == "pending")
+    if (getLoginData.status === "pending")
       throw new UnauthorizedError("Your account is not approved yet");
-    if (getLoginData.status == "rejected")
+    if (getLoginData.status === "rejected")
       throw new UnauthorizedError("Your account is rejected");
   } else {
     throw new UnauthorizedError("Invalid username or password");
@@ -124,7 +124,7 @@ const login = async (req) => {
     delete getLoginData.password;
     getLoginData.tokens = tokens;
 
-    if (getLoginData.role == "admin") {
+    if (getLoginData.role === "admin") {
       const getRequestData = await adminData();
       getLoginData.signUprequests = getRequestData?.signUprequest || 0;
       getLoginData.projectRequests = getRequestData?.projectRequest || 0;
@@ -179,6 +179,7 @@ const updateProfilePhoto = async (req) => {
   return updateData;
 };
 
+// eslint-disable-next-line consistent-return
 const userDetails = async (req) => {
   let getLoginData = await dataExist(User, { username: req.decoded.username });
 
@@ -186,7 +187,7 @@ const userDetails = async (req) => {
     getLoginData = getLoginData.dataValues;
     delete getLoginData.password;
 
-    if (getLoginData.role == "admin") {
+    if (getLoginData.role === "admin") {
       const getRequestData = await adminData();
       getLoginData.signUprequests = getRequestData?.signUprequest || 0;
       getLoginData.projectRequests = getRequestData?.projectRequest || 0;

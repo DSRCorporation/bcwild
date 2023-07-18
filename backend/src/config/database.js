@@ -2,7 +2,7 @@
 const Sequelize = require("sequelize");
 
 const env = process.env.NODE_ENV || "local";
-const config = require(`${__dirname}/config.json`)[env];
+const config = require("./config.json")[env];
 
 let sequelize;
 if (config.use_env_variable) {

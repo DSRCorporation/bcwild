@@ -30,6 +30,8 @@ const registerMail = (email, name, username) => {
     .sendMail(mailoptionsuccess)
     .then((info) => info)
     .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error("Could not send mail", err);
       throw new InternalServerError(
         "Email cannot send, please try again in some time",
       );
@@ -54,7 +56,8 @@ const signupApprovalMail = (email, name, status) => {
     .sendMail(mailoptionsuccess)
     .then((info) => info)
     .catch((err) => {
-      console.log(err);
+      // eslint-disable-next-line no-console
+      console.error("Could not send mail", err);
       throw new InternalServerError(
         "Email cannot send, please try again in some time",
       );
@@ -83,6 +86,8 @@ const resetMail = (email, name, password) => {
     .sendMail(mailoptionsuccess)
     .then((info) => info)
     .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error("Could not send mail", err);
       throw new InternalServerError(
         "Email cannot send, please try again in some time",
       );
@@ -116,6 +121,8 @@ const dataExportMail = (email, name, file) => {
     .sendMail(mailoptionsuccess)
     .then((info) => info)
     .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error("Could not send mail", err);
       throw new InternalServerError(
         "Email cannot send, please try again in some time",
       );

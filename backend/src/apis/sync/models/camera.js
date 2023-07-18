@@ -1,9 +1,5 @@
-"use strict";
-
 const Sequelize = require("sequelize");
-const User = require("../../user/model/user");
 const db = require("../../../config/database");
-const Project = require("../../project/model/project");
 
 const CameraTrapData = db.sequelize.define(
   "camera_trap_data",

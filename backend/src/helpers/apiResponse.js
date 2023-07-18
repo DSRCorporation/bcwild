@@ -10,14 +10,16 @@ const successResponse = (message, result, res) =>
 
 const errorResponse = (error, res) => {
   if (
-    error.message ==
+    error.message ===
     "Can't send mail - all recipients were rejected: 550 unrouteable address"
   ) {
-    (error.message =
-      "Invalid Email Address - Please check the email address and try again"),
-      (error.status = httpStatusCodes.BAD_REQUEST);
+    // eslint-disable-next-line no-param-reassign
+    error.message =
+      "Invalid Email Address - Please check the email address and try again";
+    // eslint-disable-next-line no-param-reassign
+    error.status = httpStatusCodes.BAD_REQUEST;
   }
-  const type = error.name == "Warning" ? "warning" : "error";
+  const type = error.name === "Warning" ? "warning" : "error";
   return res.status(error.status || httpStatusCodes.INTERNAL_SERVER).json({
     type,
     status: error.status || httpStatusCodes.INTERNAL_SERVER,

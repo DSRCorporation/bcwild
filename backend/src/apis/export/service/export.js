@@ -2,7 +2,6 @@ const converter = require("json-2-csv");
 const fs = require("fs");
 const Telemetry = require("../../sync/models/telemetry");
 const CameraTrapData = require("../../sync/models/camera");
-const ProjectAccess = require("../../project/model/projectAccess");
 const {
   customFindAll,
   customInsert,
@@ -10,16 +9,21 @@ const {
 const { dataExportMail } = require("../../../helpers/send-email");
 const ExportLog = require("../model/export_log");
 const { sequelize } = require("../../../config/database");
+const { customErrors } = require("../../../errorHandler/error");
 
+// eslint-disable-next-line consistent-return
 const exportData = async (req) => {
   let transaction;
   try {
+    // eslint-disable-next-line camelcase
     const { email, project_id } = req.body;
 
     const { username } = req.decoded;
 
+    // eslint-disable-next-line camelcase
     const telemetryData = customFindAll(Telemetry, { project_id });
 
+    // eslint-disable-next-line camelcase
     const cameraTrapData = customFindAll(CameraTrapData, { project_id });
     const [telemetry, cameraTrap] = await Promise.all([
       telemetryData,
@@ -41,6 +45,7 @@ const exportData = async (req) => {
     const exportLogData = {
       username,
       export_email: email,
+      // eslint-disable-next-line camelcase
       project_id,
     };
 

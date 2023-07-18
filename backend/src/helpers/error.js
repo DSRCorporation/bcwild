@@ -1,6 +1,6 @@
 function error(status, errorType, errorMessage) {
   return () => {
-    e = {};
+    const e = {};
     e.status = status;
     e.type = errorType;
     e.message = errorMessage || "Default Error";

@@ -9,7 +9,7 @@ if (envFound.error) {
 
 const { DB_NAME } = process.env;
 const { DB_USER } = process.env;
-const pass = process.env.DB_PASSWORD;
+// const pass = process.env.DB_PASSWORD;
 
 module.exports = {
   app_setting: {
@@ -27,7 +27,7 @@ module.exports = {
     database: DB_NAME,
     connectTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT, 10),
     waitForConnections: process.env.DB_WAIT_FOR_CONNECTION || true,
-    acquireTimeout: parseInt(process.env.DB_ACQUIRE_TIMEOUT),
+    acquireTimeout: parseInt(process.env.DB_ACQUIRE_TIMEOUT, 10),
     debug: process.env.DB_DEBUG || false,
   },
   auth: {

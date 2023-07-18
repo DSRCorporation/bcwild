@@ -13,11 +13,12 @@ const User = require("../../user/model/user");
 const { signupRequestValidation } = require("../validation/admin");
 const { sequelize } = require("../../../config/database");
 
+// eslint-disable-next-line consistent-return
 const signupRequestsHandler = async (req) => {
   let transaction;
   try {
     const { id, status } = req.body;
-    if (req.decoded.role != "admin")
+    if (req.decoded.role !== "admin")
       throw new UnauthorizedError("Not Authorized to access this resource!");
 
     // validation
@@ -26,15 +27,17 @@ const signupRequestsHandler = async (req) => {
 
     transaction = await sequelize.transaction();
     let userData;
-    if (status == "rejected") {
+    if (status === "rejected") {
       // Deleting user data if signupRequest rejected so user can register with same email id and usernamae
       userData = await customDelete(User, { id }, transaction);
     } else {
       userData = await customUpdate(User, { id }, { status }, transaction);
     }
 
+    // eslint-disable-next-line camelcase
     const { email, first_name, last_name } = userData;
     // sending mail
+    // eslint-disable-next-line camelcase
     await signupApprovalMail(email, `${first_name} ${last_name}`, status);
     await transaction.commit();
 
@@ -48,9 +51,10 @@ const signupRequestsHandler = async (req) => {
 };
 
 const showSignupRequests = async (req) => {
+  // eslint-disable-next-line camelcase
   const { page, page_size } = req.query;
 
-  if (req.decoded.role != "admin")
+  if (req.decoded.role !== "admin")
     throw new UnauthorizedError("Not Authorized to access this resource!");
   const signUpRequestsData = await customFindAll(
     User,

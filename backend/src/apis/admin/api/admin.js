@@ -1,13 +1,13 @@
 const services = require("../service/admin");
 const signupRequestServices = require("../service/handleRequests");
 
-const login = async (req) => await services.login(req);
+const login = async (req) => services.login(req);
 
 const handleSignupRequests = async (req) =>
-  await signupRequestServices.signupRequestsHandler(req);
+  signupRequestServices.signupRequestsHandler(req);
 
 const showSignupAccess = async (req) =>
-  await signupRequestServices.showSignupRequests(req);
+  signupRequestServices.showSignupRequests(req);
 
 module.exports = {
   login,

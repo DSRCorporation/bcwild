@@ -1,5 +1,3 @@
-"use strict";
-
 const Sequelize = require("sequelize");
 const User = require("../../user/model/user");
 const Project = require("./project");

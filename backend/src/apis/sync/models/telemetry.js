@@ -1,10 +1,5 @@
-"use strict";
-
 const Sequelize = require("sequelize");
-const Project = require("../../project/model/project");
 const db = require("../../../config/database");
-const User = require("../../user/model/user");
-// const GroundTelemetry = require("./groundTelemetry");
 
 const Telemetry = db.sequelize.define(
   "telemetry_data",

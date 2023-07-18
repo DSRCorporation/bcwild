@@ -3,7 +3,8 @@ const { BadRequestError } = require("../errorHandler/customErrorHandlers");
 const authConfig = require("../config/config").auth;
 const customError = require("./error");
 
-function signToken(data, algorithm = "RS256") {
+// eslint-disable-next-line no-unused-vars
+function signToken(data, _algorithm = "RS256") {
   const privateKey = authConfig.jwt_secret;
   const refreshKey = authConfig.jwt_refresh_Secret;
   const expired = authConfig.jwt_expiresin;
@@ -19,38 +20,12 @@ function signToken(data, algorithm = "RS256") {
   const refreshToken = jwt.sign({ data }, refreshKey, {
     expiresIn: refreshExpired,
   });
-  token = {
+  const token = {
     accessToken,
     refreshToken,
   };
 
   return token;
-}
-
-async function isAuthorized(req, res, next) {
-  try {
-    const refreshToken = req.headers[authConfig.jwt_refresh_auth_header_name];
-    const accessToken = getTokenFromRequest(req);
-    const decodedToken = await verifyToken(accessToken, refreshToken, req, res);
-    //  const userid = decodedToken.data.user_id;
-    // const qid=decodedToken.data.qid;
-    // const userFromRedis = await getFromRedis(qid);
-    req.decoded = decodedToken.data;
-
-    if (decodedToken.data !== null) {
-      next();
-    } else {
-      const err = customError.error(
-        6666,
-        "error",
-        "Invalid Token or User has been logged out",
-      )();
-      req.error = err.message;
-      res.status(403).send(err);
-    }
-  } catch (error) {
-    res.status(400).send(error);
-  }
 }
 
 function getTokenFromRequest(req) {
@@ -71,14 +46,17 @@ function getTokenFromRequest(req) {
   return null;
 }
 
-function verifyToken(token, refreshToken, req, res) {
+// eslint-disable-next-line no-unused-vars
+function verifyToken(token, _refreshToken, _req, _res) {
+  // eslint-disable-next-line consistent-return
   return new Promise((resolve, reject) => {
     try {
-      const refreshKey = authConfig.jwt_refresh_Secret;
-      const expired = authConfig.jwt_expiresin;
-      const refreshExpired = authConfig.jwt_refresh_expiresin;
-      const error = new Error();
+      // const refreshKey = authConfig.jwt_refresh_Secret;
+      // const expired = authConfig.jwt_expiresin;
+      // const refreshExpired = authConfig.jwt_refresh_expiresin;
+      // const error = new Error();
       if (!token) {
+        // eslint-disable-next-line no-promise-executor-return
         return reject(
           customError.error(
             401,
@@ -141,6 +119,32 @@ function verifyToken(token, refreshToken, req, res) {
       reject(customError.error(500, "error", "Internal Server Error")());
     }
   });
+}
+
+async function isAuthorized(req, res, next) {
+  try {
+    const refreshToken = req.headers[authConfig.jwt_refresh_auth_header_name];
+    const accessToken = getTokenFromRequest(req);
+    const decodedToken = await verifyToken(accessToken, refreshToken, req, res);
+    //  const userid = decodedToken.data.user_id;
+    // const qid=decodedToken.data.qid;
+    // const userFromRedis = await getFromRedis(qid);
+    req.decoded = decodedToken.data;
+
+    if (decodedToken.data !== null) {
+      next();
+    } else {
+      const err = customError.error(
+        6666,
+        "error",
+        "Invalid Token or User has been logged out",
+      )();
+      req.error = err.message;
+      res.status(403).send(err);
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
 }
 
 module.exports = { isAuthorized, signToken };

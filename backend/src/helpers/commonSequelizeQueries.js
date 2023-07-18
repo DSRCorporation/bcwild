@@ -6,17 +6,20 @@ const dataExist = async (model, where, include, attributes) => {
 };
 
 const customInsert = async (model, data, transaction) =>
-  await model.create(data, transaction);
+  model.create(data, transaction);
 
 const customFindAll = async (
   model,
   where,
   include,
   page,
+  // eslint-disable-next-line camelcase
   page_size,
   attributes,
 ) => {
+  // eslint-disable-next-line no-param-reassign, camelcase
   page = page ? (page - 1) * page_size : null;
+  // eslint-disable-next-line no-param-reassign, camelcase
   page_size = page_size || null;
 
   const item = await model.findAndCountAll({
@@ -24,6 +27,7 @@ const customFindAll = async (
     attributes,
     include,
     offset: page,
+    // eslint-disable-next-line camelcase
     limit: page_size,
   });
   if (!item) throw new NotFoundError("Record not found");
@@ -35,7 +39,7 @@ const customUpdate = async (model, where, updateItem, transaction) => {
   if (!updatedItem) throw new NotFoundError("Record not found");
   // Found an item, update it
   await model.update(updateItem, { where }, transaction);
-  return await model.findOne({ where });
+  return model.findOne({ where });
 };
 
 const customDelete = async (model, where, transaction) => {

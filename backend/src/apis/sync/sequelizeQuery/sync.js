@@ -3,13 +3,13 @@ const customCreate = async (model, data, transaction, where) => {
   if (dataExists) {
     return false;
   }
-  return await model.create(data, transaction);
+  return model.create(data, transaction);
 };
 
 const customUpdate = async (model, where, data) =>
-  await model.update(data, { where });
+  model.update(data, { where });
 
-const customDelete = async (model, where) => await model.destroy({ where });
+const customDelete = async (model, where) => model.destroy({ where });
 
 module.exports = {
   customCreate,

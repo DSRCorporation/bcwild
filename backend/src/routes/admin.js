@@ -2,19 +2,16 @@ const router = require("express").Router();
 const adminController = require("../apis/admin/api/admin");
 const { successResponse, errorResponse } = require("../helpers/apiResponse");
 const { isAuthorized } = require("../helpers/auth");
-// router.post('/login',login)
-router.get("/signupRequests", isAuthorized, showSignupRequests);
-router.post("/changeSignupAccessStatus", isAuthorized, signupRequestsHandler);
 
-async function login(req, res) {
-  try {
-    const result = await adminController.login(req, res);
-
-    successResponse("Login successfully", result, res);
-  } catch (error) {
-    errorResponse(error, res);
-  }
-}
+// async function login(req, res) {
+//   try {
+//     const result = await adminController.login(req, res);
+//
+//     successResponse("Login successfully", result, res);
+//   } catch (error) {
+//     errorResponse(error, res);
+//   }
+// }
 
 async function showSignupRequests(req, res) {
   try {
@@ -35,5 +32,9 @@ async function signupRequestsHandler(req, res) {
     errorResponse(error, res);
   }
 }
+
+// router.post('/login',login)
+router.get("/signupRequests", isAuthorized, showSignupRequests);
+router.post("/changeSignupAccessStatus", isAuthorized, signupRequestsHandler);
 
 module.exports = router;

@@ -14,6 +14,7 @@ const { customErrors } = require("../../../errorHandler/error");
 const { generateHash } = require("../../../helpers/passwordHash");
 const { resetPasswordValidation } = require("../validation/forgetPassword");
 
+// eslint-disable-next-line consistent-return
 const forgetPassword = async (req) => {
   let transaction;
   try {
@@ -38,7 +39,9 @@ const forgetPassword = async (req) => {
       { password: hashPassword },
       transaction,
     );
+    // eslint-disable-next-line camelcase
     const { first_name, last_name } = updateUser;
+    // eslint-disable-next-line camelcase
     await resetMail(email, `${first_name} ${last_name}`, password);
     await transaction.commit();
     return updateUser;
@@ -50,10 +53,12 @@ const forgetPassword = async (req) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 const resetPassword = async (req) => {
   let transaction;
   try {
-    const { new_password, confirm_password } = req.body;
+    // eslint-disable-next-line camelcase
+    const { new_password } = req.body;
 
     // validation
     const { error } = resetPasswordValidation(req.body);
