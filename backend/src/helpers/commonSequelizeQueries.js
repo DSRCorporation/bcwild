@@ -52,10 +52,24 @@ const customDelete = async (model, where, transaction) => {
   return updatedItem;
 };
 
+const setMandatoryProperty = (mainModel, propertyModel, foreignKeyName) => {
+  const options = foreignKeyName
+    ? {
+        allowNull: false,
+      }
+    : {
+        name: foreignKeyName,
+        allowNull: false,
+      };
+  propertyModel.hasMany(mainModel, options);
+  mainModel.belongsTo(propertyModel, options);
+};
+
 module.exports = {
   dataExist,
   customInsert,
   customFindAll,
   customUpdate,
   customDelete,
+  setMandatoryProperty,
 };

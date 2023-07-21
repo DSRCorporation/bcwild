@@ -193,7 +193,229 @@
           }
         }
       }
+    },
+    "/datasheet/BatsAndBridges": {
+      "post": {
+        "tags": [
+          "BatsAndBridges"
+        ],
+        "summary": "Submit Bats and Bridges Datasheet",
+        "description": "Submit Bats and Bridges Datasheet, possibly updating the bridge description",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "timestamp",
+                  "observers"
+                ],
+                "properties": {
+                  "timestamp": {
+                    "type": "integer"
+                  },
+                  "observers": {
+                    "type": "string"
+                  },
+                  "bridgeId": {
+                    "type": "integer"
+                  },
+                  "bridgeName": {
+                    "type": "string"
+                  },
+                  "bridgeMotId": {
+                    "type": "string"
+                  },
+                  "regionId": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4, 5]
+                  },
+                  "roadId": {
+                    "type": "integer"
+                  },
+                  "roadName": {
+                    "type": "integer"
+                  },
+                  "bridgeType": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                  },
+                  "spanMaterial": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4, 5, 6]
+                  },
+                  "abutment": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4, 5, 6]
+                  },
+                  "underdeck": {
+                    "type": "integer",
+                    "enum": [1, 2, 3]
+                  },
+                  "beams": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4]
+                  },
+                  "columns": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4]
+                  },
+                  "height": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "length": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "bridgeFor": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "enum": [1, 2, 4, 8, 16]
+                    }
+                  },
+                  "crossingType": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4]
+                  },
+                  "waterUnderBridge": {
+                    "type": "boolean"
+                  },
+                  "water": {
+                    "type": "integer",
+                    "enum": [1, 2, 3]
+                  },
+                  "habitat": {
+                    "type": "integer",
+                    "enum": [1, 2, 3]
+                  },
+                  "habitatComment": {
+                    "type": "string"
+                  },
+                  "batSigns": {
+                    "type": "object",
+                    "properties": {
+                      "standardLocations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "location": {
+                              "type": "integer",
+                              "enum": [1, 2, 3, 4, 5]
+                            },
+                            "batSigns": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer",
+                                "enum": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "otherLocations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "locationDescription": {
+                              "type": "string"
+                            },
+                            "batSigns": {
+                              "type": "array",
+                              "items": {
+                                "type": "integer",
+                                "enum": [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "guanoAmount": {
+                    "type": "integer",
+                    "enum": [1, 2, 3, 4]
+                  },
+                  "guanoDistribution": {
+                    "type": "integer",
+                    "enum": [1, 2]
+                  },
+                  "guanoCollected": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "enum": [1, 2, 4]
+                    }
+                  },
+                  "guanoSampleLabel": {
+                    "type": "string"
+                  },
+                  "roostAssessmentNight": {
+                    "type": "integer",
+                    "enum": [1, 2, 3]
+                  },
+                  "roostAssessmentDay": {
+                    "type": "integer",
+                    "enum": [1, 2, 3]
+                  },
+                  "maternity": {
+                    "type": "integer",
+                    "enum": [1, 2, 3]
+                  },
+                  "emergencyCountDone": {
+                    "type": "boolean"
+                  },
+                  "batRecodings": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "enum": [1, 2, 4]
+                    }
+                  },
+                  "areSwallowNestsPresent": {
+                    "type": "boolean"
+                  },
+                  "swallowNestTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "enum": [1, 2, 4]
+                    }
+                  },
+                  "swallowsFlying": {
+                    "type": "boolean"
+                  },
+                  "speciesComments": {
+                    "type": "string"
+                  },
+                  "photosTaken": {
+                    "type": "boolean"
+                  },
+                  "couldBeSafelyNetted": {
+                    "type": "boolean"
+                  },
+                  "wouldBatsBeReachable": {
+                    "type": "boolean"
+                  },
+                  "comments": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
-
   }
 }
