@@ -47,7 +47,7 @@ const DashboardScreen = ({route,navigation}) => {
     };
     fetchData();
   }, [])
-  
+
 
   const showAlertOnly=(title, message)=> {
     Alert.alert(
@@ -58,7 +58,7 @@ const DashboardScreen = ({route,navigation}) => {
           text: 'Ok',
           onPress: () =>{
             console.log('OK Pressed')
-          } 
+          }
         }
       ]
     );
@@ -68,6 +68,9 @@ const DashboardScreen = ({route,navigation}) => {
     navigation.navigate('TelemetryForm');
   }
 
+  const handleBridgesClick = () => {
+    navigation.navigate('BridgesList');
+  }
 
   const handleTelemetryTriangulation = () => {
     navigation.navigate('TelemetryTriangulation');
@@ -76,7 +79,7 @@ const DashboardScreen = ({route,navigation}) => {
   const handleCameraTrapData = () => {
     navigation.navigate('CameraTrapData');
   }
-  
+
   const handleApproveSignupReqs = () => {
     navigation.navigate('ApproveSignupAccess');
   }
@@ -104,13 +107,13 @@ const DashboardScreen = ({route,navigation}) => {
           onPress: () =>{
             console.log('Yes Pressed')
             handleLogout();
-          } 
+          }
         },
         {
           text: 'No',
           onPress: () =>{
             console.log('No Pressed')
-          } 
+          }
         }
       ]
     );
@@ -142,7 +145,7 @@ const DashboardScreen = ({route,navigation}) => {
       </View>
 
       <View style={{flex:1 ,marginTop:90, flexDirection:'row',alignItems:'center'}}>
-       
+
          <Image style={{height:15,width:15,marginLeft:20}} source={require('../assets/plus_sign.png')} />
          <TouchableOpacity onPress={()=>handleAddProject()}>
          <Text style={{fontSize:20,color:'black',fontWeight:'bold',marginLeft:10}}>Project Setup</Text>
@@ -163,6 +166,9 @@ const DashboardScreen = ({route,navigation}) => {
 
           <TouchableOpacity onPress={()=>handleTelemetryTriangulation()}>
           <Image style={{height:100,width:100, resizeMode:'contain'}} source={require('../assets/gtele.png')} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={()=>handleBridgesClick()}>
+              <Text>Bridges</Text>
           </TouchableOpacity>
       </View>
       <View style={{flex:1 ,marginTop:10, flexDirection:'row',alignItems:'center'}}>
@@ -190,7 +196,7 @@ const DashboardScreen = ({route,navigation}) => {
      </View>
       <View style={{flex:2}}>
         <></>
-      </View>  
+      </View>
       </ScrollView>
       <View style={{flex:0.4, backgroundColor:'#234075',flexDirection:'column',
       justifyContent:'center',alignItems:'center'
@@ -200,12 +206,12 @@ const DashboardScreen = ({route,navigation}) => {
           <Image style={{height:50,width:50,
             resizeMode:'contain'}} source={require('../assets/placeholder_profile.png')} />
         </TouchableOpacity>
-      </View>  
+      </View>
       <LoadingOverlay loading={loading} />
     </View>
-    
+
   );
- 
+
 };
 
 const styles = StyleSheet.create({
