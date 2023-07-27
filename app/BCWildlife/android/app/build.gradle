@@ -93,9 +93,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.bcwildlife"
+    namespace "ca.bc.gov.bcwild"
     defaultConfig {
-        applicationId "com.bcwildlife"
+        applicationId "ca.bc.gov.bcwild"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
