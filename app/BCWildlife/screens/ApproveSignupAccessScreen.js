@@ -7,10 +7,35 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { statuschange_url } from '../network/path';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { getAccessToken } from '../global';
+import {useCardListStyles} from "../shared/styles/card-list-styles";
 
 const ApproveSignupAccessScreen = (navigation) => {
-
-
+  const cardListStyles = useCardListStyles();
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
+    logoContainer: {
+      flex:3,
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+    },
+    logo: {
+      height: 200,
+      width: 200,
+      marginRight: 16,
+      resizeMode:'contain'
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color:'black'
+    },
+    ...cardListStyles
+  });
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   let refreshTokenCount = 0;
@@ -19,7 +44,7 @@ const ApproveSignupAccessScreen = (navigation) => {
     getPendingSignupAccessRequests();
   }, [])
 
-  const configAuth = () => { 
+  const configAuth = () => {
     let token = getAccessToken();
     let AuthStr = 'Bearer '.concat(token);
     return { headers: { Authorization: AuthStr } };
@@ -52,15 +77,15 @@ const ApproveSignupAccessScreen = (navigation) => {
               updateStatus(item, 'rejected');
               // reject network request
             }
-            
-          } 
+
+          }
         },
         {
           text: 'Cancel',
           onPress: () =>{
             console.log('cancel Pressed')
             // do nothing
-          } 
+          }
         }
       ]
     );
@@ -91,9 +116,9 @@ const ApproveSignupAccessScreen = (navigation) => {
             if(title=='Info'){
               navigateToDashboard();
             }// else do nothing
-            console.log('OK Pressed')  
-  
-          } 
+            console.log('OK Pressed')
+
+          }
         }
       ]
     );
@@ -104,7 +129,7 @@ const ApproveSignupAccessScreen = (navigation) => {
     navigation.goBack();
   };
 
- 
+
 
     async function updateStatus(id, status) {
       const data = {
@@ -112,9 +137,9 @@ const ApproveSignupAccessScreen = (navigation) => {
         status,
       };
       setLoading(true);
-    
+
       const USER_TOKEN = getAccessToken();
-      const AuthStr = 'Bearer '.concat(USER_TOKEN); 
+      const AuthStr = 'Bearer '.concat(USER_TOKEN);
       try {
         axiosUtility.post(statuschange_url, data,
           { headers: { Authorization: AuthStr } })
@@ -172,13 +197,13 @@ const ApproveSignupAccessScreen = (navigation) => {
         setLoading(false);
         console.error(error);
       }
-    }  
+    }
 
   const getPendingSignupAccessRequests = async () => {
     setLoading(true);
-    
+
     try {
-        axiosUtility.get(getpendinguser_url, 
+        axiosUtility.get(getpendinguser_url,
           configAuth())
         .then(response => {
           console.log(response);
@@ -203,7 +228,7 @@ const ApproveSignupAccessScreen = (navigation) => {
                 generateNewAccessToken()
                 .then((response) => {
                   console.log('new access token generated');
-                  axiosUtility.get(getpendinguser_url, 
+                  axiosUtility.get(getpendinguser_url,
                     configAuth())
                   .then(response => {
                     console.log(response);
@@ -236,7 +261,7 @@ const ApproveSignupAccessScreen = (navigation) => {
               }else{
                 console.log('error message:', errorMessage+' with index '+errorMessage.indexOf('token'));
               }
-              showAlertOnly('Error',error.response.data.message);   
+              showAlertOnly('Error',error.response.data.message);
           } else if (error.request) {
             console.log('Request error:', error.request);
             showAlertOnly('Error',error.response.data.message);
@@ -259,7 +284,7 @@ const ApproveSignupAccessScreen = (navigation) => {
       </View>
     );
   }
- 
+
 
   return (
     <View style={styles.container}>
@@ -282,7 +307,7 @@ const ApproveSignupAccessScreen = (navigation) => {
                style={[styles.cardButton, { backgroundColor: '#234075' }]}>
                 <Text style={styles.cardButtonText}>Accept</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => onhandleReject(item.id)}
               style={[styles.cardButton, { backgroundColor: '#ccc' }]}>
                 <Text style={styles.cardButtonText}>Reject</Text>
@@ -296,67 +321,5 @@ const ApproveSignupAccessScreen = (navigation) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  logoContainer: {
-    flex:3,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  logo: {
-    height: 200,
-    width: 200,
-    marginRight: 16,
-    resizeMode:'contain'
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color:'black'
-  },
-  cardList: {
-    flex: 7,
-    padding: 16,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    padding: 16,
-    marginBottom: 16,
-  },
-  cardName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  cardValue: {
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  cardButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  cardButton: {
-    flex: 1,
-    height: 32,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 8,
-  },
-  cardButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
 
 export default ApproveSignupAccessScreen;

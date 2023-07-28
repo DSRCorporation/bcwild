@@ -7,10 +7,35 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { statuschange_url,approveproj_url } from '../network/path';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { getAccessToken } from '../global';
+import {useCardListStyles} from "../shared/styles/card-list-styles";
 
 const ApproveProjectScreen = (navigation) => {
-
-
+  const cardListStyles = useCardListStyles();
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
+    logoContainer: {
+      flex:3,
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+    },
+    logo: {
+      height: 200,
+      width: 200,
+      marginRight: 16,
+      resizeMode:'contain'
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color:'black'
+    },
+    ...cardListStyles
+  });
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   let refreshTokenCount = 0;
@@ -19,7 +44,7 @@ const ApproveProjectScreen = (navigation) => {
     getPendingProjectAccessRequests();
   }, [])
 
-  const configAuth = () => { 
+  const configAuth = () => {
     let token = getAccessToken();
     let AuthStr = 'Bearer '.concat(token);
     return { headers: { Authorization: AuthStr } };
@@ -35,7 +60,7 @@ const ApproveProjectScreen = (navigation) => {
     //showAlert('Accept','Are you sure you want to accept '+name+' this request? ',item);
   }
   const onhandleReject = (item) => {
-    
+
       showAlert('Reject','Are you sure you want to reject this request?',item);
   }
 
@@ -46,7 +71,7 @@ const ApproveProjectScreen = (navigation) => {
       { text: 'Submitter', value: 'submitter' },
     ];
     let selectedValue = buttons[0].value;
-  
+
     Alert.alert(
       title,
       `Project ID: ${projectId}\nName: ${name}`,
@@ -80,15 +105,15 @@ const ApproveProjectScreen = (navigation) => {
               updateStatus(item,'manager' ,'rejected');
               // reject network request
             }
-            
-          } 
+
+          }
         },
         {
           text: 'Cancel',
           onPress: () =>{
             console.log('cancel Pressed')
             // do nothing
-          } 
+          }
         }
       ]
     );
@@ -119,9 +144,9 @@ const ApproveProjectScreen = (navigation) => {
             if(title=='Info'){
               navigateToDashboard();
             }// else do nothing
-            console.log('OK Pressed')  
-  
-          } 
+            console.log('OK Pressed')
+
+          }
         }
       ]
     );
@@ -132,7 +157,7 @@ const ApproveProjectScreen = (navigation) => {
     navigation.goBack();
   };
 
- 
+
 
     async function updateStatus(id, project_role,status) {
         if (project_role == 'cancel') {
@@ -146,9 +171,9 @@ const ApproveProjectScreen = (navigation) => {
         status,
       };
       setLoading(true);
-    
+
       const USER_TOKEN = getAccessToken();
-      const AuthStr = 'Bearer '.concat(USER_TOKEN); 
+      const AuthStr = 'Bearer '.concat(USER_TOKEN);
       try {
         axiosUtility.post(approveproj_url, data,
           { headers: { Authorization: AuthStr } })
@@ -206,13 +231,13 @@ const ApproveProjectScreen = (navigation) => {
         setLoading(false);
         console.error(error);
       }
-    }  
+    }
 
   const getPendingProjectAccessRequests = async () => {
     setLoading(true);
-    
+
     try {
-        axiosUtility.get(getpendingprojectaccess_url, 
+        axiosUtility.get(getpendingprojectaccess_url,
           configAuth())
         .then(response => {
           console.log(response);
@@ -237,7 +262,7 @@ const ApproveProjectScreen = (navigation) => {
                 generateNewAccessToken()
                 .then((response) => {
                   console.log('new access token generated');
-                  axiosUtility.get(getpendingprojectaccess_url, 
+                  axiosUtility.get(getpendingprojectaccess_url,
                     configAuth())
                   .then(response => {
                     console.log(response);
@@ -270,7 +295,7 @@ const ApproveProjectScreen = (navigation) => {
               }else{
                 console.log('error message:', errorMessage+' with index '+errorMessage.indexOf('token'));
               }
-              showAlertOnly('Error',error.response.data.message);   
+              showAlertOnly('Error',error.response.data.message);
           } else if (error.request) {
             console.log('Request error:', error.request);
             showAlertOnly('Error',error.response.data.message);
@@ -293,7 +318,7 @@ const ApproveProjectScreen = (navigation) => {
       </View>
     );
   }
- 
+
 
   return (
     <View style={styles.container}>
@@ -316,7 +341,7 @@ const ApproveProjectScreen = (navigation) => {
                style={[styles.cardButton, { backgroundColor: '#234075' }]}>
                 <Text style={styles.cardButtonText}>Accept</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => onhandleReject(item.id,item.username,item.project_id)}
               style={[styles.cardButton, { backgroundColor: '#ccc' }]}>
                 <Text style={styles.cardButtonText}>Reject</Text>
@@ -330,67 +355,5 @@ const ApproveProjectScreen = (navigation) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  logoContainer: {
-    flex:3,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  logo: {
-    height: 200,
-    width: 200,
-    marginRight: 16,
-    resizeMode:'contain'
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color:'black'
-  },
-  cardList: {
-    flex: 7,
-    padding: 16,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    padding: 16,
-    marginBottom: 16,
-  },
-  cardName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  cardValue: {
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  cardButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  cardButton: {
-    flex: 1,
-    height: 32,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 8,
-  },
-  cardButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
 
 export default ApproveProjectScreen;
