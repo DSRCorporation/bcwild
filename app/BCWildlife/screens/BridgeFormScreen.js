@@ -12,10 +12,12 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useMockBridges} from '../mocks/mock-bridges';
 import {Picker} from '@react-native-picker/picker';
 import {InputLabel} from '../shared/components/InputLabel';
+import {useBridgeFormValidation} from '../shared/hooks/use-bridge-form-validation';
 
-const BridgeFormScreen = ({navigation, route}) => {
+const BridgeFormScreen = ({route}) => {
   const currentBridgeId = (route.params && route.params.bridgeId) || null;
   const {getMockBridgeById} = useMockBridges();
+  const {validate} = useBridgeFormValidation();
   const [loading, setLoading] = useState(false);
   const styles = StyleSheet.create({
     container: {
@@ -72,14 +74,35 @@ const BridgeFormScreen = ({navigation, route}) => {
       return;
     }
     setForm({
-      id: currentBridge.id,
-      name: currentBridge.name,
+      region: '',
+      bridgeName: '',
+      coordinates: '',
+      roadOrHighway: '',
+      motBridgeId: '',
+      bridgeType: '',
+      spanMaterial: '',
+      abutmentOrBackWall: '',
+      underdeck: '',
+      beams: '',
+      columns: '',
+      heightFromBeamsOrDeckToSurfaceBelow: '',
+      length: '',
+      bridgeIfFor: '',
+      crossingType: '',
+      waterCurrentlyUnderBridge: '',
+      waterIs: '',
+      habitatAroundBridge: '',
+      habitatComments: '',
     });
   }, [getMockBridgeById, currentBridgeId]);
 
+  const submit = useCallback(() => {
+    const isValid = validate(form);
+    console.log(isValid);
+  }, [validate, form]);
+
   useEffect(() => {
     fillForm();
-    console.log('fillForm was changed');
   }, [fillForm]);
 
   return (
@@ -96,6 +119,17 @@ const BridgeFormScreen = ({navigation, route}) => {
         </View>
         <View>
           <View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Region</InputLabel>
+              <Picker
+                selectedValue={form.region}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, region: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="N/A" value="N/A" />
+              </Picker>
+            </View>
             <View style={styles.inputContainer}>
               <InputLabel>Bridge name</InputLabel>
               <TextInput
@@ -142,8 +176,75 @@ const BridgeFormScreen = ({navigation, route}) => {
               />
             </View>
           </View>
-          <View style={styles.inputContainer}>
-            <View>
+          <View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Bridge type</InputLabel>
+              <Picker
+                selectedValue={form.bridgeType}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, bridgeType: value}))
+                }>
+                <Picker.Item label="Select" value="Unknown" />
+                <Picker.Item label="Type1" value="type1" />
+                <Picker.Item label="Type2" value="type2" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Span material</InputLabel>
+              <Picker
+                selectedValue={form.spanMaterial}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, spanMaterial: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="Concrete cast-in-place " value="concrete" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Abutment/Back wall</InputLabel>
+              <Picker
+                selectedValue={form.abutmentOrBackWall}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, abutmentOrBackWall: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="N/A" value="N/A" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Underdeck</InputLabel>
+              <Picker
+                selectedValue={form.underdeck}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, underdeck: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="Concrete" value="Concrete" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Beams</InputLabel>
+              <Picker
+                selectedValue={form.beams}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, beams: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="N/A" value="N/A" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Columns</InputLabel>
+              <Picker
+                selectedValue={form.columns}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, columns: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="N/A" value="N/A" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
               <InputLabel>Height from beams/deck to surface below</InputLabel>
               <TextInput
                 value={form.heightFromBeamsOrDeckToSurfaceBelow}
@@ -174,6 +275,28 @@ const BridgeFormScreen = ({navigation, route}) => {
               />
             </View>
             <View style={styles.inputContainer}>
+              <InputLabel>Bridge is for</InputLabel>
+              <Picker
+                selectedValue={form.bridgeIfFor}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, bridgeIfFor: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="Vehicle" value="Vehicle" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Crossing type</InputLabel>
+              <Picker
+                selectedValue={form.crossingType}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, crossingType: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="Road" value="Road" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
               <InputLabel>Water currently under bridge</InputLabel>
               <Picker
                 selectedValue={form.waterCurrentlyUnderBridge}
@@ -199,6 +322,32 @@ const BridgeFormScreen = ({navigation, route}) => {
                 </Picker>
               </View>
             )}
+            <View style={styles.inputContainer}>
+              <InputLabel>Habitat around bridge</InputLabel>
+              <Picker
+                selectedValue={form.habitatAroundBridge}
+                onValueChange={value =>
+                  setForm(prev => ({...prev, habitatAroundBridge: value}))
+                }>
+                <Picker.Item label="Select" value={null} />
+                <Picker.Item label="Forest" value="Forest" />
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Habitat Comments</InputLabel>
+              <TextInput
+                value={form.habitatComments}
+                onChangeText={text =>
+                  setForm(prev => ({
+                    ...prev,
+                    habitatComments: text,
+                  }))
+                }
+                multiline={true}
+                placeholder="Enter Habitat Comments"
+                style={styles.textInput}
+              />
+            </View>
           </View>
           <TouchableOpacity
             style={{
@@ -209,7 +358,7 @@ const BridgeFormScreen = ({navigation, route}) => {
               padding: 10,
               justifyContent: 'center',
             }}
-            onPress={() => navigation.navigate('BridgeForm')}
+            onPress={submit}
             accessibilityLabel="create bridge button"
             testID="createNewBridgeButton">
             <Text
