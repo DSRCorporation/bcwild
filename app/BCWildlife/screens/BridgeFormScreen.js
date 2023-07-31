@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
 } from 'react-native';
 import LoadingOverlay from '../utility/LoadingOverlay';
@@ -13,6 +12,8 @@ import {useMockBridges} from '../mocks/mock-bridges';
 import {Picker} from '@react-native-picker/picker';
 import {InputLabel} from '../shared/components/InputLabel';
 import {useBridgeFormValidation} from '../shared/hooks/use-bridge-form-validation';
+import {BCWildLogo} from '../shared/components/BCWildLogo';
+import {TitleText} from '../shared/components/TitleText';
 
 const BridgeFormScreen = ({route}) => {
   const currentBridgeId = (route.params && route.params.bridgeId) || null;
@@ -22,9 +23,8 @@ const BridgeFormScreen = ({route}) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 20,
-      paddingTop: 50,
       backgroundColor: '#fff',
+      paddingHorizontal: 25,
     },
     logoContainer: {
       alignItems: 'center',
@@ -43,6 +43,20 @@ const BridgeFormScreen = ({route}) => {
     },
     inputContainer: {
       marginBottom: 8,
+    },
+    button: {
+      backgroundColor: '#234075',
+      borderRadius: 10,
+      marginTop: 20,
+      marginBottom: 20,
+      padding: 10,
+      justifyContent: 'center',
+    },
+    buttonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 18,
+      textAlign: 'center',
     },
   });
 
@@ -99,8 +113,12 @@ const BridgeFormScreen = ({route}) => {
 
   const submit = useCallback(() => {
     const isValid = validate(form);
-    console.log(isValid);
   }, [validate, form]);
+
+  const actionText = useMemo(
+    () => (currentBridgeId ? 'Edit' : 'Create'),
+    [currentBridgeId],
+  );
 
   useEffect(() => {
     fillForm();
@@ -109,15 +127,8 @@ const BridgeFormScreen = ({route}) => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../assets/bc_abbreviated.png')}
-            style={styles.logo}
-          />
-          <Text style={styles.label}>
-            {currentBridgeId ? 'Edit' : 'Create'} Bridge
-          </Text>
-        </View>
+        <BCWildLogo />
+        <TitleText>{actionText} bridge</TitleText>
         <View>
           <View>
             <View style={styles.inputContainer}>
@@ -351,26 +362,11 @@ const BridgeFormScreen = ({route}) => {
             </View>
           </View>
           <TouchableOpacity
-            style={{
-              backgroundColor: '#234075',
-              borderRadius: 10,
-              marginTop: 20,
-              marginBottom: 20,
-              padding: 10,
-              justifyContent: 'center',
-            }}
+            style={styles.button}
             onPress={submit}
             accessibilityLabel="create bridge button"
             testID="createNewBridgeButton">
-            <Text
-              style={{
-                color: '#fff',
-                fontWeight: 'bold',
-                fontSize: 18,
-                textAlign: 'center',
-              }}>
-              {currentBridgeId ? 'Edit' : 'Create'}
-            </Text>
+            <Text style={styles.buttonText}>{actionText}</Text>
           </TouchableOpacity>
         </View>
       </View>

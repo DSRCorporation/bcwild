@@ -4,7 +4,6 @@ const useCardListStyles = () => {
   return StyleSheet.create({
     cardList: {
       flex: 7,
-      padding: 16,
     },
     card: {
       backgroundColor: '#fff',

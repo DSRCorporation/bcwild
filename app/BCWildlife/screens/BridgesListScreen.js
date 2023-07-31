@@ -1,9 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useCardListStyles} from '../shared/styles/card-list-styles';
 import {useMockBridges} from '../mocks/mock-bridges';
+import {GoBackArrowButton} from '../shared/components/GoBackArrowButton';
+import {BCWildLogo} from '../shared/components/BCWildLogo';
+import {TitleText} from '../shared/components/TitleText';
 
 const BridgeListScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
@@ -13,41 +16,28 @@ const BridgeListScreen = ({navigation}) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 20,
-      paddingTop: 50,
       backgroundColor: '#fff',
-    },
-    logoContainer: {
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    logo: {
-      width: 150,
-      height: 150,
-      resizeMode: 'contain',
+      paddingHorizontal: 25,
     },
     ...cardListStyles,
   });
 
+  const fakeLoading = useCallback(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, []);
+
   useEffect(() => {
-      console.log(mockBridges);
-  }, [])
+    fakeLoading();
+  }, [fakeLoading]);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
-        <Image
-          style={{height: 30}}
-          source={require('../assets/arrow_back_ios.png')}
-        />
-      </TouchableOpacity>
-      <View style={styles.logoContainer}>
-        <Image
-          source={require('../assets/bc_abbreviated.png')}
-          style={styles.logo}
-        />
-        <Text style={styles.label}>List of Bridges</Text>
-      </View>
+      <GoBackArrowButton />
+      <BCWildLogo />
+      <TitleText>Bridge list</TitleText>
       <View style={styles.cardList}>
         <ScrollView>
           {mockBridges.map(bridge => (

@@ -168,7 +168,7 @@ const DashboardScreen = ({route,navigation}) => {
           <Image style={{height:100,width:100, resizeMode:'contain'}} source={require('../assets/gtele.png')} />
           </TouchableOpacity>
           <TouchableOpacity onPress={()=>handleBridgesClick()}>
-              <Text>Bridges</Text>
+              <Text style={{fontWeight: "bold"}}>Bridges</Text>
           </TouchableOpacity>
       </View>
       <View style={{flex:1 ,marginTop:10, flexDirection:'row',alignItems:'center'}}>
