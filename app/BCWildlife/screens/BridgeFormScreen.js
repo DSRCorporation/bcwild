@@ -76,7 +76,7 @@ const BridgeFormScreen = ({route}) => {
     length: '',
     bridgeIfFor: '',
     crossingType: '',
-    waterCurrentlyUnderBridge: '',
+    waterCurrentlyUnderBridge: 'no',
     waterIs: '',
     habitatAroundBridge: '',
     habitatComments: '',
