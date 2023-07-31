@@ -9,7 +9,7 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import { getAccessToken } from '../global';
 import {useCardListStyles} from "../shared/styles/card-list-styles";
 
-const ApproveSignupAccessScreen = (navigation) => {
+const ApproveSignupAccessScreen = ({navigation}) => {
   const cardListStyles = useCardListStyles();
   const styles = StyleSheet.create({
     container: {
@@ -123,13 +123,6 @@ const ApproveSignupAccessScreen = (navigation) => {
       ]
     );
   }
-
-
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
-
 
     async function updateStatus(id, status) {
       const data = {
@@ -288,7 +281,7 @@ const ApproveSignupAccessScreen = (navigation) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={()=>handleGoBack}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
       <Image style={{height:30,width:30,margin:25}} source={require('../assets/arrow_back_ios.png')} />
       </TouchableOpacity>
       <View style={styles.logoContainer}>

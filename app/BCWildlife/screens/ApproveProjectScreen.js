@@ -9,7 +9,7 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import { getAccessToken } from '../global';
 import {useCardListStyles} from "../shared/styles/card-list-styles";
 
-const ApproveProjectScreen = (navigation) => {
+const ApproveProjectScreen = ({navigation}) => {
   const cardListStyles = useCardListStyles();
   const styles = StyleSheet.create({
     container: {
@@ -151,13 +151,6 @@ const ApproveProjectScreen = (navigation) => {
       ]
     );
   }
-
-
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
-
 
     async function updateStatus(id, project_role,status) {
         if (project_role == 'cancel') {
@@ -322,7 +315,7 @@ const ApproveProjectScreen = (navigation) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={()=>handleGoBack}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
       <Image style={{height:30,width:30,margin:25}} source={require('../assets/arrow_back_ios.png')} />
       </TouchableOpacity>
       <View style={styles.logoContainer}>
