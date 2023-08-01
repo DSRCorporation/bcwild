@@ -66,6 +66,11 @@ const DashboardScreen = ({route, navigation}) => {
   const hanldeTelemetryForm = () => {
     navigation.navigate('TelemetryForm');
   };
+  }
+
+  const handleBridgesClick = () => {
+    navigation.navigate('BridgesList');
+  }
 
   const handleTelemetryTriangulation = () => {
     navigation.navigate('TelemetryTriangulation');
