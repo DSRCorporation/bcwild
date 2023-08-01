@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -14,39 +14,22 @@ import {useImmer} from 'use-immer';
 import {InputLabel} from '../shared/components/InputLabel';
 import {BCWildLogo} from '../shared/components/BCWildLogo';
 import {TitleText} from '../shared/components/TitleText';
-
-const batSurveyFormLabels = {
-  batSign: 'Bat sign',
-  locationBatSign: 'Location of bat sign',
-  GuanoAmountInBiggestPile: 'Guano amount in biggest pile',
-  guanoIs: 'Guano is',
-  guanoCollected: 'Guano collected',
-  guanoSampleLabel: 'Guano sample label',
-  roostAssessmentNight: 'Roost assessment - Night',
-  roostAssessmentDay: 'Roost assessment - Day',
-  maternity: 'Maternity',
-  emergenceCountDone: 'Emergence count done',
-  otherTypeOfCount: 'Other (acoutstic, etc), other type of count',
-  nests: 'Nests',
-  nestType: 'Nest type',
-  swallowsFlying: 'Swallows flying',
-  speciesOtherComments: 'Species, other comments',
-  photos: 'Photos',
-  couldThisSiteBeSafelyOrEasilyNetted:
-    'Could this site be safely/easily netted?',
-  wouldRoostingBatsBeReachableWithoutLadder:
-    'Would roosting bats be reachable without a ladder?',
-  comments: 'Comments',
-};
-
-const yesOrNoOptions = [
-  {label: 'Yes', value: 'yes'},
-  {label: 'No', value: 'no'},
-];
+import {yesOrNoOptions} from '../constants/yes-or-no-options';
+import {useBatSurveyFormValidation} from '../shared/hooks/use-bat-survey-form-validation';
+import {batSurveyFormLabels} from '../constants/bat-survey/bat-survey-labels';
+import {transformListDataToCheckboxItems} from '../shared/utils/form-data';
+import {
+  batSignData,
+  batSignLocationData,
+  guanoAmountData,
+  guanoBatSignId,
+  guanoCollectedData,
+  swallowNestTypeData,
+} from '../constants/bat-survey/bat-survey-data';
 
 const BatSurveyFormScreen = () => {
   const [loading, setLoading] = useState(false);
-  const [isChecked, setIsChecked] = useState(true);
+  const {validate} = useBatSurveyFormValidation();
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -89,44 +72,64 @@ const BatSurveyFormScreen = () => {
 
   const [form, setForm] = useImmer({
     // Bat survey results
-    batSign: [
-      {label: 'BatSign1', checked: false},
-      {label: 'BatSign2', checked: false},
-      {label: 'BatSign3', checked: false},
-    ], // checkboxes, multiselect, no selection means None
-    locationBatSign: [
-      {label: 'locationBatSign1', checked: false, what: ''},
-      {label: 'locationBatSign2', checked: false, what: ''},
-      {label: 'locationBatSign3', checked: false, what: ''},
-    ], // checkboxes. If checked, "What" text field appears. Only shows if previous field is not None
-    GuanoAmountInBiggestPile: '', // Only shows if Guano Bat sign is checked
+    batSign: [...transformListDataToCheckboxItems(batSignData)], // checkboxes, multiselect, no selection means None
+    locationBatSign: [...transformListDataToCheckboxItems(batSignLocationData)], // checkboxes. If checked, "What" text field appears. Only shows if previous field is not None
+    guanoAmountInBiggestPile: [
+      ...transformListDataToCheckboxItems(guanoAmountData),
+    ], // Only shows if Guano Bat sign is checked
     guanoIs: '', // Only shows if Guano Bat sign is checked
-    guanoCollected: [
-      {label: 'guanoCollected1', checked: false},
-      {label: 'guanoCollected2', checked: false},
-      {label: 'guanoCollected3', checked: false},
-    ], //checkboxes, multiselect, no selection means None. Only shows if Guano Bat sign is checked.
-    guanoSampleLabel: 'C',
+    guanoCollected: [...transformListDataToCheckboxItems(guanoCollectedData)], //checkboxes, multiselect, no selection means None. Only shows if Guano Bat sign is checked.
+    guanoSampleLabel: '',
     roostAssessmentNight: '',
     roostAssessmentDay: '',
     maternity: '',
     // Bat count detail
-    emergenceCountDone: 'no', // if yes, show the link https://bcbats.ca/get-involved/counting-bats/
+    emergenceCountDone: '', // if yes, show the link https://bcbats.ca/get-involved/counting-bats/
     otherTypeOfCount: '', // separately as checkboxes, multiselect, no selection means None
     // Swallow observations
-    nests: 'no',
-    nestType: [
-      {label: 'nestType1', checked: false},
-      {label: 'nestType2', checked: false},
-      {label: 'nestType3', checked: false},
-    ], // checkboxes, multiselect, no selection means None. Only shows if Nests is Yes
-    swallowsFlying: 'no',
+    nests: '',
+    nestType: [...transformListDataToCheckboxItems(swallowNestTypeData)], // checkboxes, multiselect, no selection means None. Only shows if Nests is Yes
+    swallowsFlying: '',
     speciesOtherComments: '',
     photos: [],
-    couldThisSiteBeSafelyOrEasilyNetted: 'no',
-    wouldRoostingBatsBeReachableWithoutLadder: 'no',
+    couldThisSiteBeSafelyOrEasilyNetted: '',
+    wouldRoostingBatsBeReachableWithoutLadder: '',
     comments: '',
   });
+
+  const isGuanoBatSignSelected = useMemo(() => {
+    const guanoCheckboxItem = form.batSign.find(
+      item => item.value === guanoBatSignId,
+    );
+    if (!guanoCheckboxItem) {
+      return false;
+    }
+    return guanoCheckboxItem.checked;
+  }, [form.batSign]);
+
+  const isAnyBatSignSelected = useMemo(
+    () => form.batSign.some(item => item.checked),
+    [form.batSign],
+  );
+
+  const submit = useCallback(() => {
+    const isValid = validate(form);
+  }, [validate, form]);
+
+  const setDefaultValues = useCallback(() => {
+    setForm(draft => {
+      draft.guanoSampleLabel = 'C';
+      draft.emergenceCountDone = 'no';
+      draft.nests = 'no';
+      draft.swallowsFlying = 'no';
+      draft.couldThisSiteBeSafelyOrEasilyNetted = 'no';
+      draft.wouldRoostingBatsBeReachableWithoutLadder = 'no';
+    });
+  }, [setForm]);
+
+  useEffect(() => {
+    setDefaultValues();
+  }, [setDefaultValues]);
 
   return (
     <ScrollView>
@@ -152,53 +155,81 @@ const BatSurveyFormScreen = () => {
                 />
               ))}
             </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{batSurveyFormLabels.locationBatSign}</InputLabel>
-              {form.locationBatSign.map((option, optionIndex) => (
-                <View key={option.label}>
-                  <BouncyCheckbox
-                    onPress={value => {
-                      setForm(draft => {
-                        draft.locationBatSign[optionIndex].checked = value;
-                      });
-                    }}
-                    isChecked={option.checked}
-                    text={option.label}
-                    textStyle={{textDecorationLine: 'none'}}
-                    style={{marginBottom: 8}}
-                  />
-                  {option.checked && (
-                    <TextInput
-                      value={option.what}
-                      onChangeText={text =>
+            {isAnyBatSignSelected && (
+              <View style={styles.inputContainer}>
+                <InputLabel>{batSurveyFormLabels.locationBatSign}</InputLabel>
+                {form.locationBatSign.map((option, optionIndex) => (
+                  <View key={option.label}>
+                    <BouncyCheckbox
+                      onPress={value => {
                         setForm(draft => {
-                          draft.locationBatSign[optionIndex].what = text;
-                        })
-                      }
-                      placeholder="Enter text"
-                      style={[styles.textInput, {marginBottom: 8}]}
+                          draft.locationBatSign[optionIndex].checked = value;
+                        });
+                      }}
+                      isChecked={option.checked}
+                      text={option.label}
+                      textStyle={{textDecorationLine: 'none'}}
+                      style={{marginBottom: 8}}
                     />
-                  )}
+                    {option.checked && (
+                      <TextInput
+                        value={option.what}
+                        onChangeText={text =>
+                          setForm(draft => {
+                            draft.locationBatSign[optionIndex].what = text;
+                          })
+                        }
+                        placeholder="Enter text"
+                        style={[styles.textInput, {marginBottom: 8}]}
+                      />
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {isGuanoBatSignSelected && (
+              <>
+                <View style={styles.inputContainer}>
+                  <InputLabel>
+                    {batSurveyFormLabels.guanoAmountInBiggestPile}
+                  </InputLabel>
+                  {form.guanoAmountInBiggestPile.map((option, optionIndex) => (
+                    <BouncyCheckbox
+                      key={option.label}
+                      onPress={value => {
+                        setForm(draft => {
+                          draft.guanoAmountInBiggestPile[optionIndex].checked =
+                            value;
+                        });
+                      }}
+                      isChecked={option.checked}
+                      text={option.label}
+                      textStyle={{textDecorationLine: 'none'}}
+                      style={{marginBottom: 8}}
+                    />
+                  ))}
                 </View>
-              ))}
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{batSurveyFormLabels.guanoCollected}</InputLabel>
-              {form.guanoCollected.map((option, optionIndex) => (
-                <BouncyCheckbox
-                  key={option.label}
-                  onPress={value => {
-                    setForm(draft => {
-                      draft.guanoCollected[optionIndex].checked = value;
-                    });
-                  }}
-                  isChecked={option.checked}
-                  text={option.label}
-                  textStyle={{textDecorationLine: 'none'}}
-                  style={{marginBottom: 8}}
-                />
-              ))}
-            </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>{batSurveyFormLabels.guanoCollected}</InputLabel>
+                  {form.guanoCollected.map((option, optionIndex) => (
+                    <BouncyCheckbox
+                      key={option.label}
+                      onPress={value => {
+                        setForm(draft => {
+                          draft.guanoCollected[optionIndex].checked = value;
+                        });
+                      }}
+                      isChecked={option.checked}
+                      text={option.label}
+                      textStyle={{textDecorationLine: 'none'}}
+                      style={{marginBottom: 8}}
+                    />
+                  ))}
+                </View>
+              </>
+            )}
+
             <View style={styles.inputContainer}>
               <InputLabel>{batSurveyFormLabels.guanoSampleLabel}</InputLabel>
               <TextInput
@@ -346,6 +377,7 @@ const BatSurveyFormScreen = () => {
             </View>
           </View>
           <TouchableOpacity
+            onPress={submit}
             style={styles.button}
             accessibilityLabel="create bat survey button"
             testID="createBatSurveyButton">
