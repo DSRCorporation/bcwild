@@ -98,7 +98,11 @@ const BatSurveyFormScreen = () => {
     ], // checkboxes. If checked, "What" text field appears. Only shows if previous field is not None
     GuanoAmountInBiggestPile: '', // Only shows if Guano Bat sign is checked
     guanoIs: '', // Only shows if Guano Bat sign is checked
-    guanoCollected: '', //checkboxes, multiselect, no selection means None. Only shows if Guano Bat sign is checked.
+    guanoCollected: [
+      {label: 'guanoCollected1', checked: false},
+      {label: 'guanoCollected2', checked: false},
+      {label: 'guanoCollected3', checked: false},
+    ], //checkboxes, multiselect, no selection means None. Only shows if Guano Bat sign is checked.
     guanoSampleLabel: 'C',
     roostAssessmentNight: '',
     roostAssessmentDay: '',
@@ -108,7 +112,11 @@ const BatSurveyFormScreen = () => {
     otherTypeOfCount: '', // separately as checkboxes, multiselect, no selection means None
     // Swallow observations
     nests: 'no',
-    nestType: '', // checkboxes, multiselect, no selection means None. Only shows if Nests is Yes
+    nestType: [
+      {label: 'nestType1', checked: false},
+      {label: 'nestType2', checked: false},
+      {label: 'nestType3', checked: false},
+    ], // checkboxes, multiselect, no selection means None. Only shows if Nests is Yes
     swallowsFlying: 'no',
     speciesOtherComments: '',
     photos: [],
@@ -163,10 +171,27 @@ const BatSurveyFormScreen = () => {
                         })
                       }
                       placeholder="Enter text"
-                      style={styles.textInput}
+                      style={[styles.textInput, {marginBottom: 8}]}
                     />
                   )}
                 </View>
+              ))}
+            </View>
+            <View style={styles.inputContainer}>
+              <Text>{batSurveyFormLabels.guanoCollected}</Text>
+              {form.guanoCollected.map((option, optionIndex) => (
+                <BouncyCheckbox
+                  key={option.label}
+                  onPress={value => {
+                    setForm(draft => {
+                      draft.guanoCollected[optionIndex].checked = value;
+                    });
+                  }}
+                  isChecked={option.checked}
+                  text={option.label}
+                  textStyle={{textDecorationLine: 'none'}}
+                  style={{marginBottom: 8}}
+                />
               ))}
             </View>
             <View style={styles.inputContainer}>
@@ -220,6 +245,25 @@ const BatSurveyFormScreen = () => {
                 ))}
               </Picker>
             </View>
+            {form.nests === 'yes' && (
+              <View style={styles.inputContainer}>
+                <Text>{batSurveyFormLabels.nestType}</Text>
+                {form.nestType.map((option, optionIndex) => (
+                  <BouncyCheckbox
+                    key={option.label}
+                    onPress={value => {
+                      setForm(draft => {
+                        draft.batSign[optionIndex].checked = value;
+                      });
+                    }}
+                    isChecked={option.checked}
+                    text={option.label}
+                    textStyle={{textDecorationLine: 'none'}}
+                    style={{marginBottom: 8}}
+                  />
+                ))}
+              </View>
+            )}
             <View style={styles.inputContainer}>
               <Text>{batSurveyFormLabels.swallowsFlying}</Text>
               <Picker
