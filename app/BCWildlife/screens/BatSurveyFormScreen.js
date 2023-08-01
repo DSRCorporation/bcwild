@@ -11,6 +11,9 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {useImmer} from 'use-immer';
+import {InputLabel} from '../shared/components/InputLabel';
+import {BCWildLogo} from '../shared/components/BCWildLogo';
+import {TitleText} from '../shared/components/TitleText';
 
 const batSurveyFormLabels = {
   batSign: 'Bat sign',
@@ -128,10 +131,12 @@ const BatSurveyFormScreen = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
+        <BCWildLogo />
+        <TitleText>Bat survey</TitleText>
         <View>
           <View>
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.batSign}</Text>
+              <InputLabel>{batSurveyFormLabels.batSign}</InputLabel>
               {form.batSign.map((option, optionIndex) => (
                 <BouncyCheckbox
                   key={option.label}
@@ -148,7 +153,7 @@ const BatSurveyFormScreen = () => {
               ))}
             </View>
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.locationBatSign}</Text>
+              <InputLabel>{batSurveyFormLabels.locationBatSign}</InputLabel>
               {form.locationBatSign.map((option, optionIndex) => (
                 <View key={option.label}>
                   <BouncyCheckbox
@@ -178,7 +183,7 @@ const BatSurveyFormScreen = () => {
               ))}
             </View>
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.guanoCollected}</Text>
+              <InputLabel>{batSurveyFormLabels.guanoCollected}</InputLabel>
               {form.guanoCollected.map((option, optionIndex) => (
                 <BouncyCheckbox
                   key={option.label}
@@ -195,7 +200,7 @@ const BatSurveyFormScreen = () => {
               ))}
             </View>
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.guanoSampleLabel}</Text>
+              <InputLabel>{batSurveyFormLabels.guanoSampleLabel}</InputLabel>
               <TextInput
                 value={form.guanoSampleLabel}
                 onChangeText={text =>
@@ -208,7 +213,7 @@ const BatSurveyFormScreen = () => {
               />
             </View>
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.emergenceCountDone}</Text>
+              <InputLabel>{batSurveyFormLabels.emergenceCountDone}</InputLabel>
               <Picker
                 selectedValue={form.emergenceCountDone}
                 onValueChange={value =>
@@ -227,7 +232,7 @@ const BatSurveyFormScreen = () => {
               </Picker>
             </View>
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.nests}</Text>
+              <InputLabel>{batSurveyFormLabels.nests}</InputLabel>
               <Picker
                 selectedValue={form.nests}
                 onValueChange={value =>
@@ -247,7 +252,7 @@ const BatSurveyFormScreen = () => {
             </View>
             {form.nests === 'yes' && (
               <View style={styles.inputContainer}>
-                <Text>{batSurveyFormLabels.nestType}</Text>
+                <InputLabel>{batSurveyFormLabels.nestType}</InputLabel>
                 {form.nestType.map((option, optionIndex) => (
                   <BouncyCheckbox
                     key={option.label}
@@ -265,7 +270,7 @@ const BatSurveyFormScreen = () => {
               </View>
             )}
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.swallowsFlying}</Text>
+              <InputLabel>{batSurveyFormLabels.swallowsFlying}</InputLabel>
               <Picker
                 selectedValue={form.swallowsFlying}
                 onValueChange={value =>
@@ -284,9 +289,9 @@ const BatSurveyFormScreen = () => {
               </Picker>
             </View>
             <View style={styles.inputContainer}>
-              <Text>
+              <InputLabel>
                 {batSurveyFormLabels.couldThisSiteBeSafelyOrEasilyNetted}
-              </Text>
+              </InputLabel>
               <Picker
                 selectedValue={form.couldThisSiteBeSafelyOrEasilyNetted}
                 onValueChange={value =>
@@ -305,9 +310,9 @@ const BatSurveyFormScreen = () => {
               </Picker>
             </View>
             <View style={styles.inputContainer}>
-              <Text>
+              <InputLabel>
                 {batSurveyFormLabels.wouldRoostingBatsBeReachableWithoutLadder}
-              </Text>
+              </InputLabel>
               <Picker
                 selectedValue={form.wouldRoostingBatsBeReachableWithoutLadder}
                 onValueChange={value =>
@@ -326,7 +331,7 @@ const BatSurveyFormScreen = () => {
               </Picker>
             </View>
             <View style={styles.inputContainer}>
-              <Text>{batSurveyFormLabels.comments}</Text>
+              <InputLabel>{batSurveyFormLabels.comments}</InputLabel>
               <TextInput
                 value={form.comments}
                 onChangeText={text =>

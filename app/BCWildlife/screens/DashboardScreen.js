@@ -66,11 +66,10 @@ const DashboardScreen = ({route, navigation}) => {
   const hanldeTelemetryForm = () => {
     navigation.navigate('TelemetryForm');
   };
-  }
 
   const handleBridgesClick = () => {
     navigation.navigate('BridgesList');
-  }
+  };
 
   const handleTelemetryTriangulation = () => {
     navigation.navigate('TelemetryTriangulation');
@@ -198,6 +197,9 @@ const DashboardScreen = ({route, navigation}) => {
 
           <TouchableOpacity onPress={() => handleBatSurvey()}>
             <Text>Bat Survey</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleBridgesClick()}>
+            <Text>Bridges</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => hanldeTelemetryForm()}>
