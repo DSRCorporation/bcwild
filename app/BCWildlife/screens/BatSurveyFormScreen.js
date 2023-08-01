@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -21,6 +22,7 @@ import {transformListDataToCheckboxItems} from '../shared/utils/form-data';
 import {
   batSignData,
   batSignLocationData,
+  countingBatsURL,
   guanoAmountData,
   guanoBatSignId,
   guanoCollectedData,
@@ -110,6 +112,11 @@ const BatSurveyFormScreen = () => {
   const isAnyBatSignSelected = useMemo(
     () => form.batSign.some(item => item.checked),
     [form.batSign],
+  );
+
+  const isEmergencyCountDoneSelected = useMemo(
+    () => form.emergenceCountDone === 'yes',
+    [form.emergenceCountDone],
   );
 
   const submit = useCallback(() => {
@@ -261,6 +268,13 @@ const BatSurveyFormScreen = () => {
                   />
                 ))}
               </Picker>
+              {isEmergencyCountDoneSelected && (
+                <Text
+                  onPress={() => Linking.openURL(countingBatsURL)}
+                  style={{color: '#216de8', paddingVertical: 8}}>
+                  https://bcbats.ca/get-involved/counting-bats/
+                </Text>
+              )}
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>{batSurveyFormLabels.nests}</InputLabel>

@@ -1,5 +1,7 @@
 export const guanoBatSignId = 515;
 
+export const countingBatsURL = 'https://bcbats.ca/get-involved/counting-bats/';
+
 export const batSignData = [
   {
     id: 1,
