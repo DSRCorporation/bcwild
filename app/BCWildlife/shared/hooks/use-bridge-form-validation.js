@@ -1,13 +1,10 @@
 import {useCallback} from 'react';
 import {Alert} from 'react-native';
+import {getFormValidationErrorMessage} from '../utils/get-form-validation-error-message';
 import {bridgeFormLabels} from '../../constants/bridge-form';
 
 const isStringValueInvalid = value => Boolean(!value);
 const isNumberValueInvalid = value => value === '' || value < 0;
-
-const getErrorMessage = prop => {
-  return `${bridgeFormLabels[prop] || prop} is invalid`;
-};
 
 export const useBridgeFormValidation = () => {
   const validate = useCallback(form => {
@@ -42,8 +39,13 @@ export const useBridgeFormValidation = () => {
       }
     });
 
-    if (invalidProperties[0]) {
-      Alert.alert(getErrorMessage(invalidProperties[0]));
+    const firstProp = invalidProperties[0];
+
+    if (firstProp) {
+      const errorMessage = getFormValidationErrorMessage(
+        bridgeFormLabels[firstProp] || firstProp,
+      );
+      Alert.alert(errorMessage);
     }
     return invalidProperties.length === 0;
   }, []);
