@@ -29,6 +29,8 @@ import {
   swallowNestTypeData,
 } from '../constants/bat-survey/bat-survey-data';
 
+const linkColor = '#216de8';
+
 const BatSurveyFormScreen = () => {
   const [loading, setLoading] = useState(false);
   const {validate} = useBatSurveyFormValidation();
@@ -234,22 +236,23 @@ const BatSurveyFormScreen = () => {
                     />
                   ))}
                 </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>
+                    {batSurveyFormLabels.guanoSampleLabel}
+                  </InputLabel>
+                  <TextInput
+                    value={form.guanoSampleLabel}
+                    onChangeText={text =>
+                      setForm(draft => {
+                        draft.guanoSampleLabel = text;
+                      })
+                    }
+                    placeholder="Enter guanoSampleLabel"
+                    style={styles.textInput}
+                  />
+                </View>
               </>
             )}
-
-            <View style={styles.inputContainer}>
-              <InputLabel>{batSurveyFormLabels.guanoSampleLabel}</InputLabel>
-              <TextInput
-                value={form.guanoSampleLabel}
-                onChangeText={text =>
-                  setForm(draft => {
-                    draft.guanoSampleLabel = text;
-                  })
-                }
-                placeholder="Enter guanoSampleLabel"
-                style={styles.textInput}
-              />
-            </View>
             <View style={styles.inputContainer}>
               <InputLabel>{batSurveyFormLabels.emergenceCountDone}</InputLabel>
               <Picker
@@ -271,7 +274,7 @@ const BatSurveyFormScreen = () => {
               {isEmergencyCountDoneSelected && (
                 <Text
                   onPress={() => Linking.openURL(countingBatsURL)}
-                  style={{color: '#216de8', paddingVertical: 8}}>
+                  style={{color: linkColor, paddingVertical: 8}}>
                   https://bcbats.ca/get-involved/counting-bats/
                 </Text>
               )}
