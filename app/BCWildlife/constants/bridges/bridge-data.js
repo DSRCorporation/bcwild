@@ -175,7 +175,7 @@ export const columnsData = [
   },
 ];
 
-export const bridgeForData = [
+export const bridgeIsForData = [
   {
     id: 1,
     value: 'other',
@@ -232,7 +232,7 @@ export const habitatData = [
   },
 ];
 
-export const waterData = [
+export const waterIsData = [
   {
     id: 1,
     value: 'Quiet',
