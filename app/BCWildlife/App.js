@@ -12,6 +12,8 @@ import ApproveSignupAccessScreen from './screens/ApproveSignupAccessScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import ApproveProjectScreen from './screens/ApproveProjectScreen';
 import TelemetryTriangulationScreen from './screens/TelemetryTriangulation';
+import BridgesListScreen from './screens/BridgesListScreen';
+import BridgeFormScreen from './screens/BridgeFormScreen';
 import { useState,useEffect } from 'react';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { setAccessToken } from './global';
@@ -63,7 +65,7 @@ function App() {
         theme={MyTheme}
         initialRouteName='Login'
     >
-      
+
        <Stack.Navigator screenOptions={{headerShown: false,}}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
@@ -78,7 +80,9 @@ function App() {
        <Stack.Screen name='CameraTrapData' component={CameraTrapDataScreen} />
         <Stack.Screen name='TelemetryTriangulation' component={TelemetryTriangulationScreen} />
         <Stack.Screen name='TelemetryForm' component={TelemetryFormScreen} />
-        
+        <Stack.Screen name='BridgesList' component={BridgesListScreen} />
+        <Stack.Screen name='BridgeForm' component={BridgeFormScreen} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
