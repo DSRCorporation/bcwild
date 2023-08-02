@@ -76,7 +76,10 @@ const BridgeFormScreen = ({route}) => {
   const [form, setForm] = useImmer({
     region: '',
     bridgeName: '',
-    coordinates: '',
+    coordinates: {
+      long: '',
+      lat: '',
+    },
     roadOrHighway: '',
     motBridgeId: '',
     bridgeType: '',
@@ -163,18 +166,35 @@ const BridgeFormScreen = ({route}) => {
               />
             </View>
             <View style={styles.inputContainer}>
-              <InputLabel>Coordinates</InputLabel>
-              <TextInput
-                keyboardType="numeric"
-                placeholder="Enter coordinates"
-                onChangeText={value =>
-                  setForm(draft => {
-                    draft.coordinates = value;
-                  })
-                }
-                value={form.coordinates}
-                style={styles.textInput}
-              />
+              <InputLabel>Coordinates long/lat</InputLabel>
+              <View style={{flexDirection: 'row', gap: 8}}>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Enter longitude"
+                    onChangeText={value =>
+                      setForm(draft => {
+                        draft.coordinates.long = value;
+                      })
+                    }
+                    value={form.coordinates.long}
+                    style={styles.textInput}
+                  />
+                </View>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Enter latitude"
+                    onChangeText={value =>
+                      setForm(draft => {
+                        draft.coordinates.lat = value;
+                      })
+                    }
+                    value={form.coordinates.lat}
+                    style={[styles.textInput, {flex: 2}]}
+                  />
+                </View>
+              </View>
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>Road/Highway</InputLabel>
