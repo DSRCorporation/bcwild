@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 import {Alert} from 'react-native';
 import {getFormValidationErrorMessage} from '../utils/get-form-validation-error-message';
-import {bridgeFormLabels} from '../../constants/bridge-form';
+import {bridgeFormLabels} from '../../constants/bridges/bridge-labels';
 
 const isStringValueInvalid = value => Boolean(!value);
 const isNumberValueInvalid = value => value === '' || value < 0;
