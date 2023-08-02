@@ -123,8 +123,10 @@ const BridgeFormScreen = ({route}) => {
   }, [setForm]);
 
   useEffect(() => {
-    setDefaultValues();
-  }, [setDefaultValues]);
+    if (!currentBridgeId) {
+      setDefaultValues();
+    }
+  }, [currentBridgeId, setDefaultValues]);
 
   return (
     <ScrollView>
