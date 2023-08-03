@@ -8,16 +8,29 @@ import {
 } from 'react-native';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
-import {useMockBridges} from '../mocks/mock-bridges';
 import {Picker} from '@react-native-picker/picker';
 import {InputLabel} from '../shared/components/InputLabel';
 import {useBridgeFormValidation} from '../shared/hooks/use-bridge-form-validation';
 import {BCWildLogo} from '../shared/components/BCWildLogo';
 import {TitleText} from '../shared/components/TitleText';
+import {
+  abutmentData,
+  beamsData,
+  bridgeIsForData,
+  bridgeTypeData,
+  columnsData,
+  crossingTypeData,
+  habitatData,
+  regionData,
+  spanMaterialData,
+  underdeckData,
+  waterIsData,
+} from '../constants/bridges/bridge-data';
+import {useImmer} from 'use-immer';
+import {yesOrNoOptions} from '../constants/yes-or-no-options';
 
 const BridgeFormScreen = ({route}) => {
   const currentBridgeId = (route.params && route.params.bridgeId) || null;
-  const {getMockBridgeById} = useMockBridges();
   const {validate} = useBridgeFormValidation();
   const [loading, setLoading] = useState(false);
   const styles = StyleSheet.create({
@@ -60,10 +73,13 @@ const BridgeFormScreen = ({route}) => {
     },
   });
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useImmer({
     region: '',
     bridgeName: '',
-    coordinates: '',
+    coordinates: {
+      long: '',
+      lat: '',
+    },
     roadOrHighway: '',
     motBridgeId: '',
     bridgeType: '',
@@ -82,35 +98,6 @@ const BridgeFormScreen = ({route}) => {
     habitatComments: '',
   });
 
-  const fillForm = useCallback(() => {
-    const currentBridge = getMockBridgeById(currentBridgeId);
-    if (!currentBridge) {
-      return;
-    }
-    setForm({
-      region: currentBridge.region,
-      bridgeName: currentBridge.bridgeName,
-      coordinates: currentBridge.coordinates,
-      roadOrHighway: currentBridge.roadOrHighway,
-      motBridgeId: currentBridge.motBridgeId,
-      bridgeType: currentBridge.bridgeName,
-      spanMaterial: currentBridge.spanMaterial,
-      abutmentOrBackWall: currentBridge.abutmentOrBackWall,
-      underdeck: currentBridge.underdeck,
-      beams: currentBridge.beams,
-      columns: currentBridge.columns,
-      heightFromBeamsOrDeckToSurfaceBelow:
-        currentBridge.heightFromBeamsOrDeckToSurfaceBelow,
-      length: currentBridge.length,
-      bridgeIfFor: currentBridge.bridgeName,
-      crossingType: currentBridge.crossingType,
-      waterCurrentlyUnderBridge: currentBridge.waterCurrentlyUnderBridge,
-      waterIs: currentBridge.waterIs,
-      habitatAroundBridge: currentBridge.habitatAroundBridge,
-      habitatComments: currentBridge.habitatComments,
-    });
-  }, [getMockBridgeById, currentBridgeId]);
-
   const submit = useCallback(() => {
     const isValid = validate(form);
   }, [validate, form]);
@@ -120,9 +107,26 @@ const BridgeFormScreen = ({route}) => {
     [currentBridgeId],
   );
 
+  const setDefaultValues = useCallback(() => {
+    setForm(draft => {
+      draft.region = regionData[0].id;
+      draft.bridgeType = bridgeTypeData[0].id;
+      draft.spanMaterial = spanMaterialData[0].id;
+      draft.abutmentOrBackWall = abutmentData[0].id;
+      draft.beams = beamsData[2].id;
+      draft.underdeck = underdeckData[0].id;
+      draft.columns = columnsData[0].id;
+      draft.bridgeIfFor = bridgeIsForData[1].id;
+      draft.crossingType = crossingTypeData[1].id;
+      draft.habitatAroundBridge = habitatData[0].id;
+    });
+  }, [setForm]);
+
   useEffect(() => {
-    fillForm();
-  }, [fillForm]);
+    if (!currentBridgeId) {
+      setDefaultValues();
+    }
+  }, [currentBridgeId, setDefaultValues]);
 
   return (
     <ScrollView>
@@ -136,41 +140,72 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.region}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, region: value}))
+                  setForm(draft => {
+                    draft.region = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="N/A" value="N/A" />
+                {regionData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>Bridge name</InputLabel>
               <TextInput
                 value={form.bridgeName}
-                onChangeText={text =>
-                  setForm(prev => ({...prev, bridgeName: text}))
+                onChangeText={value =>
+                  setForm(draft => {
+                    draft.bridgeName = value;
+                  })
                 }
                 placeholder="Enter Bridge name"
                 style={styles.textInput}
               />
             </View>
             <View style={styles.inputContainer}>
-              <InputLabel>Coordinates</InputLabel>
-              <TextInput
-                keyboardType="numeric"
-                placeholder="Enter coordinates"
-                onChangeText={value =>
-                  setForm(prev => ({...prev, coordinates: value}))
-                }
-                value={form.coordinates}
-                style={styles.textInput}
-              />
+              <InputLabel>Coordinates long/lat</InputLabel>
+              <View style={{flexDirection: 'row', gap: 8}}>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Enter longitude"
+                    onChangeText={value =>
+                      setForm(draft => {
+                        draft.coordinates.long = value;
+                      })
+                    }
+                    value={form.coordinates.long}
+                    style={styles.textInput}
+                  />
+                </View>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Enter latitude"
+                    onChangeText={value =>
+                      setForm(draft => {
+                        draft.coordinates.lat = value;
+                      })
+                    }
+                    value={form.coordinates.lat}
+                    style={[styles.textInput, {flex: 2}]}
+                  />
+                </View>
+              </View>
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>Road/Highway</InputLabel>
               <TextInput
                 value={form.roadOrHighway}
-                onChangeText={text =>
-                  setForm(prev => ({...prev, roadOrHighway: text}))
+                onChangeText={value =>
+                  setForm(draft => {
+                    draft.roadOrHighway = value;
+                  })
                 }
                 placeholder="Enter Road/Highway"
                 style={styles.textInput}
@@ -180,8 +215,10 @@ const BridgeFormScreen = ({route}) => {
               <InputLabel>MOT Bridge ID</InputLabel>
               <TextInput
                 value={form.motBridgeId}
-                onChangeText={text =>
-                  setForm(prev => ({...prev, motBridgeId: text}))
+                onChangeText={value =>
+                  setForm(draft => {
+                    draft.motBridgeId = value;
+                  })
                 }
                 placeholder="Enter MOT Bridge ID"
                 style={styles.textInput}
@@ -194,11 +231,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.bridgeType}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, bridgeType: value}))
+                  setForm(draft => {
+                    draft.bridgeType = value;
+                  })
                 }>
-                <Picker.Item label="Select" value="Unknown" />
-                <Picker.Item label="Type1" value="type1" />
-                <Picker.Item label="Type2" value="type2" />
+                <Picker.Item label="Select" value={null} />
+                {bridgeTypeData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -206,10 +250,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.spanMaterial}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, spanMaterial: value}))
+                  setForm(draft => {
+                    draft.spanMaterial = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Concrete cast-in-place " value="concrete" />
+                {spanMaterialData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -217,10 +269,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.abutmentOrBackWall}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, abutmentOrBackWall: value}))
+                  setForm(draft => {
+                    draft.abutmentOrBackWall = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="N/A" value="N/A" />
+                {abutmentData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -228,10 +288,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.underdeck}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, underdeck: value}))
+                  setForm(draft => {
+                    draft.underdeck = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Concrete" value="Concrete" />
+                {underdeckData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -239,10 +307,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.beams}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, beams: value}))
+                  setForm(draft => {
+                    draft.beams = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="N/A" value="N/A" />
+                {beamsData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -250,10 +326,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.columns}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, columns: value}))
+                  setForm(draft => {
+                    draft.columns = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="N/A" value="N/A" />
+                {columnsData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -261,10 +345,9 @@ const BridgeFormScreen = ({route}) => {
               <TextInput
                 value={form.heightFromBeamsOrDeckToSurfaceBelow}
                 onChangeText={text =>
-                  setForm(prev => ({
-                    ...prev,
-                    heightFromBeamsOrDeckToSurfaceBelow: text,
-                  }))
+                  setForm(draft => {
+                    draft.heightFromBeamsOrDeckToSurfaceBelow = text;
+                  })
                 }
                 keyboardType="numeric"
                 placeholder="Enter height/deck"
@@ -276,10 +359,9 @@ const BridgeFormScreen = ({route}) => {
               <TextInput
                 value={form.length}
                 onChangeText={text =>
-                  setForm(prev => ({
-                    ...prev,
-                    length: text,
-                  }))
+                  setForm(draft => {
+                    draft.length = text;
+                  })
                 }
                 keyboardType="numeric"
                 placeholder="Enter length"
@@ -291,10 +373,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.bridgeIfFor}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, bridgeIfFor: value}))
+                  setForm(draft => {
+                    draft.bridgeIfFor = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Vehicle" value="Vehicle" />
+                {bridgeIsForData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -302,10 +392,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.crossingType}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, crossingType: value}))
+                  setForm(draft => {
+                    draft.crossingType = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Road" value="Road" />
+                {crossingTypeData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -313,11 +411,18 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.waterCurrentlyUnderBridge}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, waterCurrentlyUnderBridge: value}))
+                  setForm(draft => {
+                    draft.waterCurrentlyUnderBridge = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Yes" value="yes" />
-                <Picker.Item label="No" value="no" />
+                {yesOrNoOptions.map(option => (
+                  <Picker.Item
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                  />
+                ))}
               </Picker>
             </View>
             {form.waterCurrentlyUnderBridge === 'yes' && (
@@ -326,11 +431,18 @@ const BridgeFormScreen = ({route}) => {
                 <Picker
                   selectedValue={form.waterIs}
                   onValueChange={value =>
-                    setForm(prev => ({...prev, waterIs: value}))
+                    setForm(draft => {
+                      draft.waterIs = value;
+                    })
                   }>
                   <Picker.Item label="Select" value={null} />
-                  <Picker.Item label="Quit" value="quit" />
-                  <Picker.Item label="Noisy" value="noisy" />
+                  {waterIsData.map(item => (
+                    <Picker.Item
+                      key={item.id}
+                      label={item.value}
+                      value={item.id}
+                    />
+                  ))}
                 </Picker>
               </View>
             )}
@@ -339,21 +451,28 @@ const BridgeFormScreen = ({route}) => {
               <Picker
                 selectedValue={form.habitatAroundBridge}
                 onValueChange={value =>
-                  setForm(prev => ({...prev, habitatAroundBridge: value}))
+                  setForm(draft => {
+                    draft.habitatAroundBridge = value;
+                  })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Forest" value="Forest" />
+                {habitatData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>Habitat Comments</InputLabel>
               <TextInput
                 value={form.habitatComments}
-                onChangeText={text =>
-                  setForm(prev => ({
-                    ...prev,
-                    habitatComments: text,
-                  }))
+                onChangeText={value =>
+                  setForm(draft => {
+                    draft.habitatComments = value;
+                  })
                 }
                 multiline={true}
                 placeholder="Enter Habitat Comments"
