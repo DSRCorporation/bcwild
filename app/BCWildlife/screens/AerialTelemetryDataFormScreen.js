@@ -26,6 +26,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 8,
   },
+  textInput: {
+    backgroundColor: '#EFEFEF',
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 5,
+  },
 });
 
 const ArielTelemetryDataFormScreen = () => {

@@ -13,22 +13,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  listItemContainer: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
 });
 
-export const GalleryPicker = ({images = [], onChange}) => {
-  const [attachedImages, setAttachedImages] = useState(images);
+export const GalleryPicker = ({onChange}) => {
+  const [attachedImages, setAttachedImages] = useState([]);
 
   const openGallery = useCallback(async () => {
     const result = await launchImageLibrary({});
     if (!result.assets) {
       return;
     }
-    setAttachedImages(prev => {
-      const newList = prev.concat(result.assets);
-      onChange && onChange(newList);
-      return newList;
-    });
-  }, [onChange]);
+    const newList = attachedImages.concat(result.assets);
+
+    setAttachedImages(newList);
+    onChange && onChange(newList);
+  }, [attachedImages, onChange]);
 
   return (
     <View>
@@ -42,18 +47,12 @@ export const GalleryPicker = ({images = [], onChange}) => {
         <Text>No attached photos</Text>
       ) : (
         attachedImages.map((image, index) => (
-          <View
-            key={image.uri}
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              marginBottom: 8,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <Text numberOfLines={1}>
-              {index + 1}. {image.fileName}
-            </Text>
+          <View key={image.uri} style={styles.listItemContainer}>
+            <View style={{flex: 1}}>
+              <Text numberOfLines={1}>
+                {index + 1}. {image.fileName}
+              </Text>
+            </View>
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() =>
