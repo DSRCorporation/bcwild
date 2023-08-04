@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {View, Text, TextInput, StyleSheet, Linking} from 'react-native';
+import {View, Text, TextInput, Linking} from 'react-native';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
@@ -23,38 +23,15 @@ import {
 } from '../constants/bat-survey/bat-survey-data';
 import {GalleryPicker} from '../shared/components/GalleryPicker';
 import {BaseButton} from '../shared/components/BaseButton';
+import {useFormScreenStyles} from '../shared/styles/use-form-screen-styles';
 
 const linkColor = '#216de8';
 
 const BatSurveyFormScreen = () => {
+  const styles = useFormScreenStyles();
   const [loading, setLoading] = useState(false);
   const [attachedImages, setAttachedImages] = useState([]);
   const {validate} = useBatSurveyFormValidation();
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingHorizontal: 25,
-    },
-    logoContainer: {
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    logo: {
-      width: 150,
-      height: 150,
-      resizeMode: 'contain',
-    },
-    textInput: {
-      backgroundColor: '#EFEFEF',
-      padding: 10,
-      borderRadius: 10,
-      marginTop: 5,
-    },
-    inputContainer: {
-      marginBottom: 8,
-    },
-  });
 
   const [form, setForm] = useImmer({
     // Bat survey results

@@ -2,30 +2,15 @@ import {BCWildLogo} from '../../shared/components/BCWildLogo';
 import {TitleText} from '../../shared/components/TitleText';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {InputLabel} from '../../shared/components/InputLabel';
-import {View, ScrollView, StyleSheet, TextInput} from 'react-native';
+import {View, ScrollView, TextInput} from 'react-native';
 import {useImmer} from 'use-immer';
 import {BaseButton} from '../../shared/components/BaseButton';
 import {useAnimals} from './use-animals';
 import LoadingOverlay from '../../utility/LoadingOverlay';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 25,
-  },
-  textInput: {
-    backgroundColor: '#EFEFEF',
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 5,
-  },
-  inputContainer: {
-    marginBottom: 8,
-  },
-});
+import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
 
 const AnimalFormScreen = ({route}) => {
+  const styles = useFormScreenStyles();
   const currentAnimalId = (route.params && route.params.animalId) || null;
   const {getAnimalById, loading} = useAnimals();
   const currentAnimal = useMemo(

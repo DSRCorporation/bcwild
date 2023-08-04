@@ -2,39 +2,17 @@ import {BCWildLogo} from '../shared/components/BCWildLogo';
 import {TitleText} from '../shared/components/TitleText';
 import React from 'react';
 import {InputLabel} from '../shared/components/InputLabel';
-import {
-  View,
-  ScrollView,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import {View, ScrollView, Text, TextInput} from 'react-native';
 import {DatePicker} from '../shared/components/DatePicker';
 import {useImmer} from 'use-immer';
 import {useAnimals} from './Animals/use-animals';
 import {Picker} from '@react-native-picker/picker';
 import {GalleryPicker} from '../shared/components/GalleryPicker';
 import {BaseButton} from '../shared/components/BaseButton';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 25,
-  },
-  inputContainer: {
-    marginBottom: 8,
-  },
-  textInput: {
-    backgroundColor: '#EFEFEF',
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 5,
-  },
-});
+import {useFormScreenStyles} from '../shared/styles/use-form-screen-styles';
 
 const ArielTelemetryDataFormScreen = () => {
+  const styles = useFormScreenStyles();
   const [form, setForm] = useImmer({
     date: new Date(),
     observer: '',
