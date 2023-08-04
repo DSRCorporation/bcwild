@@ -39,15 +39,6 @@ const BridgeFormScreen = ({route}) => {
       backgroundColor: '#fff',
       paddingHorizontal: 25,
     },
-    logoContainer: {
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    logo: {
-      width: 150,
-      height: 150,
-      resizeMode: 'contain',
-    },
     textInput: {
       backgroundColor: '#EFEFEF',
       padding: 10,

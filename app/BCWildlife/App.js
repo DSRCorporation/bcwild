@@ -1,4 +1,5 @@
 import React from 'react';
+import EncryptedStorage from 'react-native-encrypted-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import 'react-native-gesture-handler';
@@ -15,13 +16,15 @@ import TelemetryTriangulationScreen from './screens/TelemetryTriangulation';
 import {useEffect} from 'react';
 import BridgesListScreen from './screens/BridgesListScreen';
 import BridgeFormScreen from './screens/BridgeFormScreen';
-import EncryptedStorage from 'react-native-encrypted-storage';
 import {setAccessToken} from './global';
 import {setRefreshToken} from './global';
 import CameraTrapDataScreen from './screens/CameraTrapDataScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import TelemetryFormScreen from './screens/TelemetryFormScreen';
 import BatSurveyFormScreen from './screens/BatSurveyFormScreen';
+import AnimalFormScreen from './screens/Animals/AnimalFormScreen';
+import AnimalListScreen from './screens/Animals/AnimalListScreen';
+import AerialTelemetryDataFormScreen from './screens/AerialTelemetryDataFormScreen';
 
 const Stack = createStackNavigator();
 
@@ -83,9 +86,15 @@ function App() {
           component={TelemetryTriangulationScreen}
         />
         <Stack.Screen name="TelemetryForm" component={TelemetryFormScreen} />
-        <Stack.Screen name='BridgesList' component={BridgesListScreen} />
-        <Stack.Screen name='BridgeForm' component={BridgeFormScreen} />
+        <Stack.Screen name="BridgesList" component={BridgesListScreen} />
+        <Stack.Screen name="BridgeForm" component={BridgeFormScreen} />
         <Stack.Screen name="BatSurveyForm" component={BatSurveyFormScreen} />
+        <Stack.Screen name="AnimalList" component={AnimalListScreen} />
+        <Stack.Screen name="AnimalForm" component={AnimalFormScreen} />
+        <Stack.Screen
+          name="AerialTelemetryDataForm"
+          component={AerialTelemetryDataFormScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -12,8 +12,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export const DatePicker = ({containerStyle, textStyle, onChange}) => {
-  const [date, setDate] = useState(new Date());
+export const DatePicker = ({value, containerStyle, textStyle, onChange}) => {
+  const [date, setDate] = useState(value);
   const [showPicker, setShowPicker] = useState(false);
 
   const handleDateChange = (event, newDate) => {

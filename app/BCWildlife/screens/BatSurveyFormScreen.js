@@ -1,12 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Linking,
-} from 'react-native';
+import {View, Text, TextInput, StyleSheet, Linking} from 'react-native';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
@@ -28,11 +21,14 @@ import {
   guanoCollectedData,
   swallowNestTypeData,
 } from '../constants/bat-survey/bat-survey-data';
+import {GalleryPicker} from '../shared/components/GalleryPicker';
+import {BaseButton} from '../shared/components/BaseButton';
 
 const linkColor = '#216de8';
 
 const BatSurveyFormScreen = () => {
   const [loading, setLoading] = useState(false);
+  const [attachedImages, setAttachedImages] = useState([]);
   const {validate} = useBatSurveyFormValidation();
   const styles = StyleSheet.create({
     container: {
@@ -57,20 +53,6 @@ const BatSurveyFormScreen = () => {
     },
     inputContainer: {
       marginBottom: 8,
-    },
-    button: {
-      backgroundColor: '#234075',
-      borderRadius: 10,
-      marginTop: 20,
-      marginBottom: 20,
-      padding: 10,
-      justifyContent: 'center',
-    },
-    buttonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 18,
-      textAlign: 'center',
     },
   });
 
@@ -393,13 +375,19 @@ const BatSurveyFormScreen = () => {
               />
             </View>
           </View>
-          <TouchableOpacity
+          <View style={styles.inputContainer}>
+            <InputLabel>{batSurveyFormLabels.photos}</InputLabel>
+            <GalleryPicker
+              onChange={setAttachedImages}
+              images={attachedImages}
+            />
+          </View>
+          <BaseButton
             onPress={submit}
-            style={styles.button}
             accessibilityLabel="create bat survey button"
             testID="createBatSurveyButton">
-            <Text style={styles.buttonText}>Create</Text>
-          </TouchableOpacity>
+            Create
+          </BaseButton>
         </View>
       </View>
       <LoadingOverlay loading={loading} />
