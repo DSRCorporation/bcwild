@@ -1,8 +1,11 @@
 import {useCallback} from 'react';
-import {isStringValueInvalid} from '../../shared/utils/form-validation';
 import {getFormValidationErrorMessage} from '../../shared/utils/get-form-validation-error-message';
 import {Alert} from 'react-native';
 import {batSurveyFormLabels} from '../../constants/bat-survey/bat-survey-labels';
+import {
+  isCheckboxesValueInvalid,
+  isStringValueInvalid,
+} from '../../shared/utils/form-validation';
 
 export const useBatSurveyFormValidation = () => {
   const validate = useCallback(
@@ -23,11 +26,11 @@ export const useBatSurveyFormValidation = () => {
             if (!isNestsSelected) {
               break;
             }
-            return form[name].every(option => !option.checked);
+            return isCheckboxesValueInvalid(form[name]);
           case 'batSign':
           case 'locationBatSign':
           case 'otherTypeOfCount':
-            return form[name].every(option => !option.checked);
+            return isCheckboxesValueInvalid(form[name]);
           case 'guanoAmountInBiggestPile':
           case 'guanoSampleLabel':
           case 'guanoDistribution':
@@ -39,7 +42,7 @@ export const useBatSurveyFormValidation = () => {
             if (!isGuanoBatSignSelected) {
               break;
             }
-            return form[name].every(option => !option.checked);
+            return isCheckboxesValueInvalid(form[name]);
         }
       });
 
