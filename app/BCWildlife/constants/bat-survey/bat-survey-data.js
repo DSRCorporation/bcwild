@@ -102,6 +102,47 @@ export const guanoCollectedData = [
   },
 ];
 
+export const guanoDistributionData = [
+  {
+    id: 1,
+    value: 'Dispersed (typical of night roosting)',
+  },
+  {
+    id: 2,
+    value: 'Concentrated below crevices (typical of day roosting)',
+  },
+];
+
+export const assessmentData = [
+  {
+    id: 1,
+    value: 'Likely',
+  },
+  {
+    id: 2,
+    value: 'Unlikely',
+  },
+  {
+    id: 3,
+    value: 'Unknown',
+  },
+];
+
+export const recordingData = [
+  {
+    id: 1,
+    value: 'Acoustic recording',
+  },
+  {
+    id: 2,
+    value: 'Infrared camera recording',
+  },
+  {
+    id: 4,
+    value: 'Video recording',
+  },
+];
+
 export const swallowNestTypeData = [
   {
     id: 1,

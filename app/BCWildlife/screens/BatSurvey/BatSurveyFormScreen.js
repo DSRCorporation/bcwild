@@ -1,29 +1,36 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View, Text, TextInput, Linking} from 'react-native';
-import LoadingOverlay from '../utility/LoadingOverlay';
+import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {useImmer} from 'use-immer';
-import {InputLabel} from '../shared/components/InputLabel';
-import {BCWildLogo} from '../shared/components/BCWildLogo';
-import {TitleText} from '../shared/components/TitleText';
-import {yesOrNoOptions} from '../constants/yes-or-no-options';
-import {useBatSurveyFormValidation} from '../shared/hooks/use-bat-survey-form-validation';
-import {batSurveyFormLabels} from '../constants/bat-survey/bat-survey-labels';
-import {transformListDataToCheckboxItems} from '../shared/utils/form-data';
+import {InputLabel} from '../../shared/components/InputLabel';
+import {BCWildLogo} from '../../shared/components/BCWildLogo';
+import {TitleText} from '../../shared/components/TitleText';
 import {
+  noValue,
+  yesOrNoOptions,
+  yesValue,
+} from '../../constants/yes-or-no-options';
+import {useBatSurveyFormValidation} from './use-bat-survey-form-validation';
+import {batSurveyFormLabels} from '../../constants/bat-survey/bat-survey-labels';
+import {transformListDataToCheckboxItems} from '../../shared/utils/form-data';
+import {
+  assessmentData,
   batSignData,
   batSignLocationData,
   countingBatsURL,
   guanoAmountData,
   guanoBatSignId,
   guanoCollectedData,
+  guanoDistributionData,
+  recordingData,
   swallowNestTypeData,
-} from '../constants/bat-survey/bat-survey-data';
-import {GalleryPicker} from '../shared/components/GalleryPicker';
-import {BaseButton} from '../shared/components/BaseButton';
-import {useFormScreenStyles} from '../shared/styles/use-form-screen-styles';
+} from '../../constants/bat-survey/bat-survey-data';
+import {GalleryPicker} from '../../shared/components/GalleryPicker';
+import {BaseButton} from '../../shared/components/BaseButton';
+import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
 
 const linkColor = '#216de8';
 
@@ -31,16 +38,12 @@ const BatSurveyFormScreen = () => {
   const styles = useFormScreenStyles();
   const [loading, setLoading] = useState(false);
   const [attachedImages, setAttachedImages] = useState([]);
-  const {validate} = useBatSurveyFormValidation();
 
   const [form, setForm] = useImmer({
-    // Bat survey results
     batSign: [...transformListDataToCheckboxItems(batSignData)], // checkboxes, multiselect, no selection means None
     locationBatSign: [...transformListDataToCheckboxItems(batSignLocationData)], // checkboxes. If checked, "What" text field appears. Only shows if previous field is not None
-    guanoAmountInBiggestPile: [
-      ...transformListDataToCheckboxItems(guanoAmountData),
-    ], // Only shows if Guano Bat sign is checked
-    guanoIs: '', // Only shows if Guano Bat sign is checked
+    guanoAmountInBiggestPile: '', // Only shows if Guano Bat sign is checked
+    guanoDistribution: '', // Only shows if Guano Bat sign is checked
     guanoCollected: [...transformListDataToCheckboxItems(guanoCollectedData)], //checkboxes, multiselect, no selection means None. Only shows if Guano Bat sign is checked.
     guanoSampleLabel: '',
     roostAssessmentNight: '',
@@ -48,7 +51,7 @@ const BatSurveyFormScreen = () => {
     maternity: '',
     // Bat count detail
     emergenceCountDone: '', // if yes, show the link https://bcbats.ca/get-involved/counting-bats/
-    otherTypeOfCount: '', // separately as checkboxes, multiselect, no selection means None
+    otherTypeOfCount: [...transformListDataToCheckboxItems(recordingData)], // separately as checkboxes, multiselect, no selection means None
     // Swallow observations
     nests: '',
     nestType: [...transformListDataToCheckboxItems(swallowNestTypeData)], // checkboxes, multiselect, no selection means None. Only shows if Nests is Yes
@@ -76,22 +79,29 @@ const BatSurveyFormScreen = () => {
   );
 
   const isEmergencyCountDoneSelected = useMemo(
-    () => form.emergenceCountDone === 'yes',
+    () => form.emergenceCountDone === yesValue,
     [form.emergenceCountDone],
   );
 
+  const isNestsSelected = useMemo(() => form.nests === yesValue, [form.nests]);
+
+  const {validate} = useBatSurveyFormValidation(isGuanoBatSignSelected);
+
   const submit = useCallback(() => {
-    const isValid = validate(form);
-  }, [validate, form]);
+    const isValid = validate(form, {isGuanoBatSignSelected, isNestsSelected});
+  }, [validate, form, isGuanoBatSignSelected, isNestsSelected]);
 
   const setDefaultValues = useCallback(() => {
     setForm(draft => {
       draft.guanoSampleLabel = 'C';
-      draft.emergenceCountDone = 'no';
-      draft.nests = 'no';
-      draft.swallowsFlying = 'no';
-      draft.couldThisSiteBeSafelyOrEasilyNetted = 'no';
-      draft.wouldRoostingBatsBeReachableWithoutLadder = 'no';
+      draft.emergenceCountDone = noValue;
+      draft.nests = noValue;
+      draft.swallowsFlying = noValue;
+      draft.couldThisSiteBeSafelyOrEasilyNetted = noValue;
+      draft.wouldRoostingBatsBeReachableWithoutLadder = noValue;
+      draft.roostAssessmentDay = 3;
+      draft.roostAssessmentNight = 3;
+      draft.maternity = 3;
     });
   }, [setForm]);
 
@@ -162,21 +172,43 @@ const BatSurveyFormScreen = () => {
                   <InputLabel>
                     {batSurveyFormLabels.guanoAmountInBiggestPile}
                   </InputLabel>
-                  {form.guanoAmountInBiggestPile.map((option, optionIndex) => (
-                    <BouncyCheckbox
-                      key={option.label}
-                      onPress={value => {
-                        setForm(draft => {
-                          draft.guanoAmountInBiggestPile[optionIndex].checked =
-                            value;
-                        });
-                      }}
-                      isChecked={option.checked}
-                      text={option.label}
-                      textStyle={{textDecorationLine: 'none'}}
-                      style={{marginBottom: 8}}
-                    />
-                  ))}
+                  <Picker
+                    selectedValue={form.guanoAmountInBiggestPile}
+                    onValueChange={value =>
+                      setForm(draft => {
+                        draft.guanoAmountInBiggestPile = value;
+                      })
+                    }>
+                    <Picker.Item label="Select" value={null} />
+                    {guanoAmountData.map(item => (
+                      <Picker.Item
+                        key={item.id}
+                        label={item.value}
+                        value={item.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>
+                    {batSurveyFormLabels.guanoDistribution}
+                  </InputLabel>
+                  <Picker
+                    selectedValue={form.guanoDistribution}
+                    onValueChange={value =>
+                      setForm(draft => {
+                        draft.guanoDistribution = value;
+                      })
+                    }>
+                    <Picker.Item label="Select" value={null} />
+                    {guanoDistributionData.map(item => (
+                      <Picker.Item
+                        key={item.id}
+                        label={item.value}
+                        value={item.id}
+                      />
+                    ))}
+                  </Picker>
                 </View>
                 <View style={styles.inputContainer}>
                   <InputLabel>{batSurveyFormLabels.guanoCollected}</InputLabel>
@@ -213,6 +245,65 @@ const BatSurveyFormScreen = () => {
               </>
             )}
             <View style={styles.inputContainer}>
+              <InputLabel>
+                {batSurveyFormLabels.roostAssessmentNight}
+              </InputLabel>
+              <Picker
+                selectedValue={form.roostAssessmentNight}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.roostAssessmentNight = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {assessmentData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.roostAssessmentDay}</InputLabel>
+              <Picker
+                selectedValue={form.roostAssessmentDay}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.roostAssessmentDay = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {assessmentData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.maternity}</InputLabel>
+              <Picker
+                selectedValue={form.maternity}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.maternity = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {assessmentData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
               <InputLabel>{batSurveyFormLabels.emergenceCountDone}</InputLabel>
               <Picker
                 selectedValue={form.emergenceCountDone}
@@ -239,6 +330,23 @@ const BatSurveyFormScreen = () => {
               )}
             </View>
             <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.otherTypeOfCount}</InputLabel>
+              {form.otherTypeOfCount.map((option, optionIndex) => (
+                <BouncyCheckbox
+                  key={option.label}
+                  onPress={value => {
+                    setForm(draft => {
+                      draft.otherTypeOfCount[optionIndex].checked = value;
+                    });
+                  }}
+                  isChecked={option.checked}
+                  text={option.label}
+                  textStyle={{textDecorationLine: 'none'}}
+                  style={{marginBottom: 8}}
+                />
+              ))}
+            </View>
+            <View style={styles.inputContainer}>
               <InputLabel>{batSurveyFormLabels.nests}</InputLabel>
               <Picker
                 selectedValue={form.nests}
@@ -257,7 +365,7 @@ const BatSurveyFormScreen = () => {
                 ))}
               </Picker>
             </View>
-            {form.nests === 'yes' && (
+            {isNestsSelected && (
               <View style={styles.inputContainer}>
                 <InputLabel>{batSurveyFormLabels.nestType}</InputLabel>
                 {form.nestType.map((option, optionIndex) => (
@@ -265,7 +373,7 @@ const BatSurveyFormScreen = () => {
                     key={option.label}
                     onPress={value => {
                       setForm(draft => {
-                        draft.batSign[optionIndex].checked = value;
+                        draft.nestType[optionIndex].checked = value;
                       });
                     }}
                     isChecked={option.checked}

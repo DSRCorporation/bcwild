@@ -21,7 +21,7 @@ import {setRefreshToken} from './global';
 import CameraTrapDataScreen from './screens/CameraTrapDataScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import TelemetryFormScreen from './screens/TelemetryFormScreen';
-import BatSurveyFormScreen from './screens/BatSurveyFormScreen';
+import BatSurveyFormScreen from './screens/BatSurvey/BatSurveyFormScreen';
 import AnimalFormScreen from './screens/Animals/AnimalFormScreen';
 import AnimalListScreen from './screens/Animals/AnimalListScreen';
 import AerialTelemetryDataFormScreen from './screens/AerialTelemetryDataFormScreen';
