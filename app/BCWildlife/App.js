@@ -14,8 +14,8 @@ import DashboardScreen from './screens/DashboardScreen';
 import ApproveProjectScreen from './screens/ApproveProjectScreen';
 import TelemetryTriangulationScreen from './screens/TelemetryTriangulation';
 import {useEffect} from 'react';
-import BridgesListScreen from './screens/BridgesListScreen';
-import BridgeFormScreen from './screens/BridgeFormScreen';
+import BridgesListScreen from './screens/Bridges/BridgesListScreen';
+import BridgeFormScreen from './screens/Bridges/BridgeFormScreen';
 import {setAccessToken} from './global';
 import {setRefreshToken} from './global';
 import CameraTrapDataScreen from './screens/CameraTrapDataScreen';
@@ -24,7 +24,7 @@ import TelemetryFormScreen from './screens/TelemetryFormScreen';
 import BatSurveyFormScreen from './screens/BatSurvey/BatSurveyFormScreen';
 import AnimalFormScreen from './screens/Animals/AnimalFormScreen';
 import AnimalListScreen from './screens/Animals/AnimalListScreen';
-import AerialTelemetryDataFormScreen from './screens/AerialTelemetryDataFormScreen';
+import AerialTelemetryDataFormScreen from './screens/AerielTelemetry/AerialTelemetryDataFormScreen';
 
 const Stack = createStackNavigator();
 

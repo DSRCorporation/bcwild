@@ -1,12 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View, TextInput} from 'react-native';
-import LoadingOverlay from '../utility/LoadingOverlay';
+import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
-import {InputLabel} from '../shared/components/InputLabel';
-import {useBridgeFormValidation} from '../shared/hooks/use-bridge-form-validation';
-import {BCWildLogo} from '../shared/components/BCWildLogo';
-import {TitleText} from '../shared/components/TitleText';
+import {InputLabel} from '../../shared/components/InputLabel';
+import {useBridgeFormValidation} from './use-bridge-form-validation';
+import {BCWildLogo} from '../../shared/components/BCWildLogo';
+import {TitleText} from '../../shared/components/TitleText';
 import {
   abutmentData,
   beamsData,
@@ -19,11 +19,11 @@ import {
   spanMaterialData,
   underdeckData,
   waterIsData,
-} from '../constants/bridges/bridge-data';
+} from '../../constants/bridges/bridge-data';
 import {useImmer} from 'use-immer';
-import {yesOrNoOptions} from '../constants/yes-or-no-options';
-import {useFormScreenStyles} from '../shared/styles/use-form-screen-styles';
-import {BaseButton} from '../shared/components/BaseButton';
+import {yesOrNoOptions} from '../../constants/yes-or-no-options';
+import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+import {BaseButton} from '../../shared/components/BaseButton';
 
 const BridgeFormScreen = ({route}) => {
   const styles = useFormScreenStyles();

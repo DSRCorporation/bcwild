@@ -1,12 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import LoadingOverlay from '../utility/LoadingOverlay';
+import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
-import {useCardListStyles} from '../shared/styles/card-list-styles';
-import {useMockBridges} from '../mocks/mock-bridges';
-import {GoBackArrowButton} from '../shared/components/GoBackArrowButton';
-import {BCWildLogo} from '../shared/components/BCWildLogo';
-import {TitleText} from '../shared/components/TitleText';
+import {useCardListStyles} from '../../shared/styles/card-list-styles';
+import {useMockBridges} from '../../mocks/mock-bridges';
+import {GoBackArrowButton} from '../../shared/components/GoBackArrowButton';
+import {BCWildLogo} from '../../shared/components/BCWildLogo';
+import {TitleText} from '../../shared/components/TitleText';
 
 const BridgeListScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);

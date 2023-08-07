@@ -1,19 +1,28 @@
-import {BCWildLogo} from '../shared/components/BCWildLogo';
-import {TitleText} from '../shared/components/TitleText';
-import React from 'react';
-import {InputLabel} from '../shared/components/InputLabel';
+import {BCWildLogo} from '../../shared/components/BCWildLogo';
+import {TitleText} from '../../shared/components/TitleText';
+import React, {useCallback} from 'react';
+import {InputLabel} from '../../shared/components/InputLabel';
 import {View, ScrollView, Text, TextInput} from 'react-native';
-import {DatePicker} from '../shared/components/DatePicker';
+import {DatePicker} from '../../shared/components/DatePicker';
 import {useImmer} from 'use-immer';
-import {useAnimals} from './Animals/use-animals';
+import {useAnimals} from '../Animals/use-animals';
 import {Picker} from '@react-native-picker/picker';
-import {GalleryPicker} from '../shared/components/GalleryPicker';
-import {BaseButton} from '../shared/components/BaseButton';
-import {useFormScreenStyles} from '../shared/styles/use-form-screen-styles';
+import {GalleryPicker} from '../../shared/components/GalleryPicker';
+import {BaseButton} from '../../shared/components/BaseButton';
+import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+import {aerielTelemetryFormLabels} from '../../constants/aeriel-telemetry/aeriel-telemetry-labels';
+import {
+  aspectData,
+  macroPositionData,
+  mesoSlopeData,
+} from '../../constants/aeriel-telemetry/aeriel-telemetry-data';
+import {useBatSurveyFormValidation} from '../BatSurvey/use-bat-survey-form-validation';
+import {useAerielTelemetryDataFormValidation} from './use-aeriel-telemetry-data-form-validation';
 
 const ArielTelemetryDataFormScreen = () => {
   const styles = useFormScreenStyles();
   const [form, setForm] = useImmer({
+    locationId: '',
     date: new Date(),
     observer: '',
     animal: null,
@@ -24,6 +33,11 @@ const ArielTelemetryDataFormScreen = () => {
     comments: '',
   });
   const {animals} = useAnimals();
+  const {validate} = useAerielTelemetryDataFormValidation();
+
+  const submit = useCallback(() => {
+    const isValid = validate(form);
+  }, [validate, form]);
 
   return (
     <ScrollView>
@@ -33,7 +47,20 @@ const ArielTelemetryDataFormScreen = () => {
         <View>
           <View>
             <View style={styles.inputContainer}>
-              <InputLabel>Date</InputLabel>
+              <InputLabel>{aerielTelemetryFormLabels.locationId}</InputLabel>
+              <TextInput
+                value={form.locationId}
+                onChangeText={value =>
+                  setForm(draft => {
+                    draft.locationId = value;
+                  })
+                }
+                placeholder="Enter location ID"
+                style={styles.textInput}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{aerielTelemetryFormLabels.date}</InputLabel>
               <DatePicker
                 value={form.date}
                 onChange={date =>
@@ -44,7 +71,7 @@ const ArielTelemetryDataFormScreen = () => {
               />
             </View>
             <View style={styles.inputContainer}>
-              <InputLabel>Observer</InputLabel>
+              <InputLabel>{aerielTelemetryFormLabels.observer}</InputLabel>
               <TextInput
                 value={form.observer}
                 onChangeText={value =>
@@ -57,7 +84,7 @@ const ArielTelemetryDataFormScreen = () => {
               />
             </View>
             <View style={styles.inputContainer}>
-              <InputLabel>Animal</InputLabel>
+              <InputLabel>{aerielTelemetryFormLabels.animal}</InputLabel>
               <Picker
                 selectedValue={form.animal}
                 onValueChange={value =>
@@ -72,7 +99,7 @@ const ArielTelemetryDataFormScreen = () => {
               </Picker>
             </View>
             <View style={styles.inputContainer}>
-              <InputLabel>Aspect</InputLabel>
+              <InputLabel>{aerielTelemetryFormLabels.aspect}</InputLabel>
               <Picker
                 selectedValue={form.aspect}
                 onValueChange={value =>
@@ -81,18 +108,17 @@ const ArielTelemetryDataFormScreen = () => {
                   })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="N" value="N" />
-                <Picker.Item label="NE" value="NE" />
-                <Picker.Item label="E" value="E" />
-                <Picker.Item label="SE" value="SE" />
-                <Picker.Item label="S" value="S" />
-                <Picker.Item label="SW" value="SW" />
-                <Picker.Item label="W" value="W" />
-                <Picker.Item label="NW" value="NW" />
+                {aspectData.map(option => (
+                  <Picker.Item
+                    key={option.id}
+                    label={option.value}
+                    value={option.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
-              <InputLabel>Meso slope</InputLabel>
+              <InputLabel>{aerielTelemetryFormLabels.mesoSlope}</InputLabel>
               <Picker
                 selectedValue={form.mesoSlope}
                 onValueChange={value =>
@@ -101,14 +127,17 @@ const ArielTelemetryDataFormScreen = () => {
                   })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Flat" value="Flat" />
-                <Picker.Item label="Shallow" value="Shallow" />
-                <Picker.Item label="Moderate" value="Moderate" />
-                <Picker.Item label="Steep" value="Steep" />
+                {mesoSlopeData.map(option => (
+                  <Picker.Item
+                    key={option.id}
+                    label={option.value}
+                    value={option.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
-              <InputLabel>Macro position</InputLabel>
+              <InputLabel>{aerielTelemetryFormLabels.macroPosition}</InputLabel>
               <Picker
                 selectedValue={form.macroPosition}
                 onValueChange={value =>
@@ -117,13 +146,13 @@ const ArielTelemetryDataFormScreen = () => {
                   })
                 }>
                 <Picker.Item label="Select" value={null} />
-                <Picker.Item label="Apex" value="Apex" />
-                <Picker.Item label="Face" value="Face" />
-                <Picker.Item label="Upper" value="Upper" />
-                <Picker.Item label="Middle" value="Middle" />
-                <Picker.Item label="Lower" value="Lower" />
-                <Picker.Item label="Valley Floor" value="Valley Floor" />
-                <Picker.Item label="Flood plain" value="Flood plain" />
+                {macroPositionData.map(option => (
+                  <Picker.Item
+                    key={option.id}
+                    label={option.value}
+                    value={option.id}
+                  />
+                ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
@@ -151,6 +180,7 @@ const ArielTelemetryDataFormScreen = () => {
             </View>
           </View>
           <BaseButton
+            onPress={submit}
             style={styles.button}
             accessibilityLabel="create aerial telemetry data button"
             testID="createAerialTelemetryDataButton">

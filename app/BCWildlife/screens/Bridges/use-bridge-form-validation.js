@@ -1,11 +1,11 @@
 import {useCallback} from 'react';
 import {Alert} from 'react-native';
-import {getFormValidationErrorMessage} from '../utils/get-form-validation-error-message';
+import {getFormValidationErrorMessage} from '../../shared/utils/get-form-validation-error-message';
 import {bridgeFormLabels} from '../../constants/bridges/bridge-labels';
 import {
   isStringValueInvalid,
   isNumberValueInvalid,
-} from '../utils/form-validation';
+} from '../../shared/utils/form-validation';
 
 export const useBridgeFormValidation = () => {
   const validate = useCallback(form => {
