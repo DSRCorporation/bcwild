@@ -1,28 +1,19 @@
-const services = require("../service/user")
-const registration = async(req)=>{
-    return await services.registration(req)
-}
+const services = require("../service/user");
 
-const login = async(req)=>{
-    return await services.login(req)
-}
+const registration = async (req) => services.registration(req);
 
-const generateAccessToken = async(req)=>{
-    return await services.generateAccessToken(req)
-}
+const login = async (req) => services.login(req);
 
-const updateProfilePhoto = async(req)=>{
-    return await services.updateProfilePhoto(req)
-}
+const generateAccessToken = async (req) => services.generateAccessToken(req);
 
-const userDetails = async(req)=>{
-    return await services.userDetails(req)
-}
+const updateProfilePhoto = async (req) => services.updateProfilePhoto(req);
+
+const userDetails = async (req) => services.userDetails(req);
 
 module.exports = {
-    registration,
-    login,
-    generateAccessToken,
-    updateProfilePhoto,
-    userDetails
-}
+  registration,
+  login,
+  generateAccessToken,
+  updateProfilePhoto,
+  userDetails,
+};
