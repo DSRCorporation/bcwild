@@ -1,54 +1,74 @@
-const { UnauthorizedError, BadRequestError } = require("../../../errorHandler/customErrorHandlers");
+const {
+  UnauthorizedError,
+  BadRequestError,
+} = require("../../../errorHandler/customErrorHandlers");
 const { customErrors } = require("../../../errorHandler/error");
-const { customFindAll, customUpdate, customDelete } = require("../../../helpers/commonSequelizeQueries");
+const {
+  customFindAll,
+  customUpdate,
+  customDelete,
+} = require("../../../helpers/commonSequelizeQueries");
 const { signupApprovalMail } = require("../../../helpers/send-email");
 const User = require("../../user/model/user");
 const { signupRequestValidation } = require("../validation/admin");
 const { sequelize } = require("../../../config/database");
-const signupRequestsHandler = async(req)=>{
-    let transaction;
-    try{
-        const {id,status} = req.body;
-        if(req.decoded.role!="admin") throw new UnauthorizedError("Not Authorized to access this resource!")
 
-        //validation
-        const {error} = signupRequestValidation(req.body)
-        if(error) throw new BadRequestError(error.message)
+// eslint-disable-next-line consistent-return
+const signupRequestsHandler = async (req) => {
+  let transaction;
+  try {
+    const { id, status } = req.body;
+    if (req.decoded.role !== "admin")
+      throw new UnauthorizedError("Not Authorized to access this resource!");
 
-        transaction = await sequelize.transaction()
-        let userData;
-        if(status=="rejected"){
-            // Deleting user data if signupRequest rejected so user can register with same email id and usernamae
-            userData = await customDelete(User,{id:id},transaction)
-        }else{
-            userData = await customUpdate(User,{id:id},{status:status},transaction)
-        }
+    // validation
+    const { error } = signupRequestValidation(req.body);
+    if (error) throw new BadRequestError(error.message);
 
-        const {email,first_name,last_name} = userData
-        //sending mail
-        await signupApprovalMail(email,first_name+" "+last_name,status)
-        await transaction.commit()
-
-        return req.body
-    }catch(error){
-        if (transaction) {
-            await transaction.rollback();
-        }
-        customErrors(error.name, error.message)
+    transaction = await sequelize.transaction();
+    let userData;
+    if (status === "rejected") {
+      // Deleting user data if signupRequest rejected so user can register with same email id and usernamae
+      userData = await customDelete(User, { id }, transaction);
+    } else {
+      userData = await customUpdate(User, { id }, { status }, transaction);
     }
 
-}
+    // eslint-disable-next-line camelcase
+    const { email, first_name, last_name } = userData;
+    // sending mail
+    // eslint-disable-next-line camelcase
+    await signupApprovalMail(email, `${first_name} ${last_name}`, status);
+    await transaction.commit();
 
-const showSignupRequests = async(req)=>{    
-    const {page,page_size} = req.query;
+    return req.body;
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    customErrors(error.name, error.message);
+  }
+};
 
-    if(req.decoded.role!="admin") throw new UnauthorizedError("Not Authorized to access this resource!")
-    const signUpRequestsData = await customFindAll(User,{status:"pending",role:"user"},null,page,page_size,["id","first_name","last_name","username","email"])
+const showSignupRequests = async (req) => {
+  // eslint-disable-next-line camelcase
+  const { page, page_size } = req.query;
 
-    return signUpRequestsData
-}
+  if (req.decoded.role !== "admin")
+    throw new UnauthorizedError("Not Authorized to access this resource!");
+  const signUpRequestsData = await customFindAll(
+    User,
+    { status: "pending", role: "user" },
+    null,
+    page,
+    page_size,
+    ["id", "first_name", "last_name", "username", "email"],
+  );
+
+  return signUpRequestsData;
+};
 
 module.exports = {
-    showSignupRequests,
-    signupRequestsHandler
-}
+  showSignupRequests,
+  signupRequestsHandler,
+};
