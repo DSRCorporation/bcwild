@@ -71,6 +71,14 @@ const DashboardScreen = ({route, navigation}) => {
     navigation.navigate('BridgesList');
   };
 
+  const handleAnimalsClick = () => {
+    navigation.navigate('AnimalList');
+  };
+
+  const handleAerialTelemetryDataClick = () => {
+    navigation.navigate('AerialTelemetryDataForm');
+  };
+
   const handleTelemetryTriangulation = () => {
     navigation.navigate('TelemetryTriangulation');
   };
@@ -180,41 +188,52 @@ const DashboardScreen = ({route, navigation}) => {
 
         <View
           style={{
-            flex: 1,
-            marginTop: 15,
-            paddingVertical: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-evenly',
             backgroundColor: '#E8F0FF',
           }}>
-          <TouchableOpacity onPress={() => handleCameraTrapData()}>
-            <Image
-              style={{height: 80, width: 80, resizeMode: 'contain'}}
-              source={require('../assets/cam_trap.png')}
-            />
-          </TouchableOpacity>
+          <View style={styles.row}>
+            <TouchableOpacity onPress={() => handleCameraTrapData()}>
+              <Image
+                style={{height: 80, width: 80, resizeMode: 'contain'}}
+                source={require('../assets/cam_trap.png')}
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleBatSurvey()}>
-            <Text>Bat Survey</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleBridgesClick()}>
-            <Text>Bridges</Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => hanldeTelemetryForm()}>
+              <Image
+                style={{height: 95, width: 95, resizeMode: 'contain'}}
+                source={require('../assets/telemetry.png')}
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => hanldeTelemetryForm()}>
-            <Image
-              style={{height: 95, width: 95, resizeMode: 'contain'}}
-              source={require('../assets/telemetry.png')}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => handleTelemetryTriangulation()}>
-            <Image
-              style={{height: 100, width: 100, resizeMode: 'contain'}}
-              source={require('../assets/gtele.png')}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleTelemetryTriangulation()}>
+              <Image
+                style={{height: 100, width: 100, resizeMode: 'contain'}}
+                source={require('../assets/gtele.png')}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={styles.listItemWithoutImage}
+              onPress={() => handleBatSurvey()}>
+              <Text style={styles.listItemText}>Bat Survey</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.listItemWithoutImage}
+              onPress={() => handleBridgesClick()}>
+              <Text style={styles.listItemText}>Bridges</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.listItemWithoutImage}
+              onPress={() => handleAnimalsClick()}>
+              <Text style={styles.listItemText}>Animals</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.listItemWithoutImage}
+              onPress={() => handleAerialTelemetryDataClick()}>
+              <Text style={styles.listItemText}>Aerial Telemetry Data</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <View
           style={{
@@ -246,16 +265,7 @@ const DashboardScreen = ({route, navigation}) => {
           </TouchableOpacity>
         </View>
         {admin ? (
-          <View
-            style={{
-              flex: 1,
-              marginTop: 15,
-              paddingVertical: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-evenly',
-              backgroundColor: '#E8F0FF',
-            }}>
+          <View style={styles.row}>
             <TouchableOpacity onPress={() => handleApproveProjectAccess()}>
               <Image
                 style={{height: 90, width: 90, resizeMode: 'contain'}}
@@ -327,6 +337,21 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  row: {
+    flex: 1,
+    marginTop: 15,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    backgroundColor: '#E8F0FF',
+  },
+  listItemWithoutImage: {
+    paddingVertical: 8,
+  },
+  listItemText: {
+    color: '#000',
   },
   imageContainer: {
     margin: 10,

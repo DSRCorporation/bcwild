@@ -1,18 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import LoadingOverlay from '../utility/LoadingOverlay';
+import {View, TextInput} from 'react-native';
+import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
-import {InputLabel} from '../shared/components/InputLabel';
-import {useBridgeFormValidation} from '../shared/hooks/use-bridge-form-validation';
-import {BCWildLogo} from '../shared/components/BCWildLogo';
-import {TitleText} from '../shared/components/TitleText';
+import {InputLabel} from '../../shared/components/InputLabel';
+import {useBridgeFormValidation} from './use-bridge-form-validation';
+import {BCWildLogo} from '../../shared/components/BCWildLogo';
+import {TitleText} from '../../shared/components/TitleText';
 import {
   abutmentData,
   beamsData,
@@ -25,53 +19,17 @@ import {
   spanMaterialData,
   underdeckData,
   waterIsData,
-} from '../constants/bridges/bridge-data';
+} from '../../constants/bridges/bridge-data';
 import {useImmer} from 'use-immer';
-import {yesOrNoOptions} from '../constants/yes-or-no-options';
+import {yesOrNoOptions} from '../../constants/yes-or-no-options';
+import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+import {BaseButton} from '../../shared/components/BaseButton';
 
 const BridgeFormScreen = ({route}) => {
+  const styles = useFormScreenStyles();
   const currentBridgeId = (route.params && route.params.bridgeId) || null;
   const {validate} = useBridgeFormValidation();
   const [loading, setLoading] = useState(false);
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingHorizontal: 25,
-    },
-    logoContainer: {
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    logo: {
-      width: 150,
-      height: 150,
-      resizeMode: 'contain',
-    },
-    textInput: {
-      backgroundColor: '#EFEFEF',
-      padding: 10,
-      borderRadius: 10,
-      marginTop: 5,
-    },
-    inputContainer: {
-      marginBottom: 8,
-    },
-    button: {
-      backgroundColor: '#234075',
-      borderRadius: 10,
-      marginTop: 20,
-      marginBottom: 20,
-      padding: 10,
-      justifyContent: 'center',
-    },
-    buttonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 18,
-      textAlign: 'center',
-    },
-  });
 
   const [form, setForm] = useImmer({
     region: '',
@@ -480,13 +438,12 @@ const BridgeFormScreen = ({route}) => {
               />
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.button}
+          <BaseButton
             onPress={submit}
             accessibilityLabel="create bridge button"
             testID="createNewBridgeButton">
-            <Text style={styles.buttonText}>{actionText}</Text>
-          </TouchableOpacity>
+            {actionText}
+          </BaseButton>
         </View>
       </View>
       <LoadingOverlay loading={loading} />

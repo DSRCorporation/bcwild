@@ -1,4 +1,7 @@
+export const yesValue = 'yes';
+export const noValue = 'no';
+
 export const yesOrNoOptions = [
-  {label: 'Yes', value: 'yes'},
-  {label: 'No', value: 'no'},
+  {label: 'Yes', value: yesValue},
+  {label: 'No', value: noValue},
 ];
