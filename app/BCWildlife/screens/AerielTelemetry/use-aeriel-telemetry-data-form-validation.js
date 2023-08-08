@@ -1,5 +1,8 @@
 import {useCallback} from 'react';
-import {isStringValueInvalid} from '../../shared/utils/form-validation';
+import {
+  isNumberValueInvalid,
+  isStringValueInvalid,
+} from '../../shared/utils/form-validation';
 import {getFormValidationErrorMessage} from '../../shared/utils/get-form-validation-error-message';
 import {Alert} from 'react-native';
 import {aerielTelemetryFormLabels} from '../../constants/aeriel-telemetry/aeriel-telemetry-labels';
@@ -12,12 +15,23 @@ export const useAerielTelemetryDataFormValidation = () => {
       switch (name) {
         case 'locationId':
         case 'date':
+        case 'pilot':
+        case 'navigator':
         case 'observer':
+        case 'gpsID':
         case 'animal':
+        case 'frequency':
         case 'aspect':
         case 'mesoSlope':
         case 'macroPosition':
+        case 'habitatType':
           return isStringValueInvalid(form[name]);
+        case 'gpsCoordinates':
+          const {lat, long} = form[name];
+          return isStringValueInvalid(lat) || isStringValueInvalid(long);
+        case 'easing':
+        case 'northing':
+          return isNumberValueInvalid(form[name]);
       }
     });
 
