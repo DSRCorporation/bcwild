@@ -1,0 +1,487 @@
+{
+  "types": [
+    {
+      "name": "YesNo",
+      "values": [
+        {
+          "id": 1,
+          "value": "Yes"
+        },
+        {
+          "id": 2,
+          "value": "No"
+        }
+      ],
+      "comment": "For use in the DB."
+    },
+    {
+      "name": "Assessment",
+      "values": [
+        {
+          "id": 1,
+          "value": "Likely"
+        },
+        {
+          "id": 2,
+          "value": "Unlikely"
+        },
+        {
+          "id": 3,
+          "value": "Unknown"
+        }
+      ]
+    },
+    {
+      "name": "Region",
+      "values": [
+        {
+          "id": 1,
+          "value": "Lower Mainland"
+        },
+        {
+          "id": 2,
+          "value": "Islands"
+        },
+        {
+          "id": 3,
+          "value": "OK"
+        },
+        {
+          "id": 4,
+          "value": "Koot"
+        },
+        {
+          "id": 5,
+          "value": "Boundary"
+        }
+      ]
+    },
+    {
+      "name": "BridgeType",
+      "values": [
+        {
+          "id": 1,
+          "value": "Unknown"
+        },
+        {
+          "id": 2,
+          "value": "Other"
+        },
+        {
+          "id": 3,
+          "value": "Truss"
+        },
+        {
+          "id": 4,
+          "value": "Trestle"
+        },
+        {
+          "id": 5,
+          "value": "Steel I-beam"
+        },
+        {
+          "id": 6,
+          "value": "Pre-Stressed Concrete Girder/T-Beam"
+        },
+        {
+          "id": 7,
+          "value": "Cast-in-place"
+        },
+        {
+          "id": 8,
+          "value": "Adjacent/Parallel Box Girder"
+        },
+        {
+          "id": 9,
+          "value": "Flat Slab/Box"
+        },
+        {
+          "id": 10,
+          "value": "Wood Girder"
+        },
+        {
+          "id": 11,
+          "value": "Culvert"
+        }
+      ]
+    },
+    {
+      "name": "SpanMaterial",
+      "values": [
+        {
+          "id": 1,
+          "value": "Concrete cast-in-place"
+        },
+        {
+          "id": 2,
+          "value": "Concrete pre-cast"
+        },
+        {
+          "id": 3,
+          "value": "Log"
+        },
+        {
+          "id": 4,
+          "value": "Stell - structural"
+        },
+        {
+          "id": 5,
+          "value": "Timber - sawn untreated"
+        },
+        {
+          "id": 6,
+          "value": "Timber - sawn treated"
+        }
+      ]
+    },
+    {
+      "name": "Abutment",
+      "values": [
+        {
+          "id": 1,
+          "value": "NA"
+        },
+        {
+          "id": 2,
+          "value": "Other"
+        },
+        {
+          "id": 3,
+          "value": "Concrete"
+        },
+        {
+          "id": 4,
+          "value": "Steel"
+        },
+        {
+          "id": 5,
+          "value": "Wood"
+        },
+        {
+          "id": 6,
+          "value": "Treated wood"
+        }
+      ]
+    },
+    {
+      "name": "Underdeck",
+      "values": [
+        {
+          "id": 1,
+          "value": "Wood"
+        },
+        {
+          "id": 2,
+          "value": "Concrete"
+        },
+        {
+          "id": 3,
+          "value": "Metal"
+        }
+      ]
+    },
+    {
+      "name": "Beams",
+      "values": [
+        {
+          "id": 1,
+          "value": "NA"
+        },
+        {
+          "id": 2,
+          "value": "Wood"
+        },
+        {
+          "id": 3,
+          "value": "Concrete"
+        },
+        {
+          "id": 4,
+          "value": "Metal"
+        }
+      ]
+    },
+    {
+      "name": "Columns",
+      "values": [
+        {
+          "id": 1,
+          "value": "NA"
+        },
+        {
+          "id": 2,
+          "value": "Wood"
+        },
+        {
+          "id": 3,
+          "value": "Concrete"
+        },
+        {
+          "id": 4,
+          "value": "Metal"
+        }
+      ]
+    },
+    {
+      "name": "Columns",
+      "values": [
+        {
+          "id": 1,
+          "value": "NA"
+        },
+        {
+          "id": 2,
+          "value": "Wood"
+        },
+        {
+          "id": 3,
+          "value": "Concrete"
+        },
+        {
+          "id": 4,
+          "value": "Metal"
+        }
+      ]
+    },
+    {
+      "name": "BridgeFor",
+      "values": [
+        {
+          "id": 1,
+          "value": "other"
+        },
+        {
+          "id": 2,
+          "value": "vehicle"
+        },
+        {
+          "id": 4,
+          "value": "train"
+        },
+        {
+          "id": 8,
+          "value": "bike"
+        },
+        {
+          "id": 16,
+          "value": "pedestrian"
+        }
+      ]
+    },
+    {
+      "name": "CrossingType",
+      "values": [
+        {
+          "id": 1,
+          "value": "other"
+        },
+        {
+          "id": 2,
+          "value": "road"
+        },
+        {
+          "id": 3,
+          "value": "railway"
+        },
+        {
+          "id": 4,
+          "value": "path/water"
+        }
+      ]
+    },
+    {
+      "name": "Habitat",
+      "values": [
+        {
+          "id": 1,
+          "value": "forest"
+        },
+        {
+          "id": 2,
+          "value": "open"
+        },
+        {
+          "id": 3,
+          "value": "roads"
+        }
+      ]
+    },
+    {
+      "name": "Water",
+      "values": [
+        {
+          "id": 1,
+          "value": "No"
+        },
+        {
+          "id": 2,
+          "value": "Quiet"
+        },
+        {
+          "id": 3,
+          "value": "Slightly audible"
+        },
+        {
+          "id": 4,
+          "value": "Loud"
+        }
+      ]
+    },
+    {
+      "name": "BatSign",
+      "values": [
+        {
+          "id": 1,
+          "value": "Bats visible live"
+        },
+        {
+          "id": 2,
+          "value": "Bats visible dead"
+        },
+        {
+          "id": 4,
+          "value": "Pups visible live"
+        },
+        {
+          "id": 8,
+          "value": "Pups visible dead"
+        },
+        {
+          "id": 16,
+          "value": "Noises"
+        },
+        {
+          "id": 32,
+          "value": "Insect wings"
+        },
+        {
+          "id": 64,
+          "value": "Insect pieces"
+        },
+        {
+          "id": 128,
+          "value": "Urine staining"
+        },
+        {
+          "id": 256,
+          "value": "Body oil staining"
+        },
+        {
+          "id": 512,
+          "value": "Guano"
+        }
+      ]
+    },
+    {
+      "name": "BatSignLocation",
+      "values": [
+        {
+          "id": 1,
+          "value": "In crevices formed between two beams"
+        },
+        {
+          "id": 2,
+          "value": "In expansion joints"
+        },
+        {
+          "id": 3,
+          "value": "On vertical surfaces or back wall"
+        },
+        {
+          "id": 4,
+          "value": "Stuck to exposed sides of beams or columns"
+        },
+        {
+          "id": 5,
+          "value": "On ground below bridge"
+        }
+      ],
+      "comment": "Only standard locations are covered by this type.  Arbitrary locations are processed differently."
+    },
+    {
+      "name": "GuanoAmount",
+      "values": [
+        {
+          "id": 1,
+          "value": "NONE"
+        },
+        {
+          "id": 2,
+          "value": "Little: 1-30 pellets"
+        },
+        {
+          "id": 3,
+          "value": "Some: 30 pellets - 1 cup"
+        },
+        {
+          "id": 4,
+          "value": "Lots >> 1 cup"
+        }
+      ]
+    },
+    {
+      "name": "GuanoDistribution",
+      "values": [
+        {
+          "id": 1,
+          "value": "Dispersed (typical of night roosting)"
+        },
+        {
+          "id": 2,
+          "value": "Concentrated below crevices (typical of day roosting)"
+        }
+      ]
+    },
+    {
+      "name": "GuanoCollected",
+      "values": [
+        {
+          "id": 1,
+          "value": "Pd testing"
+        },
+        {
+          "id": 2,
+          "value": "Single species ID-WGI"
+        },
+        {
+          "id": 4,
+          "value": "Pooled species ID-NAU"
+        }
+      ]
+    },
+    {
+      "name": "BatRecording",
+      "values": [
+        {
+          "id": 1,
+          "value": "Acoustic recording"
+        },
+        {
+          "id": 2,
+          "value": "Infrared camera recording"
+        },
+        {
+          "id": 4,
+          "value": "Video recording"
+        }
+      ]
+    },
+    {
+      "name": "SwallowNestType",
+      "values": [
+        {
+          "id": 1,
+          "value": "Cup"
+        },
+        {
+          "id": 2,
+          "value": "Mud Gourd"
+        },
+        {
+          "id": 4,
+          "value": "Hole"
+        }
+      ]
+    }
+  ]
+}

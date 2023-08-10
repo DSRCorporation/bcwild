@@ -22,11 +22,16 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 db.DataTypes = Sequelize.DataTypes;
 
-// sequelize.sync().then(data=>{
-//   console.log("Sync Complete")
-// }).catch(err=>{
-//   console.log("Error in syncing",err)
-// });
+sequelize
+  .sync()
+  .then(() => {
+    // eslint-disable-next-line no-console
+    console.log("Sync Complete");
+  })
+  .catch((err) => {
+    // eslint-disable-next-line no-console
+    console.error("Error in syncing", err);
+  });
 
 // db.sequelize = sequelize;
 // db.Sequelize = Sequelize;xxxxxx
