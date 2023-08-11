@@ -235,8 +235,8 @@ const ApproveSignupAccessScreen = (navigation) => {
                 });
               }else{
                 console.log('error message:', errorMessage+' with index '+errorMessage.indexOf('token'));
+                showAlertOnly('Error',error.response.data.message);
               }
-              showAlertOnly('Error',error.response.data.message);
             } else if (error.request) {
               console.log('Request error:', error.request);
               showAlertOnly('Error',error.response.data.message);
