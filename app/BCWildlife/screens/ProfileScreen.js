@@ -14,6 +14,8 @@ import { getAccessToken } from '../global';
 import { dataexport_url, datasyncpush_url } from '../network/path';
 import axiosUtility from '../network/AxiosUtility';
 import LoadingOverlay from '../utility/LoadingOverlay';
+import { generateNewAccessToken } from '../network/AxiosUtility';
+import {useBridges} from '../shared/hooks/use-bridges/useBridges';
 
 const ProfileScreen = ({navigation}) => {
   const [fname,setFname] = useState('');
@@ -25,6 +27,7 @@ const ProfileScreen = ({navigation}) => {
   const [fullname, setFullname] = useState('');
   const [dialogVisible, setDialogVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const {pullBridges} = useBridges();
   var refreshTokenCount=0;
 
 
@@ -142,108 +145,120 @@ const ProfileScreen = ({navigation}) => {
     setDialogVisible(true);
   };
 
-  const handleSync = () => {
+  const handleSync = async () => {
     setLoading(true);
     // handle sync logic
-    RecordsRepo.getUnsyncedRecords().then((records) => {
-        console.log(records);
-        console.log('Sync');
-        var recordsObj;
-        try{
-         recordsObj = JSON.parse(records);
-        }catch(e){
-          Alert.alert('Success','No records to sync');
-          console.log('error parsing records');
-          setLoading(false);
-          return;
-        }
+    // Syncing the bridges:
+    // 1. Locally stored changes are pushed among other records
+    // 2. Fresh list of bridges is loaded; obsolete local changes are discarded.
+    try {
+      await RecordsRepo.getUnsyncedRecords().then((records) => {
+          console.log(records);
+          console.log('Sync');
+          var recordsObj;
+          try{
+           recordsObj = JSON.parse(records);
+          }catch(e){
+            Alert.alert('Success','No records to sync');
+            console.log('error parsing records');
+            return;
+          }
 
-        if(recordsObj.length < 1){
-          Alert.alert('Success','No records to sync');
-          setLoading(false);
-          return;
-        }else{
-          console.log('records to sync' + recordsObj.length);
-        }
+          if(recordsObj.length < 1){
+            Alert.alert('Success','No records to sync');
+            return;
+          }else{
+            console.log(`records to sync: ${recordsObj.length}`);
+          }
 
-        const USER_TOKEN = getAccessToken();
-        const AuthStr = 'Bearer '.concat(USER_TOKEN); 
-        try {
-          axiosUtility.post(datasyncpush_url, recordsObj,
-            { headers: { Authorization: AuthStr } })
-          .then(response => {
-            console.log(response);
-            Alert.alert('Success',response.message);
-            RecordsRepo.deleteUnsyncedRecords()
-              .then(() => {
-                console.log('Successfully deleted all unsynced records');
-              })
-              .catch((error) => {
-                console.error('Error deleting unsynced records:', error);
-              });
-            //getPendingProjectAccessRequests();
-            setLoading(false);
-          }).catch((error) => {
-            setLoading(false);
-            if (error.response) {
-                let errorMessage = error.response.data.message;
-                if(errorMessage.indexOf('token') > -1){
-                  console.log('token expired');
-                  if(refreshTokenCount > 0){
-                    return;
-                  }
-                  generateNewAccessToken()
-                  .then((response) => {
-                    refreshTokenCount++;
-                    console.log('new access token generated');
-                    axiosUtility.post(datasyncpush_url, recordsObj,configAuth())
-                    .then(response => {
-                      Alert.alert('Success',response.message);
-                      RecordsRepo.deleteUnsyncedRecords()
-                      .then(() => {
-                        console.log('Successfully deleted all unsynced records');
-                      })
-                      .catch((error) => {
-                        console.error('Error deleting unsynced records:', error);
+          const USER_TOKEN = getAccessToken();
+          const AuthStr = 'Bearer '.concat(USER_TOKEN); 
+          try {
+            axiosUtility.post(datasyncpush_url, recordsObj,
+              { headers: { Authorization: AuthStr } })
+            .then(response => {
+              console.log(response);
+              Alert.alert('Success',response.message);
+              RecordsRepo.deleteUnsyncedRecords()
+                .then(() => {
+                  console.log('Successfully deleted all unsynced records');
+                })
+                .catch((error) => {
+                  console.error('Error deleting unsynced records:', error);
+                });
+              //getPendingProjectAccessRequests();
+            }).catch((error) => {
+              if (error.response) {
+                  let errorMessage = error.response.data.message;
+                  if(errorMessage.indexOf('token') > -1){
+                    console.log('token expired');
+                    if(refreshTokenCount > 0){
+                      return;
+                    }
+                    generateNewAccessToken()
+                    .then((response) => {
+                      refreshTokenCount++;
+                      console.log('new access token generated');
+                      axiosUtility.post(datasyncpush_url, recordsObj,configAuth())
+                      .then(response => {
+                        Alert.alert('Success',response.message);
+                        RecordsRepo.deleteUnsyncedRecords()
+                        .then(() => {
+                          console.log('Successfully deleted all unsynced records');
+                        })
+                        .catch((error) => {
+                          console.error('Error deleting unsynced records:', error);
+                        });
+                        //getPendingProjectAccessRequests();
+                      }).catch((error) => {
+                        if (error.response) {
+                          console.log('Response error:', error.response.data);
+                          Alert.alert('Error',error.response.data.message);
+                        } else if (error.request) {
+                          console.log('Request error:', error.request);
+                          Alert.alert('Error','Request error' +error.response.data.message);
+                        } else {
+                          console.log('Error message:', error.message);
+                          Alert.alert('Error',error.response.data.message);
+                        }
                       });
-                      setLoading(false);
-                      //getPendingProjectAccessRequests();
                     }).catch((error) => {
-                      setLoading(false);
-                      if (error.response) {
-                        console.log('Response error:', error.response.data);
-                        Alert.alert('Error',error.response.data.message);
-                      } else if (error.request) {
-                        console.log('Request error:', error.request);
-                        Alert.alert('Error','Request error' +error.response.data.message);
-                      } else {
-                        console.log('Error message:', error.message);
-                        Alert.alert('Error',error.response.data.message);
-                      }
+                      refreshTokenCount++;
+                      console.log('error generating new access token');
                     });
-                  }).catch((error) => {
-                    refreshTokenCount++;
-                    console.log('error generating new access token');
-                  });
-                }else{
-                  console.log('error message:', errorMessage+' with index '+errorMessage.indexOf('token'));
-                }
-                Alert.alert('Error',errorMessage);
-              console.log('Response error:', error.response.data);
-            } else if (error.request) {
-              console.log('Request error:', error.request);
-              Alert.alert('Error','Request error');
-            } else {
-              console.log('Error', error.message);
-              Alert.alert('Error','Error');
-            }
-            setLoading(false);
-          });
-        } catch (error) {
-          setLoading(false);
-          console.error(error);
+                  }else{
+                    console.log('error message:', errorMessage+' with index '+errorMessage.indexOf('token'));
+                  }
+                  Alert.alert('Error',errorMessage);
+                console.log('Response error:', error.response.data);
+              } else if (error.request) {
+                console.log('Request error:', error.request);
+                Alert.alert('Error','Request error');
+              } else {
+                console.log('Error', error.message);
+                Alert.alert('Error','Error');
+              }
+            });
+          } catch (error) {
+            console.error(error);
+          }
+      });
+      try {
+        await pullBridges();
+        Alert.alert('Success','Bridge data loaded');
+      } catch (error) {
+        console.error('Failed to pull bridges', error, JSON.stringify(error));
+        if (error.response) {
+          Alert.alert('Error', error.response.data.message);
+        } else if (error.request) {
+          Alert.alert('Error', `Request error: ${error.request}`);
+        } else {
+          Alert.alert('Error', error.message);
         }
-    });
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
 

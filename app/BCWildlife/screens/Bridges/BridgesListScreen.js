@@ -1,16 +1,17 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useCardListStyles} from '../../shared/styles/card-list-styles';
-import {useMockBridges} from '../../mocks/mock-bridges';
 import {GoBackArrowButton} from '../../shared/components/GoBackArrowButton';
 import {BCWildLogo} from '../../shared/components/BCWildLogo';
 import {TitleText} from '../../shared/components/TitleText';
+import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 
 const BridgeListScreen = ({navigation}) => {
-  const [loading, setLoading] = useState(false);
-  const {mockBridges} = useMockBridges();
+  const [loading, setLoading] = useState(true);
+  const [bridges, setBridges] = useState([]);
+  const {bridgeList, bridgeByMotId} = useBridges();
   const cardListStyles = useCardListStyles();
 
   const styles = StyleSheet.create({
@@ -22,16 +23,25 @@ const BridgeListScreen = ({navigation}) => {
     ...cardListStyles,
   });
 
-  const fakeLoading = useCallback(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
-  }, []);
-
   useEffect(() => {
-    fakeLoading();
-  }, [fakeLoading]);
+    const load = async () => {
+      try {
+        const loadedBridges = await bridgeList();
+        setBridges(loadedBridges);
+        setLoading(false);
+      } catch (error) {
+        let errorMessage = 'Error occurred';
+        if (error.message) {
+          errorMessage = errorMessage;
+        }
+        Alert.alert('Error', errorMessage);
+        console.error('Could not load bridges', error);
+      }
+    };
+    if (loading) {
+      load();
+    }
+  }, [bridgeList, loading]);
 
   return (
     <View style={styles.container}>
@@ -40,20 +50,17 @@ const BridgeListScreen = ({navigation}) => {
       <TitleText>Bridge list</TitleText>
       <View style={styles.cardList}>
         <ScrollView>
-          {mockBridges.map(bridge => (
-            <View key={bridge.id} style={styles.card}>
-              <Text style={styles.cardName}>{bridge.name}</Text>
+          {bridges.map(bridge => (
+            <View key={bridge.bridgeMotId} style={styles.card}>
+              <Text style={styles.cardName}>{bridge.bridgeName}</Text>
               <View style={styles.cardButtonContainer}>
                 <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('BridgeForm', {bridgeId: bridge.id})
-                  }
+                  onPress={async () => {
+                    const dto = await bridgeByMotId(bridge.bridgeMotId);
+                    navigation.navigate('BridgeForm', {bridge: dto});
+                  }}
                   style={[styles.cardButton, {backgroundColor: '#234075'}]}>
                   <Text style={styles.cardButtonText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.cardButton, {backgroundColor: '#ccc'}]}>
-                  <Text style={styles.cardButtonText}>Delete</Text>
                 </TouchableOpacity>
               </View>
             </View>

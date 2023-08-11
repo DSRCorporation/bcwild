@@ -1,23 +1,30 @@
 {
   "QA": {
-    "username":   "postgres",     
+    "username": "postgres",
     "password": "root123",
     "database": "wildlife",
-     "host": "localhost",
+    "host": "localhost",
     "dialect": "postgres"
   },
   "local": {
-   "username": "postgres",     
+    "username": "postgres",
     "password": "root123",
     "database": "wildlife",
-     "host": "localhost",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "local2": {
+    "username": "postgres",     
+    "password": "admin",
+    "database": "wildlife",
+    "host": "db",
     "dialect": "postgres"
   },
   "UAT": {
-   "username": "postgres",     
+    "username": "postgres",
     "password": "root123",
     "database": "wildlife",
-     "host": "localhost",
+    "host": "localhost",
     "dialect": "postgres"
   }
 }
