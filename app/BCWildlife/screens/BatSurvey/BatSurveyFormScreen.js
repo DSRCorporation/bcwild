@@ -1,0 +1,483 @@
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {View, Text, TextInput, Linking} from 'react-native';
+import LoadingOverlay from '../../utility/LoadingOverlay';
+import {ScrollView} from 'react-native-gesture-handler';
+import {Picker} from '@react-native-picker/picker';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import {useImmer} from 'use-immer';
+import {InputLabel} from '../../shared/components/InputLabel';
+import {BCWildLogo} from '../../shared/components/BCWildLogo';
+import {TitleText} from '../../shared/components/TitleText';
+import {
+  noValue,
+  yesOrNoOptions,
+  yesValue,
+} from '../../constants/yes-or-no-options';
+import {useBatSurveyFormValidation} from './use-bat-survey-form-validation';
+import {batSurveyFormLabels} from '../../constants/bat-survey/bat-survey-labels';
+import {transformListDataToCheckboxItems} from '../../shared/utils/form-data';
+import {
+  assessmentData,
+  batSignData,
+  batSignLocationData,
+  countingBatsURL,
+  guanoAmountData,
+  guanoBatSignId,
+  guanoCollectedData,
+  guanoDistributionData,
+  recordingData,
+  swallowNestTypeData,
+} from '../../constants/bat-survey/bat-survey-data';
+import {GalleryPicker} from '../../shared/components/GalleryPicker';
+import {BaseButton} from '../../shared/components/BaseButton';
+import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+
+const linkColor = '#216de8';
+
+const BatSurveyFormScreen = () => {
+  const styles = useFormScreenStyles();
+  const [loading, setLoading] = useState(false);
+  const [attachedImages, setAttachedImages] = useState([]);
+
+  const [form, setForm] = useImmer({
+    batSign: [...transformListDataToCheckboxItems(batSignData)], // checkboxes, multiselect, no selection means None
+    locationBatSign: [...transformListDataToCheckboxItems(batSignLocationData)], // checkboxes. If checked, "What" text field appears. Only shows if previous field is not None
+    guanoAmountInBiggestPile: '', // Only shows if Guano Bat sign is checked
+    guanoDistribution: '', // Only shows if Guano Bat sign is checked
+    guanoCollected: [...transformListDataToCheckboxItems(guanoCollectedData)], //checkboxes, multiselect, no selection means None. Only shows if Guano Bat sign is checked.
+    guanoSampleLabel: '',
+    roostAssessmentNight: '',
+    roostAssessmentDay: '',
+    maternity: '',
+    // Bat count detail
+    emergenceCountDone: '', // if yes, show the link https://bcbats.ca/get-involved/counting-bats/
+    otherTypeOfCount: [...transformListDataToCheckboxItems(recordingData)], // separately as checkboxes, multiselect, no selection means None
+    // Swallow observations
+    nests: '',
+    nestType: [...transformListDataToCheckboxItems(swallowNestTypeData)], // checkboxes, multiselect, no selection means None. Only shows if Nests is Yes
+    swallowsFlying: '',
+    speciesOtherComments: '',
+    photos: [],
+    couldThisSiteBeSafelyOrEasilyNetted: '',
+    wouldRoostingBatsBeReachableWithoutLadder: '',
+    comments: '',
+  });
+
+  const isGuanoBatSignSelected = useMemo(() => {
+    const guanoCheckboxItem = form.batSign.find(
+      item => item.value === guanoBatSignId,
+    );
+    if (!guanoCheckboxItem) {
+      return false;
+    }
+    return guanoCheckboxItem.checked;
+  }, [form.batSign]);
+
+  const isAnyBatSignSelected = useMemo(
+    () => form.batSign.some(item => item.checked),
+    [form.batSign],
+  );
+
+  const isEmergencyCountDoneSelected = useMemo(
+    () => form.emergenceCountDone === yesValue,
+    [form.emergenceCountDone],
+  );
+
+  const isNestsSelected = useMemo(() => form.nests === yesValue, [form.nests]);
+
+  const {validate} = useBatSurveyFormValidation(isGuanoBatSignSelected);
+
+  const submit = useCallback(() => {
+    const isValid = validate(form, {isGuanoBatSignSelected, isNestsSelected});
+  }, [validate, form, isGuanoBatSignSelected, isNestsSelected]);
+
+  const setDefaultValues = useCallback(() => {
+    setForm(draft => {
+      draft.guanoSampleLabel = 'C';
+      draft.emergenceCountDone = noValue;
+      draft.nests = noValue;
+      draft.swallowsFlying = noValue;
+      draft.couldThisSiteBeSafelyOrEasilyNetted = noValue;
+      draft.wouldRoostingBatsBeReachableWithoutLadder = noValue;
+      draft.roostAssessmentDay = 3;
+      draft.roostAssessmentNight = 3;
+      draft.maternity = 3;
+    });
+  }, [setForm]);
+
+  useEffect(() => {
+    setDefaultValues();
+  }, [setDefaultValues]);
+
+  return (
+    <ScrollView>
+      <View style={styles.container}>
+        <BCWildLogo />
+        <TitleText>Bat survey</TitleText>
+        <View>
+          <View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.batSign}</InputLabel>
+              {form.batSign.map((option, optionIndex) => (
+                <BouncyCheckbox
+                  key={option.label}
+                  onPress={value => {
+                    setForm(draft => {
+                      draft.batSign[optionIndex].checked = value;
+                    });
+                  }}
+                  isChecked={option.checked}
+                  text={option.label}
+                  textStyle={{textDecorationLine: 'none'}}
+                  style={{marginBottom: 8}}
+                />
+              ))}
+            </View>
+            {isAnyBatSignSelected && (
+              <View style={styles.inputContainer}>
+                <InputLabel>{batSurveyFormLabels.locationBatSign}</InputLabel>
+                {form.locationBatSign.map((option, optionIndex) => (
+                  <View key={option.label}>
+                    <BouncyCheckbox
+                      onPress={value => {
+                        setForm(draft => {
+                          draft.locationBatSign[optionIndex].checked = value;
+                        });
+                      }}
+                      isChecked={option.checked}
+                      text={option.label}
+                      textStyle={{textDecorationLine: 'none'}}
+                      style={{marginBottom: 8}}
+                    />
+                    {option.checked && (
+                      <TextInput
+                        value={option.what}
+                        onChangeText={text =>
+                          setForm(draft => {
+                            draft.locationBatSign[optionIndex].what = text;
+                          })
+                        }
+                        placeholder="Enter text"
+                        style={[styles.textInput, {marginBottom: 8}]}
+                      />
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {isGuanoBatSignSelected && (
+              <>
+                <View style={styles.inputContainer}>
+                  <InputLabel>
+                    {batSurveyFormLabels.guanoAmountInBiggestPile}
+                  </InputLabel>
+                  <Picker
+                    selectedValue={form.guanoAmountInBiggestPile}
+                    onValueChange={value =>
+                      setForm(draft => {
+                        draft.guanoAmountInBiggestPile = value;
+                      })
+                    }>
+                    <Picker.Item label="Select" value={null} />
+                    {guanoAmountData.map(item => (
+                      <Picker.Item
+                        key={item.id}
+                        label={item.value}
+                        value={item.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>
+                    {batSurveyFormLabels.guanoDistribution}
+                  </InputLabel>
+                  <Picker
+                    selectedValue={form.guanoDistribution}
+                    onValueChange={value =>
+                      setForm(draft => {
+                        draft.guanoDistribution = value;
+                      })
+                    }>
+                    <Picker.Item label="Select" value={null} />
+                    {guanoDistributionData.map(item => (
+                      <Picker.Item
+                        key={item.id}
+                        label={item.value}
+                        value={item.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>{batSurveyFormLabels.guanoCollected}</InputLabel>
+                  {form.guanoCollected.map((option, optionIndex) => (
+                    <BouncyCheckbox
+                      key={option.label}
+                      onPress={value => {
+                        setForm(draft => {
+                          draft.guanoCollected[optionIndex].checked = value;
+                        });
+                      }}
+                      isChecked={option.checked}
+                      text={option.label}
+                      textStyle={{textDecorationLine: 'none'}}
+                      style={{marginBottom: 8}}
+                    />
+                  ))}
+                </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>
+                    {batSurveyFormLabels.guanoSampleLabel}
+                  </InputLabel>
+                  <TextInput
+                    value={form.guanoSampleLabel}
+                    onChangeText={text =>
+                      setForm(draft => {
+                        draft.guanoSampleLabel = text;
+                      })
+                    }
+                    placeholder="Enter guanoSampleLabel"
+                    style={styles.textInput}
+                  />
+                </View>
+              </>
+            )}
+            <View style={styles.inputContainer}>
+              <InputLabel>
+                {batSurveyFormLabels.roostAssessmentNight}
+              </InputLabel>
+              <Picker
+                selectedValue={form.roostAssessmentNight}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.roostAssessmentNight = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {assessmentData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.roostAssessmentDay}</InputLabel>
+              <Picker
+                selectedValue={form.roostAssessmentDay}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.roostAssessmentDay = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {assessmentData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.maternity}</InputLabel>
+              <Picker
+                selectedValue={form.maternity}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.maternity = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {assessmentData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.emergenceCountDone}</InputLabel>
+              <Picker
+                selectedValue={form.emergenceCountDone}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.emergenceCountDone = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {yesOrNoOptions.map(option => (
+                  <Picker.Item
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                  />
+                ))}
+              </Picker>
+              {isEmergencyCountDoneSelected && (
+                <Text
+                  onPress={() => Linking.openURL(countingBatsURL)}
+                  style={{color: linkColor, paddingVertical: 8}}>
+                  https://bcbats.ca/get-involved/counting-bats/
+                </Text>
+              )}
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.otherTypeOfCount}</InputLabel>
+              {form.otherTypeOfCount.map((option, optionIndex) => (
+                <BouncyCheckbox
+                  key={option.label}
+                  onPress={value => {
+                    setForm(draft => {
+                      draft.otherTypeOfCount[optionIndex].checked = value;
+                    });
+                  }}
+                  isChecked={option.checked}
+                  text={option.label}
+                  textStyle={{textDecorationLine: 'none'}}
+                  style={{marginBottom: 8}}
+                />
+              ))}
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.nests}</InputLabel>
+              <Picker
+                selectedValue={form.nests}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.nests = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {yesOrNoOptions.map(option => (
+                  <Picker.Item
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                  />
+                ))}
+              </Picker>
+            </View>
+            {isNestsSelected && (
+              <View style={styles.inputContainer}>
+                <InputLabel>{batSurveyFormLabels.nestType}</InputLabel>
+                {form.nestType.map((option, optionIndex) => (
+                  <BouncyCheckbox
+                    key={option.label}
+                    onPress={value => {
+                      setForm(draft => {
+                        draft.nestType[optionIndex].checked = value;
+                      });
+                    }}
+                    isChecked={option.checked}
+                    text={option.label}
+                    textStyle={{textDecorationLine: 'none'}}
+                    style={{marginBottom: 8}}
+                  />
+                ))}
+              </View>
+            )}
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.swallowsFlying}</InputLabel>
+              <Picker
+                selectedValue={form.swallowsFlying}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.swallowsFlying = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {yesOrNoOptions.map(option => (
+                  <Picker.Item
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>
+                {batSurveyFormLabels.couldThisSiteBeSafelyOrEasilyNetted}
+              </InputLabel>
+              <Picker
+                selectedValue={form.couldThisSiteBeSafelyOrEasilyNetted}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.couldThisSiteBeSafelyOrEasilyNetted = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {yesOrNoOptions.map(option => (
+                  <Picker.Item
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>
+                {batSurveyFormLabels.wouldRoostingBatsBeReachableWithoutLadder}
+              </InputLabel>
+              <Picker
+                selectedValue={form.wouldRoostingBatsBeReachableWithoutLadder}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.wouldRoostingBatsBeReachableWithoutLadder = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {yesOrNoOptions.map(option => (
+                  <Picker.Item
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.comments}</InputLabel>
+              <TextInput
+                value={form.comments}
+                onChangeText={text =>
+                  setForm(draft => {
+                    draft.comments = text;
+                  })
+                }
+                multiline={true}
+                placeholder="Enter Comments"
+                style={styles.textInput}
+              />
+            </View>
+          </View>
+          <View style={styles.inputContainer}>
+            <InputLabel>{batSurveyFormLabels.photos}</InputLabel>
+            <GalleryPicker
+              onChange={setAttachedImages}
+              images={attachedImages}
+            />
+          </View>
+          <BaseButton
+            onPress={submit}
+            accessibilityLabel="create bat survey button"
+            testID="createBatSurveyButton">
+            Create
+          </BaseButton>
+        </View>
+      </View>
+      <LoadingOverlay loading={loading} />
+    </ScrollView>
+  );
+};
+
+export default BatSurveyFormScreen;

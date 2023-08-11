@@ -1,75 +1,87 @@
-const { dataExist, customUpdate } = require("../../../helpers/commonSequelizeQueries");
+const crypto = require("crypto");
+const {
+  dataExist,
+  customUpdate,
+} = require("../../../helpers/commonSequelizeQueries");
 const User = require("../../user/model/user");
 const { sequelize } = require("../../../config/database");
 const { resetMail } = require("../../../helpers/send-email");
-const { BadRequestError, NotFoundError } = require("../../../errorHandler/customErrorHandlers");
-const {customErrors}=require("../../../errorHandler/error");
+const {
+  BadRequestError,
+  NotFoundError,
+} = require("../../../errorHandler/customErrorHandlers");
+const { customErrors } = require("../../../errorHandler/error");
 const { generateHash } = require("../../../helpers/passwordHash");
 const { resetPasswordValidation } = require("../validation/forgetPassword");
-const crypto = require("crypto")
+
+// eslint-disable-next-line consistent-return
 const forgetPassword = async (req) => {
-    let transaction;
-    try {
+  let transaction;
+  try {
+    const { email } = req.body;
 
-        let { email } = req.body;
-
-        if (!email) {
-            throw new BadRequestError("Email is missing");
-        }
-
-        //checking registered user
-        const userData = await dataExist(User, { email: email });
-        if (!userData) throw new NotFoundError("User is not found")
-
-        const password = crypto.randomBytes(4).toString('hex')
-
-        const hashPassword = await generateHash(password)
-        //Initiate transaction
-        transaction = await sequelize.transaction()
-        const updateUser = await customUpdate(User, { email: email }, { password: hashPassword }, transaction);
-        const { first_name, last_name } = updateUser
-        await resetMail(email, first_name + " " + last_name, password)
-        await transaction.commit();
-        return updateUser
-    } catch (error) {
-        if (transaction) {
-            await transaction.rollback();
-        }
-        customErrors(error.name, error.message)
+    if (!email) {
+      throw new BadRequestError("Email is missing");
     }
 
-}
+    // checking registered user
+    const userData = await dataExist(User, { email });
+    if (!userData) throw new NotFoundError("User is not found");
 
+    const password = crypto.randomBytes(4).toString("hex");
+
+    const hashPassword = await generateHash(password);
+    // Initiate transaction
+    transaction = await sequelize.transaction();
+    const updateUser = await customUpdate(
+      User,
+      { email },
+      { password: hashPassword },
+      transaction,
+    );
+    // eslint-disable-next-line camelcase
+    const { first_name, last_name } = updateUser;
+    // eslint-disable-next-line camelcase
+    await resetMail(email, `${first_name} ${last_name}`, password);
+    await transaction.commit();
+    return updateUser;
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    customErrors(error.name, error.message);
+  }
+};
+
+// eslint-disable-next-line consistent-return
 const resetPassword = async (req) => {
-    let transaction;
-    try {
+  let transaction;
+  try {
+    // eslint-disable-next-line camelcase
+    const { new_password } = req.body;
 
-        let { new_password,confirm_password } = req.body;
+    // validation
+    const { error } = resetPasswordValidation(req.body);
 
-        //validation
-        const {error} = resetPasswordValidation(req.body)
+    if (error) throw new BadRequestError(error.message);
 
-        if(error) throw new BadRequestError(error.message)
+    const { id } = req.decoded;
 
-        let id = req.decoded.id;
-
-        const hashPassword = await generateHash(new_password)
-        //Initiate transaction
-        transaction = await sequelize.transaction()
-        const data = await customUpdate(User, { id: id }, { password: hashPassword });
-        await transaction.commit()
-        return data;
-
-    } catch (error) {
-        if (transaction) {
-            await transaction.rollback();
-        }
-        customErrors(error.name, error.message)
+    const hashPassword = await generateHash(new_password);
+    // Initiate transaction
+    transaction = await sequelize.transaction();
+    const data = await customUpdate(User, { id }, { password: hashPassword });
+    await transaction.commit();
+    return data;
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
     }
-
+    customErrors(error.name, error.message);
+  }
 };
 
 module.exports = {
-    forgetPassword,
-    resetPassword
-}
+  forgetPassword,
+  resetPassword,
+};
