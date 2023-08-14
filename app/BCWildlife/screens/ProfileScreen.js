@@ -14,6 +14,7 @@ import { getAccessToken } from '../global';
 import { dataexport_url, datasyncpush_url } from '../network/path';
 import axiosUtility from '../network/AxiosUtility';
 import LoadingOverlay from '../utility/LoadingOverlay';
+import { generateNewAccessToken } from '../network/AxiosUtility';
 
 const ProfileScreen = ({navigation}) => {
   const [fname,setFname] = useState('');
@@ -163,7 +164,7 @@ const ProfileScreen = ({navigation}) => {
           setLoading(false);
           return;
         }else{
-          console.log('records to sync' + recordsObj.length);
+          console.log(`records to sync: ${recordsObj.length}`);
         }
 
         const USER_TOKEN = getAccessToken();

@@ -1,4 +1,14 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+} from 'react-native';
+import LoadingOverlay from '../utility/LoadingOverlay';
 import {View, TextInput} from 'react-native';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -21,11 +31,14 @@ import {
   waterIsData,
 } from '../../constants/bridges/bridge-data';
 import {useImmer} from 'use-immer';
-import {yesOrNoOptions} from '../../constants/yes-or-no-options';
-import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
-import {BaseButton} from '../../shared/components/BaseButton';
+import {yesOrNoOptions} from '../constants/yes-or-no-options';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import { getUsernameG } from '../global';
+import RecordsRepo from '../utility/RecordsRepo';
+import {BridgeDto} from '../shared/hooks/use-bridge-form-validation';
+import {BridgeValidationError} from '../shared/hooks/use-bridge-form-validation';
 
-const BridgeFormScreen = ({route}) => {
+const BridgeFormScreen = ({route, navigation}) => {
   const styles = useFormScreenStyles();
   const currentBridgeId = (route.params && route.params.bridgeId) || null;
   const {validate} = useBridgeFormValidation();
@@ -57,7 +70,20 @@ const BridgeFormScreen = ({route}) => {
   });
 
   const submit = useCallback(() => {
-    const isValid = validate(form);
+    const timestamp = Date.now();
+    const dto = validate(form, timestamp);
+    if (dto instanceof BridgeDto) {
+      dto.timestamp = timestamp;
+      const strvalue = JSON.stringify(dto);
+      const timeNowEpoch = Math.round(timestamp / 1000);
+      const username = getUsernameG();
+      const recordIdentifier = `BRIDGE_${username}_${timeNowEpoch}`;
+      RecordsRepo.addRecord(recordIdentifier, strvalue);
+      Alert.alert('Bridge data saved');
+    }
+    if (dto instanceof BridgeValidationError) {
+      Alert.alert(dto.message);
+    }
   }, [validate, form]);
 
   const actionText = useMemo(
@@ -86,9 +112,29 @@ const BridgeFormScreen = ({route}) => {
     }
   }, [currentBridgeId, setDefaultValues]);
 
+  const navigateToDashboard = async () => {
+    const session = await EncryptedStorage.getItem('user_session');
+    console.log(session);
+    if (!session) {
+      return;
+    }
+    const obj = JSON.parse(session);
+    if (obj.data.role === 'admin') {
+      navigation.navigate('Dashboard', {admin: true});
+    } else {
+      navigation.navigate('Dashboard', {admin: false});
+    }
+  };
+
   return (
     <ScrollView>
       <View style={styles.container}>
+        <TouchableOpacity onPress={() => navigateToDashboard()}>
+          <Image
+            source={require('../assets/arrow_back_ios.png')}
+            style={{height: 25, width: 25, marginTop: 30}}
+          />
+        </TouchableOpacity>
         <BCWildLogo />
         <TitleText>{actionText} bridge</TitleText>
         <View>
@@ -364,6 +410,8 @@ const BridgeFormScreen = ({route}) => {
                 ))}
               </Picker>
             </View>
+            {/*
+            TODO: move this to bat observation form
             <View style={styles.inputContainer}>
               <InputLabel>Water currently under bridge</InputLabel>
               <Picker
@@ -404,6 +452,7 @@ const BridgeFormScreen = ({route}) => {
                 </Picker>
               </View>
             )}
+            */}
             <View style={styles.inputContainer}>
               <InputLabel>Habitat around bridge</InputLabel>
               <Picker
