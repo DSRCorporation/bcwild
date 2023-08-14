@@ -8,16 +8,6 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import LoadingOverlay from '../utility/LoadingOverlay';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Image,
-} from 'react-native';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
@@ -42,12 +32,11 @@ import {
   waterIsData,
 } from '../../constants/bridges/bridge-data';
 import {useImmer} from 'use-immer';
-import {yesOrNoOptions} from '../constants/yes-or-no-options';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import { getUsernameG } from '../global';
-import RecordsRepo from '../utility/RecordsRepo';
-import {BridgeDto} from '../shared/hooks/use-bridge-form-validation';
-import {BridgeValidationError} from '../shared/hooks/use-bridge-form-validation';
+import {getUsernameG} from '../../global';
+import RecordsRepo from '../../utility/RecordsRepo';
+import {BridgeDto} from '../../shared/hooks/use-bridge-form-validation';
+import {BridgeValidationError} from '../../shared/hooks/use-bridge-form-validation';
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
 import {BaseButton} from '../../shared/components/BaseButton';
@@ -134,19 +123,6 @@ const BridgeFormScreen = ({route, navigation}) => {
   useEffect(() => {
     setFormValues();
   }, [currentBridge, setDefaultValues, setFormValues]);
-
-  const navigateToDashboard = async () => {
-    const session = await EncryptedStorage.getItem('user_session');
-    if (!session) {
-      return;
-    }
-    const obj = JSON.parse(session);
-    if (obj.data.role === 'admin') {
-      navigation.navigate('Dashboard', {admin: true});
-    } else {
-      navigation.navigate('Dashboard', {admin: false});
-    }
-  };
 
   const navigateToDashboard = async () => {
     const session = await EncryptedStorage.getItem('user_session');
