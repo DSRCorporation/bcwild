@@ -1,4 +1,4 @@
-export const base_url = "https://138.197.138.34";
+export const base_url = "http://138.197.138.34";
 export const login_url = base_url + "/user/login";
 export const register_url = base_url + "/user/register";
 export const forgotpass_url = base_url + "/forgotPassword";
