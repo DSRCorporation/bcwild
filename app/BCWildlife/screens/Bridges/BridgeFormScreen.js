@@ -9,12 +9,23 @@ import {
   Image,
 } from 'react-native';
 import LoadingOverlay from '../utility/LoadingOverlay';
-import {View, TextInput} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+} from 'react-native';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import {InputLabel} from '../../shared/components/InputLabel';
-import {useBridgeFormValidation} from './use-bridge-form-validation';
+import {
+  useBridgeFormValidation,
+  bridgeDtoToFormData,
+} from '../../shared/hooks/use-bridge-form-validation';
 import {BCWildLogo} from '../../shared/components/BCWildLogo';
 import {TitleText} from '../../shared/components/TitleText';
 import {
@@ -37,20 +48,21 @@ import { getUsernameG } from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
 import {BridgeDto} from '../shared/hooks/use-bridge-form-validation';
 import {BridgeValidationError} from '../shared/hooks/use-bridge-form-validation';
+import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
+import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+import {BaseButton} from '../../shared/components/BaseButton';
 
 const BridgeFormScreen = ({route, navigation}) => {
   const styles = useFormScreenStyles();
-  const currentBridgeId = (route.params && route.params.bridgeId) || null;
+  const currentBridge = (route.params && route.params.bridge) || null;
   const {validate} = useBridgeFormValidation();
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useImmer({
     region: '',
     bridgeName: '',
-    coordinates: {
-      long: '',
-      lat: '',
-    },
+    longitude: '',
+    latitude: '',
     roadOrHighway: '',
     motBridgeId: '',
     bridgeType: '',
@@ -69,7 +81,9 @@ const BridgeFormScreen = ({route, navigation}) => {
     habitatComments: '',
   });
 
-  const submit = useCallback(() => {
+  const {updateBridgeLocally} = useBridges();
+
+  const submit = useCallback(async () => {
     const timestamp = Date.now();
     const dto = validate(form, timestamp);
     if (dto instanceof BridgeDto) {
@@ -79,16 +93,17 @@ const BridgeFormScreen = ({route, navigation}) => {
       const username = getUsernameG();
       const recordIdentifier = `BRIDGE_${username}_${timeNowEpoch}`;
       RecordsRepo.addRecord(recordIdentifier, strvalue);
+      await updateBridgeLocally(dto);
       Alert.alert('Bridge data saved');
     }
     if (dto instanceof BridgeValidationError) {
       Alert.alert(dto.message);
     }
-  }, [validate, form]);
+  }, [validate, form, updateBridgeLocally]);
 
   const actionText = useMemo(
-    () => (currentBridgeId ? 'Edit' : 'Create'),
-    [currentBridgeId],
+    () => (currentBridge ? 'Edit' : 'Create'),
+    [currentBridge],
   );
 
   const setDefaultValues = useCallback(() => {
@@ -106,11 +121,32 @@ const BridgeFormScreen = ({route, navigation}) => {
     });
   }, [setForm]);
 
+  const setCurrentBridgeValues = useCallback(() => {
+    const formData = bridgeDtoToFormData(currentBridge);
+    setForm(formData);
+  }, [setForm, currentBridge]);
+
+  const setFormValues = useCallback(
+    () => (currentBridge ? setCurrentBridgeValues() : setDefaultValues()),
+    [currentBridge, setCurrentBridgeValues, setDefaultValues],
+  );
+
   useEffect(() => {
-    if (!currentBridgeId) {
-      setDefaultValues();
+    setFormValues();
+  }, [currentBridge, setDefaultValues, setFormValues]);
+
+  const navigateToDashboard = async () => {
+    const session = await EncryptedStorage.getItem('user_session');
+    if (!session) {
+      return;
     }
-  }, [currentBridgeId, setDefaultValues]);
+    const obj = JSON.parse(session);
+    if (obj.data.role === 'admin') {
+      navigation.navigate('Dashboard', {admin: true});
+    } else {
+      navigation.navigate('Dashboard', {admin: false});
+    }
+  };
 
   const navigateToDashboard = async () => {
     const session = await EncryptedStorage.getItem('user_session');
@@ -131,7 +167,7 @@ const BridgeFormScreen = ({route, navigation}) => {
       <View style={styles.container}>
         <TouchableOpacity onPress={() => navigateToDashboard()}>
           <Image
-            source={require('../assets/arrow_back_ios.png')}
+            source={require('../../assets/arrow_back_ios.png')}
             style={{height: 25, width: 25, marginTop: 30}}
           />
         </TouchableOpacity>
@@ -180,10 +216,10 @@ const BridgeFormScreen = ({route, navigation}) => {
                     placeholder="Enter longitude"
                     onChangeText={value =>
                       setForm(draft => {
-                        draft.coordinates.long = value;
+                        draft.longitude = value;
                       })
                     }
-                    value={form.coordinates.long}
+                    value={form.longitude}
                     style={styles.textInput}
                   />
                 </View>
@@ -193,10 +229,10 @@ const BridgeFormScreen = ({route, navigation}) => {
                     placeholder="Enter latitude"
                     onChangeText={value =>
                       setForm(draft => {
-                        draft.coordinates.lat = value;
+                        draft.latitude = value;
                       })
                     }
-                    value={form.coordinates.lat}
+                    value={form.latitude}
                     style={[styles.textInput, {flex: 2}]}
                   />
                 </View>

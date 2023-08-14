@@ -5,5 +5,6 @@ router.use("/", require("./forgetPassword"));
 router.use("/", require("./project"));
 router.use("/", require("./sync"));
 router.use("/", require("./export"));
+router.use("/bridge", require("./bridge"));
 
 module.exports = router;

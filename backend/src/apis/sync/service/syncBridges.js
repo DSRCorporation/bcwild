@@ -2,6 +2,24 @@ const { Bridge } = require("../../../model/Bridge");
 const { sequelize } = require("../../../config/database");
 const { BridgeConfiguration } = require("../../../model/BridgeConfiguration");
 
+const toPowersOfTwo = (int) => {
+  let power = 1;
+  const result = [];
+  let num = int;
+  while (num > 0) {
+    if (num % 2 !== 0) {
+      result.push(power);
+    }
+    // eslint-disable-next-line no-bitwise
+    num >>= 1;
+    // eslint-disable-next-line no-bitwise
+    power <<= 1;
+  }
+  return result;
+};
+
+// TODO move this to bridge helpers
+// This stuff is also used elsewhere.
 const bridgeConfigurationToDtoProperties = {
   name: { property: "bridgeName" },
   roadName: { property: "roadName" },
@@ -15,6 +33,7 @@ const bridgeConfigurationToDtoProperties = {
     property: "bridgeFor",
     // eslint-disable-next-line no-bitwise
     transform: (masks) => masks.reduce((acc, val) => acc | val, 0),
+    transformToDto: toPowersOfTwo,
   },
   habitatId: { property: "habitat" },
   regionId: { property: "regionId" },
@@ -29,6 +48,7 @@ const bridgeConfigurationToDtoProperties = {
   time: {
     property: "timestamp",
     transform: (timestamp) => new Date(timestamp),
+    transformToDto: (time) => time.getTime(),
   },
 };
 
@@ -47,74 +67,24 @@ const bridgeDtoToConfiguration = (bridgeId, dto) => {
 
 const syncBridges = async (data) =>
   sequelize.transaction(async (transaction) => {
-    console.log("transaction", transaction);
-    // const data = {
-    //   record_identifier: "BRIDGE__1691514274",
-    //   data: {
-    //     bridgeId: 0,
-    //     timestamp: 1691583698076,
-    //     bridgeName: "Ddd",
-    //     bridgeMotId: "Mot",
-    //     regionId: 1,
-    //     roadName: "Rd",
-    //     bridgeType: 5,
-    //     spanMaterial: 1,
-    //     abutment: 1,
-    //     underdeck: 1,
-    //     beams: 3,
-    //     columns: 1,
-    //     crossingType: 2,
-    //     habitat: 1,
-    //     height: 2,
-    //     length: 3.6,
-    //     bridgeFor: [2],
-    //     habitatComment: "",
-    //     created_by: "dsr-admin",
-    //     record_identifier: "BRIDGE__1691514274",
-    //   },
-    // };
-    console.log("syncBridges", data);
     const dto = data.data;
-    const { bridgeId } = dto;
-    const bridge = bridgeId
-      ? await Bridge.findByPk(bridgeId, { transaction })
-      : await Bridge.create({}, { transaction });
-    console.log("syncBridges bridge", bridge);
-    if (bridge == null) {
-      throw new Error(
-        `Bridge with ID ${bridgeId} does not exist in the database`,
-      );
+    const { bridgeMotId } = dto;
+    let bridgeId;
+    const bridgeConfiguration = await BridgeConfiguration.findOne(
+      { where: { motBridgeID: bridgeMotId } },
+      { transaction },
+    );
+    if (bridgeConfiguration != null) {
+      bridgeId = bridgeConfiguration.bridgeId;
+    } else {
+      const bridge = await Bridge.create({}, { transaction });
+      bridgeId = bridge.id;
     }
-    const cfg = bridgeDtoToConfiguration(bridge.id, dto);
-    console.log("cfg", cfg);
+    const cfg = bridgeDtoToConfiguration(bridgeId, dto);
     await BridgeConfiguration.create(cfg, { transaction });
-    // BridgeConfiguration.create(
-    //   {
-    //     bridgeId: bridge.id,
-    //     name: "Ddd",
-    //     roadName: "Rd",
-    //     motBridgeID: "Mot",
-    //     longitute: 3.3,
-    //     latitude: 2.4,
-    //     height: 2.0,
-    //     habitatComment: "",
-    //     bridgeForMask: 2,
-
-    //     habitatId: 1,
-    //     regionId: 1,
-    //     typeId: 1,
-    //     spanMaterial: 1,
-    //     abutmentId: 1,
-    //     underdeckId: 1,
-    //     beamsId: 3,
-    //     columnsId: 1,
-    //     crossingTypeId: 2,
-    //     length: 3.6,
-    //   },
-    //   transaction,
-    // );
   });
 
 module.exports = {
   syncBridges,
+  bridgeConfigurationToDtoProperties,
 };

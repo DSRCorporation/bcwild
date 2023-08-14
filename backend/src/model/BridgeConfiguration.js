@@ -20,6 +20,7 @@ const BridgeConfiguration = db.sequelize.define(
       primaryKey: true,
       type: DataTypes.INTEGER,
       autoIncrement: true,
+      unique: "id-mot",
     },
     createdBy: {
       allowNull: false,
@@ -38,7 +39,7 @@ const BridgeConfiguration = db.sequelize.define(
     motBridgeID: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: "id-mot",
     },
     longitude: {
       type: DataTypes.REAL,

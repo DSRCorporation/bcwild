@@ -1,0 +1,1 @@
+start-react-native-dev -v `pwd`/../home_gradle:/home/user/.gradle
