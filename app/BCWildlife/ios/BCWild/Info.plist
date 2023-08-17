@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>BC Wild app needs access to your photo gallery to upload pictures.</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -42,10 +44,10 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>BC Wild app needs access to your location to provide location-based services and features even when it&apos;s running in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>BC Wild App needs access to your location to provide location-based services and features.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>BC Wild app needs access to your location to provide location-based services and features even when it's running in the background.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
