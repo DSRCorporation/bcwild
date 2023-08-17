@@ -125,23 +125,14 @@ const BridgeFormScreen = ({route, navigation}) => {
     setFormValues();
   }, [currentBridge, setDefaultValues, setFormValues]);
 
-  const navigateToDashboard = async () => {
-    const session = await EncryptedStorage.getItem('user_session');
-    if (!session) {
-      return;
-    }
-    const obj = JSON.parse(session);
-    if (obj.data.role === 'admin') {
-      navigation.navigate('Dashboard', {admin: true});
-    } else {
-      navigation.navigate('Dashboard', {admin: false});
-    }
+  const handleGoBack = () => {
+    navigation.goBack();
   };
 
   return (
     <ScrollView>
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => navigateToDashboard()}>
+        <TouchableOpacity onPress={handleGoBack}>
           <Image
             source={require('../../assets/arrow_back_ios.png')}
             style={{height: 25, width: 25, marginTop: 30}}
