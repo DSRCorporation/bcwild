@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {View, Text, TextInput, Linking} from 'react-native';
+import {Alert, View, Text, TextInput, Linking} from 'react-native';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
@@ -28,18 +28,28 @@ import {
   recordingData,
   swallowNestTypeData,
 } from '../../constants/bat-survey/bat-survey-data';
+import {waterIsData} from '../../constants/bridges/bridge-data';
 import {GalleryPicker} from '../../shared/components/GalleryPicker';
 import {BaseButton} from '../../shared/components/BaseButton';
 import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+import {parseBatSurvey} from './parseBatSurvey';
+import {getUsernameG} from '../../global';
+import RecordsRepo from '../../utility/RecordsRepo';
+import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 
 const linkColor = '#216de8';
 
 const BatSurveyFormScreen = () => {
   const styles = useFormScreenStyles();
+  const [needBridges, setNeedBridges] = useState(true);
+  const [bridges, setBridges] = useState([]);
   const [loading, setLoading] = useState(false);
   const [attachedImages, setAttachedImages] = useState([]);
+  const [createDisabled, setCreateDisabled] = useState(false);
 
   const [form, setForm] = useImmer({
+    observers: '',
+    bridgeMotId: '',
     batSign: [...transformListDataToCheckboxItems(batSignData)], // checkboxes, multiselect, no selection means None
     locationBatSign: [...transformListDataToCheckboxItems(batSignLocationData)], // checkboxes. If checked, "What" text field appears. Only shows if previous field is not None
     guanoAmountInBiggestPile: '', // Only shows if Guano Bat sign is checked
@@ -61,6 +71,8 @@ const BatSurveyFormScreen = () => {
     couldThisSiteBeSafelyOrEasilyNetted: '',
     wouldRoostingBatsBeReachableWithoutLadder: '',
     comments: '',
+    waterCurrentlyUnderBridge: '',
+    waterIs: '',
   });
 
   const isGuanoBatSignSelected = useMemo(() => {
@@ -85,15 +97,26 @@ const BatSurveyFormScreen = () => {
 
   const isNestsSelected = useMemo(() => form.nests === yesValue, [form.nests]);
 
-  const {validate} = useBatSurveyFormValidation(isGuanoBatSignSelected);
-
-  const submit = useCallback(() => {
-    const isValid = validate(form, {isGuanoBatSignSelected, isNestsSelected});
-  }, [validate, form, isGuanoBatSignSelected, isNestsSelected]);
+  const submit = useCallback(async () => {
+    const timestamp = Date.now();
+    const parsed = parseBatSurvey(form, timestamp);
+    if (!parsed.isValid) {
+      Alert.alert(parsed.errorMessage);
+    } else {
+      const {dto} = parsed;
+      console.log('Bat dto', dto);
+      const strvalue = JSON.stringify(dto);
+      const timeNowEpoch = Math.round(timestamp / 1000);
+      const username = getUsernameG();
+      const recordIdentifier = `BAT_${username}_${timeNowEpoch}`;
+      await RecordsRepo.addRecord(recordIdentifier, strvalue);
+      setCreateDisabled(true);
+    }
+  }, [form]);
 
   const setDefaultValues = useCallback(() => {
     setForm(draft => {
-      draft.guanoSampleLabel = 'C';
+      draft.guanoSampleLabel = '';
       draft.emergenceCountDone = noValue;
       draft.nests = noValue;
       draft.swallowsFlying = noValue;
@@ -109,12 +132,108 @@ const BatSurveyFormScreen = () => {
     setDefaultValues();
   }, [setDefaultValues]);
 
+  const {bridgeChoices} = useBridges();
+
+  useEffect(() => {
+    const loadBridges = async () => {
+      setLoading(true);
+      setNeedBridges(false);
+      try {
+        const loadedBridges = await bridgeChoices();
+        setBridges(loadedBridges);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadBridges().catch(error => {
+      console.error('Cannot load bridge list', error);
+      Alert.alert('Error', 'Cannot load bridge list');
+    });
+  }, [bridgeChoices]);
+
   return (
     <ScrollView>
       <View style={styles.container}>
         <BCWildLogo />
         <TitleText>Bat survey</TitleText>
         <View>
+          <View style={styles.inputContainer}>
+            <InputLabel>{batSurveyFormLabels.observers}</InputLabel>
+            <TextInput
+              value={form.observers}
+              onChangeText={text =>
+                setForm(draft => {
+                  draft.observers = text;
+                })
+              }
+              multiline={true}
+              placeholder="Enter Observers"
+              style={styles.textInput}
+            />
+          </View>
+          <View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.bridgeMotId}</InputLabel>
+              <Picker
+                selectedValue={form.bridgeMotId}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.bridgeMotId = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {bridges.map(({bridgeMotId, bridgeName}) => (
+                  <Picker.Item
+                    key={bridgeMotId}
+                    label={`${bridgeMotId} ${bridgeName}`}
+                    value={bridgeMotId}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </View>
+          <View style={styles.inputContainer}>
+            <InputLabel>
+              {batSurveyFormLabels.waterCurrentlyUnderBridge}
+            </InputLabel>
+            <Picker
+              selectedValue={form.waterCurrentlyUnderBridge}
+              onValueChange={value =>
+                setForm(draft => {
+                  draft.waterCurrentlyUnderBridge = value;
+                })
+              }>
+              <Picker.Item label="Select" value={null} />
+              {yesOrNoOptions.map(option => (
+                <Picker.Item
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </Picker>
+          </View>
+          {form.waterCurrentlyUnderBridge === 'yes' && (
+            <View style={styles.inputContainer}>
+              <InputLabel>{batSurveyFormLabels.waterIs}</InputLabel>
+              <Picker
+                selectedValue={form.waterIs}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.waterIs = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {waterIsData.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.value}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+          )}
           <View>
             <View style={styles.inputContainer}>
               <InputLabel>{batSurveyFormLabels.batSign}</InputLabel>
@@ -346,6 +465,7 @@ const BatSurveyFormScreen = () => {
                 />
               ))}
             </View>
+            <TitleText>Swallow observations</TitleText>
             <View style={styles.inputContainer}>
               <InputLabel>{batSurveyFormLabels.nests}</InputLabel>
               <Picker
@@ -403,6 +523,23 @@ const BatSurveyFormScreen = () => {
                 ))}
               </Picker>
             </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>
+                {batSurveyFormLabels.speciesOtherComments}
+              </InputLabel>
+              <TextInput
+                value={form.speciesOtherComments}
+                onChangeText={text =>
+                  setForm(draft => {
+                    draft.speciesOtherComments = text;
+                  })
+                }
+                multiline={true}
+                placeholder="Enter Comments"
+                style={styles.textInput}
+              />
+            </View>
+            <TitleText>Misc</TitleText>
             <View style={styles.inputContainer}>
               <InputLabel>
                 {batSurveyFormLabels.couldThisSiteBeSafelyOrEasilyNetted}
@@ -468,6 +605,7 @@ const BatSurveyFormScreen = () => {
             />
           </View>
           <BaseButton
+            disabled={createDisabled}
             onPress={submit}
             accessibilityLabel="create bat survey button"
             testID="createBatSurveyButton">

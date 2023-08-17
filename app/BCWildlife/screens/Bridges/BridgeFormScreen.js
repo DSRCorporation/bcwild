@@ -32,6 +32,7 @@ import {
   waterIsData,
 } from '../../constants/bridges/bridge-data';
 import {useImmer} from 'use-immer';
+import {yesOrNoOptions} from '../constants/yes-or-no-options';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {getUsernameG} from '../../global';
 import RecordsRepo from '../../utility/RecordsRepo';
@@ -412,49 +413,6 @@ const BridgeFormScreen = ({route, navigation}) => {
                 ))}
               </Picker>
             </View>
-            {/*
-            TODO: move this to bat observation form
-            <View style={styles.inputContainer}>
-              <InputLabel>Water currently under bridge</InputLabel>
-              <Picker
-                selectedValue={form.waterCurrentlyUnderBridge}
-                onValueChange={value =>
-                  setForm(draft => {
-                    draft.waterCurrentlyUnderBridge = value;
-                  })
-                }>
-                <Picker.Item label="Select" value={null} />
-                {yesOrNoOptions.map(option => (
-                  <Picker.Item
-                    key={option.value}
-                    label={option.label}
-                    value={option.value}
-                  />
-                ))}
-              </Picker>
-            </View>
-            {form.waterCurrentlyUnderBridge === 'yes' && (
-              <View style={styles.inputContainer}>
-                <InputLabel>Water is</InputLabel>
-                <Picker
-                  selectedValue={form.waterIs}
-                  onValueChange={value =>
-                    setForm(draft => {
-                      draft.waterIs = value;
-                    })
-                  }>
-                  <Picker.Item label="Select" value={null} />
-                  {waterIsData.map(item => (
-                    <Picker.Item
-                      key={item.id}
-                      label={item.value}
-                      value={item.id}
-                    />
-                  ))}
-                </Picker>
-              </View>
-            )}
-            */}
             <View style={styles.inputContainer}>
               <InputLabel>Habitat around bridge</InputLabel>
               <Picker
