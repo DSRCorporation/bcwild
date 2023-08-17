@@ -6,6 +6,7 @@ const { customFindAll } = require("../../../helpers/commonSequelizeQueries");
 const { customErrors } = require("../../../errorHandler/error");
 const { sequelize } = require("../../../config/database");
 const { syncBridges } = require("./syncBridges");
+const { syncBats } = require("./syncBats");
 
 const pushChangesUpdatingModel =
   (model) =>
@@ -21,6 +22,7 @@ const pushers = {
   TELE: pushChangesUpdatingModel(Telemetry),
   CAM: pushChangesUpdatingModel(CameraTrapData),
   BRIDGE: syncBridges,
+  BAT: syncBats,
 };
 
 const getPusherForRecordIdentifier = (recordIdentifier) => {

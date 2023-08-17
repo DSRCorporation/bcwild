@@ -1,15 +1,14 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/database");
 const {
-  setMandatoryProperty,
   setOptionalProperty,
+  setMandatoryProperty,
 } = require("../helpers/commonSequelizeQueries");
 const { Assessment } = require("./Assessment");
-const { Bridge } = require("./Bridge");
 const { BridgeWater } = require("./BridgeWater");
 const { BatGuanoAmount } = require("./BatGuanoAmount");
 const { BatGuanoDistribution } = require("./BatGuanoDistribution");
-const { BatGuanoCollected } = require("./BatGuanoCollected");
+const { Bridge } = require("./Bridge");
 
 const BridgeObservation = db.sequelize.define("bb_data_observation", {
   id: {
@@ -18,50 +17,61 @@ const BridgeObservation = db.sequelize.define("bb_data_observation", {
     type: DataTypes.INTEGER,
     autoIncrement: true,
   },
-  timestamp: {
+  time: {
     allowNull: false,
     type: DataTypes.DATE,
     unique: "bridge-timestamp",
   },
-  emergencyBatCountDone: {
+  emergenceBatCountDone: {
     type: DataTypes.BOOLEAN,
   },
-  batRecordings: {
+  batRecordingsMask: {
     allowNull: false,
     type: DataTypes.INTEGER,
     default: 0,
   },
-  swallowNestType: {
+  batGuanoCollectedMask: {
+    allowNull: false,
+    type: DataTypes.INTEGER,
+    default: 0,
+  },
+  batGuanoSampleLabel: {
+    type: DataTypes.STRING,
+  },
+  swallowNestTypeMask: {
     type: DataTypes.INTEGER,
   },
   swallowsFlying: {
     type: DataTypes.BOOLEAN,
   },
-  speciesComment: {
+  speciesComments: {
+    type: DataTypes.STRING,
+  },
+  comments: {
+    type: DataTypes.STRING,
+  },
+  observers: {
     type: DataTypes.STRING,
   },
 });
 
-setMandatoryProperty(BridgeObservation, Bridge);
-setOptionalProperty(BridgeObservation, BridgeWater);
-setOptionalProperty(
-  BridgeObservation,
-  Assessment,
-  "roostNightAssessmentAssessment",
-);
-setOptionalProperty(
-  BridgeObservation,
-  Assessment,
-  "roostDayAssessmentAssessment",
-);
+setMandatoryProperty(BridgeObservation, Bridge, "bridgeId");
+setOptionalProperty(BridgeObservation, BridgeWater, "water");
+setOptionalProperty(BridgeObservation, Assessment, "roostNightAssessment");
+setOptionalProperty(BridgeObservation, Assessment, "roostDayAssessment");
 setOptionalProperty(BridgeObservation, Assessment, "maternityAssessment");
 
-setOptionalProperty(BridgeObservation, BatGuanoAmount);
-setOptionalProperty(BridgeObservation, BatGuanoDistribution);
-setOptionalProperty(BridgeObservation, BatGuanoCollected);
+setOptionalProperty(BridgeObservation, BatGuanoAmount, "batGuanoAmount");
+setOptionalProperty(
+  BridgeObservation,
+  BatGuanoDistribution,
+  "batGuanoDistribution",
+);
 
 // TODO: add constraint: guano fields are null if and only if there's not guano
 // TODO: add constraint: guano fields are null if and only if there's not guano
+
+// BridgeObservation.sync();
 
 module.exports = {
   BridgeObservation,
