@@ -18,9 +18,17 @@ const styles = StyleSheet.create({
   },
 });
 
-export const BaseButton = ({onPress, accessibilityLabel, testID, children}) => {
+export const BaseButton = ({
+  onPress,
+  accessibilityLabel,
+  testID,
+  children,
+  disabled,
+}) => {
+  // FIXME different style for disabled button
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       style={styles.button}
       accessibilityLabel={accessibilityLabel}
