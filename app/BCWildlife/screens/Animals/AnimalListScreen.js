@@ -11,7 +11,11 @@ import {useAnimals} from './use-animals';
 
 const AnimalListScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
-  const {animals, loading: loadingAnimals} = useAnimals();
+  const {
+    animals,
+    loading: loadingAnimals,
+    deleteLocalAnimalById,
+  } = useAnimals();
   const cardStyles = useCardListStyles();
   const styles = StyleSheet.create({
     container: {
@@ -21,7 +25,6 @@ const AnimalListScreen = ({navigation}) => {
     },
     ...cardStyles,
   });
-
   return (
     <View style={styles.container}>
       <GoBackArrowButton />
@@ -44,10 +47,13 @@ const AnimalListScreen = ({navigation}) => {
                       style={[styles.cardButton, {backgroundColor: '#234075'}]}>
                       <Text style={styles.cardButtonText}>Edit</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.cardButton, {backgroundColor: '#ccc'}]}>
-                      <Text style={styles.cardButtonText}>Delete</Text>
-                    </TouchableOpacity>
+                    {animal.tag === 'local' && (
+                      <TouchableOpacity
+                        onPress={() => deleteLocalAnimalById(animal.id)}
+                        style={[styles.cardButton, {backgroundColor: '#ccc'}]}>
+                        <Text style={styles.cardButtonText}>Delete</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
               ))}
