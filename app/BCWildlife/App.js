@@ -3,6 +3,7 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import 'react-native-gesture-handler';
+import {StyleSheet, SafeAreaView} from 'react-native';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
@@ -34,6 +35,12 @@ const MyTheme = {
   },
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
+
 function App() {
   useEffect(() => {
     async function updateLocalValues() {
@@ -59,44 +66,52 @@ function App() {
   }, []);
 
   return (
-    <NavigationContainer theme={MyTheme} initialRouteName="Login">
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Signup" component={SignupScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="Dashboard" component={DashboardScreen} />
-        <Stack.Screen name="AddProject" component={AddProjectScreen} />
-        <Stack.Screen
-          name="ApproveSignupAccess"
-          component={ApproveSignupAccessScreen}
-        />
-        <Stack.Screen
-          name="ApproveProjectAccess"
-          component={ApproveProjectScreen}
-        />
-        <Stack.Screen
-          name="ProjectAccess"
-          component={ProjectRequestAccessScreen}
-        />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="CameraTrapData" component={CameraTrapDataScreen} />
-        <Stack.Screen
-          name="TelemetryTriangulation"
-          component={TelemetryTriangulationScreen}
-        />
-        <Stack.Screen name="TelemetryForm" component={TelemetryFormScreen} />
-        <Stack.Screen name="BridgesList" component={BridgesListScreen} />
-        <Stack.Screen name="BridgeForm" component={BridgeFormScreen} />
-        <Stack.Screen name="BatSurveyForm" component={BatSurveyFormScreen} />
-        <Stack.Screen name="AnimalList" component={AnimalListScreen} />
-        <Stack.Screen name="AnimalForm" component={AnimalFormScreen} />
-        <Stack.Screen
-          name="AerialTelemetryDataForm"
-          component={AerialTelemetryDataFormScreen}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaView style={styles.container}>
+      <NavigationContainer theme={MyTheme} initialRouteName="Login">
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+          />
+          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="AddProject" component={AddProjectScreen} />
+          <Stack.Screen
+            name="ApproveSignupAccess"
+            component={ApproveSignupAccessScreen}
+          />
+          <Stack.Screen
+            name="ApproveProjectAccess"
+            component={ApproveProjectScreen}
+          />
+          <Stack.Screen
+            name="ProjectAccess"
+            component={ProjectRequestAccessScreen}
+          />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen
+            name="CameraTrapData"
+            component={CameraTrapDataScreen}
+          />
+          <Stack.Screen
+            name="TelemetryTriangulation"
+            component={TelemetryTriangulationScreen}
+          />
+          <Stack.Screen name="TelemetryForm" component={TelemetryFormScreen} />
+          <Stack.Screen name="BridgesList" component={BridgesListScreen} />
+          <Stack.Screen name="BridgeForm" component={BridgeFormScreen} />
+          <Stack.Screen name="BatSurveyForm" component={BatSurveyFormScreen} />
+          <Stack.Screen name="AnimalList" component={AnimalListScreen} />
+          <Stack.Screen name="AnimalForm" component={AnimalFormScreen} />
+          <Stack.Screen
+            name="AerialTelemetryDataForm"
+            component={AerialTelemetryDataFormScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaView>
   );
 }
 

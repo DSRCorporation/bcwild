@@ -10,6 +10,7 @@ import {
 export const useBatSurveyFormValidation = () => {
   const validate = useCallback(
     (form, {isGuanoBatSignSelected, isNestsSelected}) => {
+      console.log('form', form);
       const formProperties = Object.keys(form);
 
       const invalidProperties = formProperties.filter(name => {

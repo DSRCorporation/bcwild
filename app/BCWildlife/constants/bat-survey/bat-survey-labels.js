@@ -1,4 +1,7 @@
 export const batSurveyFormLabels = {
+  bridgeMotId: 'Bridge',
+  waterCurrentlyUnderBridge: 'Water currently under bridge',
+  waterIs: 'Water is',
   batSign: 'Bat sign',
   locationBatSign: 'Location of bat sign',
   guanoAmountInBiggestPile: 'Guano amount in biggest pile',
@@ -20,4 +23,5 @@ export const batSurveyFormLabels = {
   wouldRoostingBatsBeReachableWithoutLadder:
     'Would roosting bats be reachable without a ladder?',
   comments: 'Comments',
+  observers: 'Observers',
 };

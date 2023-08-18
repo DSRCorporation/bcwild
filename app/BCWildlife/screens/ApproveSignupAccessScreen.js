@@ -8,7 +8,7 @@ import { statuschange_url } from '../network/path';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { getAccessToken } from '../global';
 
-const ApproveSignupAccessScreen = (navigation) => {
+const ApproveSignupAccessScreen = ({navigation}) => {
 
 
   const [items, setItems] = useState([]);
@@ -263,7 +263,7 @@ const ApproveSignupAccessScreen = (navigation) => {
 
   return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={()=>handleGoBack}>
+        <TouchableOpacity onPress={handleGoBack}>
           <Image style={{height:30,width:30,margin:25}} source={require('../assets/arrow_back_ios.png')} />
         </TouchableOpacity>
         <View style={styles.logoContainer}>

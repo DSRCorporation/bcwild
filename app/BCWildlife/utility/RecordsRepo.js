@@ -19,10 +19,7 @@ class RecordsRepo {
     unsyncedRecords.push(recordIdentifier);
 
     // Convert the array to a JSON string and store it back
-    await EncryptedStorage.setItem(
-      'unsynced_records',
-      JSON.stringify(unsyncedRecords),
-    );
+    await EncryptedStorage.setItem('unsynced_records', JSON.stringify(unsyncedRecords));
   }
 
   static async getUnsyncedRecords() {

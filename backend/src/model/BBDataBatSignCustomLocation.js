@@ -22,22 +22,10 @@ const BBDataBatSignCustomLocation = db.sequelize.define(
   },
 );
 
-BBDataBatSignCustomLocation.belongsTo(BatSign, {
-  foreignKey: {
-    allowNull: false,
-    unique: observationLocationSignUniqueness,
-  },
-});
-BatSign.hasMany(BBDataBatSignCustomLocation, {
-  foreignKey: {
-    allowNull: false,
-    unique: observationLocationSignUniqueness,
-  },
-});
-
 BBDataBatSignCustomLocation.belongsTo(BridgeObservation, {
   foreignKey: {
     allowNull: false,
+    name: "bridgeObservation",
     unique: observationLocationSignUniqueness,
   },
 });
@@ -45,6 +33,7 @@ BBDataBatSignCustomLocation.belongsTo(BridgeObservation, {
 BridgeObservation.hasMany(BBDataBatSignCustomLocation, {
   foreignKey: {
     allowNull: false,
+    name: "bridgeObservation",
     unique: observationLocationSignUniqueness,
   },
 });

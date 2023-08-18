@@ -89,6 +89,8 @@ setOptionalProperty(BridgeConfiguration, BridgeBeams, "beamsId");
 setOptionalProperty(BridgeConfiguration, BridgeColumns, "columnsId");
 setOptionalProperty(BridgeConfiguration, BridgeCrossingType, "crossingTypeId");
 
+// BridgeConfiguration.sync()
+
 module.exports = {
   BridgeConfiguration,
 };
