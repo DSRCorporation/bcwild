@@ -4,6 +4,7 @@ const CameraTrapData = require("../models/camera");
 const { syncBridges } = require("./syncBridges");
 const { syncAnimals } = require("./syncAnimals");
 const { syncAerialTelemetry } = require("./syncAerialTelemetry");
+const { syncBats } = require("./syncBats");
 
 const pushChangesUpdatingModel =
   (model) =>
@@ -19,6 +20,7 @@ const pushers = {
   TELE: pushChangesUpdatingModel(Telemetry),
   CAM: pushChangesUpdatingModel(CameraTrapData),
   BRIDGE: syncBridges,
+  BAT: syncBats,
   ANIMAL: syncAnimals,
   AERIALTELEMETRY: syncAerialTelemetry,
 };
