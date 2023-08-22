@@ -245,16 +245,16 @@ const ProfileScreen = ({navigation}) => {
       });
       try {
         await pullBridges();
-        Alert.alert('Success','Bridge data loaded');
+        // Alert.alert('Success','Bridge data loaded');
       } catch (error) {
         console.error('Failed to pull bridges', error, JSON.stringify(error));
-        if (error.response) {
-          Alert.alert('Error', error.response.data.message);
-        } else if (error.request) {
-          Alert.alert('Error', `Request error: ${error.request}`);
-        } else {
-          Alert.alert('Error', error.message);
-        }
+        // if (error.response) {
+        //   Alert.alert('Error', error.response.data.message);
+        // } else if (error.request) {
+        //   Alert.alert('Error', `Request error: ${error.request}`);
+        // } else {
+        //   Alert.alert('Error', error.message);
+        // }
       }
     } finally {
       setLoading(false);
