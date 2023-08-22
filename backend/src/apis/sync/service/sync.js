@@ -10,13 +10,14 @@ const { syncBats } = require("./syncBats");
 
 const pushChangesUpdatingModel =
   (model) =>
-  async (data, { transaction }) =>
-    customCreate(
+  async (data, { transaction }) => {
+    await customCreate(
       model,
       data.data,
       { transaction },
       { record_identifier: data.record_identifier },
     );
+  };
 
 const pushers = {
   TELE: pushChangesUpdatingModel(Telemetry),
