@@ -1,5 +1,3 @@
-import {BCWildLogo} from '../../shared/components/BCWildLogo';
-import {TitleText} from '../../shared/components/TitleText';
 import React, {useCallback} from 'react';
 import {InputLabel} from '../../shared/components/InputLabel';
 import {View, ScrollView, Text, TextInput} from 'react-native';
@@ -18,6 +16,7 @@ import {
 } from '../../constants/aeriel-telemetry/aeriel-telemetry-data';
 import {useAerielTelemetryDataFormValidation} from './use-aeriel-telemetry-data-form-validation';
 import {useCardListStyles} from '../../shared/styles/card-list-styles';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
 const ArielTelemetryDataFormScreen = () => {
   const styles = useFormScreenStyles();
@@ -56,8 +55,7 @@ const ArielTelemetryDataFormScreen = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <BCWildLogo />
-        <TitleText>Aerial Telemetry data</TitleText>
+        <SimpleScreenHeader>Aerial Telemetry data</SimpleScreenHeader>
         <View>
           <View>
             <View style={styles.inputContainer}>

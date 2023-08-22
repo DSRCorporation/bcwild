@@ -8,6 +8,7 @@ import {BaseButton} from '../../shared/components/BaseButton';
 import {useAnimals} from './use-animals';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
 const AnimalFormScreen = ({route}) => {
   const styles = useFormScreenStyles();
@@ -44,10 +45,7 @@ const AnimalFormScreen = ({route}) => {
   return (
     <>
       <ScrollView style={styles.container}>
-        <View>
-          <BCWildLogo />
-          <TitleText>Animal form</TitleText>
-        </View>
+        <SimpleScreenHeader>Animal form</SimpleScreenHeader>
         <View>
           <View style={styles.inputContainer}>
             <InputLabel>ID</InputLabel>

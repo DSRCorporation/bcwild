@@ -7,6 +7,7 @@ import {GoBackArrowButton} from '../../shared/components/GoBackArrowButton';
 import {BCWildLogo} from '../../shared/components/BCWildLogo';
 import {TitleText} from '../../shared/components/TitleText';
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
 const BridgeListScreen = ({navigation}) => {
   const [loading, setLoading] = useState(true);
@@ -45,9 +46,7 @@ const BridgeListScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <GoBackArrowButton />
-      <BCWildLogo />
-      <TitleText>Bridge list</TitleText>
+      <SimpleScreenHeader>Bridge list</SimpleScreenHeader>
       <View style={styles.cardList}>
         <ScrollView>
           {bridges.map(bridge => (

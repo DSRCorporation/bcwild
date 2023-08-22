@@ -36,6 +36,7 @@ import {parseBatSurvey} from './parseBatSurvey';
 import {getUsernameG} from '../../global';
 import RecordsRepo from '../../utility/RecordsRepo';
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
 const linkColor = '#216de8';
 
@@ -154,8 +155,7 @@ const BatSurveyFormScreen = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <BCWildLogo />
-        <TitleText>Bat survey</TitleText>
+        <SimpleScreenHeader>Bat survey</SimpleScreenHeader>
         <View>
           <View style={styles.inputContainer}>
             <InputLabel>{batSurveyFormLabels.observers}</InputLabel>
