@@ -34,7 +34,7 @@ const ProfileScreen = ({navigation}) => {
 
 
   const handleDialogSubmit = (selectedProject, email) => {
-  
+
     console.log(`Exporting data for project ${selectedProject} to email ${email}`);
     setDialogVisible(false);
     setLoading(true);
@@ -46,7 +46,7 @@ const ProfileScreen = ({navigation}) => {
 
 
     const USER_TOKEN = getAccessToken();
-      const AuthStr = 'Bearer '.concat(USER_TOKEN); 
+      const AuthStr = 'Bearer '.concat(USER_TOKEN);
       try {
         axiosUtility.post(dataexport_url, data,
           { headers: { Authorization: AuthStr } })
@@ -54,9 +54,9 @@ const ProfileScreen = ({navigation}) => {
           setDialogVisible(false);
           setLoading(false);
           console.log(response);
-        
+
           Alert.alert('Success',response.data.message);
-        
+
           //getPendingProjectAccessRequests();
         }).catch((error) => {
           setLoading(false);
@@ -127,7 +127,7 @@ const ProfileScreen = ({navigation}) => {
     renderProfile();
   }, []);
 
-  const configAuth = () => { 
+  const configAuth = () => {
     let token = getAccessToken();
     let AuthStr = 'Bearer '.concat(token);
     return { headers: { Authorization: AuthStr } };
@@ -143,7 +143,7 @@ const ProfileScreen = ({navigation}) => {
     // handle export logic
     const projectsData = await EncryptedStorage.getItem('projects');
     console.log(projectsData);
-    console.log('Export');  
+    console.log('Export');
     setDialogVisible(true);
   };
 
@@ -184,7 +184,7 @@ const ProfileScreen = ({navigation}) => {
           }
 
           const USER_TOKEN = getAccessToken();
-          const AuthStr = 'Bearer '.concat(USER_TOKEN); 
+          const AuthStr = 'Bearer '.concat(USER_TOKEN);
           try {
             axiosUtility.post(datasyncpush_url, recordsObj,
               { headers: { Authorization: AuthStr } })
@@ -257,15 +257,16 @@ const ProfileScreen = ({navigation}) => {
       });
       try {
         await pullBridges();
+        // Alert.alert('Success','Bridge data loaded');
       } catch (error) {
         console.error('Failed to pull bridges', error, JSON.stringify(error));
-        if (error.response) {
-          Alert.alert('Error', error.response.data.message);
-        } else if (error.request) {
-          Alert.alert('Error', `Request error: ${error.request}`);
-        } else {
-          Alert.alert('Error', error.message);
-        }
+        // if (error.response) {
+        //   Alert.alert('Error', error.response.data.message);
+        // } else if (error.request) {
+        //   Alert.alert('Error', `Request error: ${error.request}`);
+        // } else {
+        //   Alert.alert('Error', error.message);
+        // }
       }
       try {
         await pullAnimals();
@@ -313,7 +314,7 @@ const ProfileScreen = ({navigation}) => {
       console.log(e);
     }
 
-    
+
   };
 
 
@@ -355,13 +356,13 @@ const ProfileScreen = ({navigation}) => {
             if(title=='Logout'){
               handleLogout();
             }
-          } 
+          }
         },
         {
           text: 'No',
           onPress: () =>{
             console.log('No Pressed')
-          } 
+          }
         }
       ]
     );
@@ -376,9 +377,9 @@ const ProfileScreen = ({navigation}) => {
         <View style={{ flexDirection:'row' , width:'100%',justifyContent:'space-between'}}>
             <TouchableOpacity onPress={() => navigateToDashboard()}>
                 <Image source={require('../assets/arrow_back_ios.png')}
-                style={{height:25,width:25 , marginTop:30}} /> 
-                </TouchableOpacity>  
-            <Image source={require('../assets/bc_abbreviated.png')} 
+                style={{height:25,width:25 , marginTop:30}} />
+                </TouchableOpacity>
+            <Image source={require('../assets/bc_abbreviated.png')}
             style={{height:90,
                 width:90,resizeMode:'contain',marginLeft:35}} />
             <TouchableOpacity
@@ -386,7 +387,7 @@ const ProfileScreen = ({navigation}) => {
               <Image style={styles.l_image} source={require('../assets/logout.png')} />
             </TouchableOpacity>
         </View>
-        
+
 
       <View style={styles.photoContainer}>
         <TouchableOpacity onPress={handleUpdatePhoto}>
@@ -402,7 +403,7 @@ const ProfileScreen = ({navigation}) => {
       <View style={styles.section}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={{ marginLeft:15 ,marginTop:10,fontSize:20}}>First Name</Text>
-        <Text style={{marginRight:15 ,marginTop:10,fontSize:20}}>{fname}</Text>                  
+        <Text style={{marginRight:15 ,marginTop:10,fontSize:20}}>{fname}</Text>
         </View>
         <View
                     style={{
@@ -420,7 +421,7 @@ const ProfileScreen = ({navigation}) => {
                       borderBottomWidth: StyleSheet.hairlineWidth,
                       }}
             />
-       
+
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={{ marginLeft:15 ,marginBottom:10,fontSize:20}}>Contact Email</Text>
         <Text style={{ marginRight:15 ,marginBottom:10,fontSize:18}}>{userEmail}</Text>
@@ -451,7 +452,7 @@ const ProfileScreen = ({navigation}) => {
           </View>
       </View>
 
-      <View style={styles.containerExport}> 
+      <View style={styles.containerExport}>
             <TouchableOpacity style={styles.button}
             onPress={handleSync}>
               <Text style={styles.textButton}>Sync Offline Data</Text>
@@ -473,7 +474,7 @@ const ProfileScreen = ({navigation}) => {
         onSubmit={handleDialogSubmit}
       />
       <LoadingOverlay loading={loading} />
-      
+
     </View>
     </ScrollView>
   );
