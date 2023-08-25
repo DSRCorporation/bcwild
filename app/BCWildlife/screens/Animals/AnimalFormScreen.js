@@ -2,17 +2,37 @@ import {BCWildLogo} from '../../shared/components/BCWildLogo';
 import {TitleText} from '../../shared/components/TitleText';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {InputLabel} from '../../shared/components/InputLabel';
-import {View, ScrollView, TextInput} from 'react-native';
+import {Alert, View, ScrollView, TextInput} from 'react-native';
 import {useImmer} from 'use-immer';
 import {BaseButton} from '../../shared/components/BaseButton';
 import {useAnimals} from './use-animals';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
-const AnimalFormScreen = ({route}) => {
+const validateAnimalForm = form => {
+  if (!form.id) {
+    return {
+      isValid: false,
+      errorMessage: 'Empty animal ID',
+    };
+  }
+  if (!form.name) {
+    return {
+      isValid: false,
+      errorMessage: 'Empty animal name',
+    };
+  }
+  return {
+    isValid: true,
+    animal: form,
+  };
+};
+
+const AnimalFormScreen = ({route, navigation}) => {
   const styles = useFormScreenStyles();
   const currentAnimalId = (route.params && route.params.animalId) || null;
-  const {getAnimalById, loading} = useAnimals();
+  const {getAnimalById, loading, saveAnimalLocally, animals} = useAnimals();
   const currentAnimal = useMemo(
     () => getAnimalById(currentAnimalId),
     [currentAnimalId, getAnimalById],
@@ -37,6 +57,23 @@ const AnimalFormScreen = ({route}) => {
     });
   }, [currentAnimal, setForm]);
 
+  const submit = async () => {
+    const validated = validateAnimalForm(form);
+    try {
+      if (validated.isValid) {
+        await saveAnimalLocally(validated.animal);
+        Alert.alert('Success', 'Animal saved locally');
+        navigation.goBack();
+      } else {
+        Alert.alert('Error', validated.errorMessage);
+      }
+    } catch (error) {
+      const errorMessage = error.message || 'Could not save animal';
+      console.error('Could not save animal', error);
+      Alert.alert(errorMessage);
+    }
+  };
+
   useEffect(() => {
     fillForm();
   }, [fillForm]);
@@ -44,10 +81,7 @@ const AnimalFormScreen = ({route}) => {
   return (
     <>
       <ScrollView style={styles.container}>
-        <View>
-          <BCWildLogo />
-          <TitleText>Animal form</TitleText>
-        </View>
+        <SimpleScreenHeader>Animal form</SimpleScreenHeader>
         <View>
           <View style={styles.inputContainer}>
             <InputLabel>ID</InputLabel>
@@ -77,7 +111,8 @@ const AnimalFormScreen = ({route}) => {
           </View>
           <BaseButton
             accessibilityLabel="create animal button"
-            testID="createAnimalButton">
+            testID="createAnimalButton"
+            onPress={submit}>
             {actionText}
           </BaseButton>
         </View>

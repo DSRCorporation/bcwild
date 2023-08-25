@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { getUsernameG } from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
+import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 
 
 
@@ -119,7 +120,7 @@ const CameraTrapDataScreen = () => {
     }
   
     if (distanceFeature) {
-      data.distan_feature = distanceFeature;
+      data.distant_feature = distanceFeature;
     }
     if (quitePeriod) {
       data.quiet_period = quitePeriod;
@@ -146,7 +147,7 @@ const CameraTrapDataScreen = () => {
     }
 
     if (cameraAttached) {
-     // data.camera_attached = cameraAttached;
+      data.camera_attached = cameraAttached;
     }
 
     if(selectedValueProject){
@@ -516,11 +517,8 @@ const CameraTrapDataScreen = () => {
     
     <View style={styles.container}>
       <ScrollView>
-      <View style={styles.logoContainer}>
-        <Image source={require('../assets/bc_abbreviated.png')} style={styles.logo} />
-        <Text style={styles.label}>Camera Trap Data</Text>
-      </View>
-      
+        <SimpleScreenHeader>Camera Trap Data</SimpleScreenHeader>
+
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}> Project </Text>
               <View style={styles.dropdownContainer}>

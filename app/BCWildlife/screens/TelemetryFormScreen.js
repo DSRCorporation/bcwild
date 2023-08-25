@@ -6,6 +6,7 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import { getUsernameG } from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
 import { getTelemetryStr,setTelemetryStr } from '../global';
+import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 
 
 
@@ -326,10 +327,7 @@ const TelemetryFormScreen = ({navigation}) => {
     
     <View style={styles.container}>
       <ScrollView>
-      <View style={styles.logoContainer}>
-        <Image source={require('../assets/bc_abbreviated.png')} style={styles.logo} />
-        <Text style={styles.label}>Telemetry Data</Text>
-      </View>
+        <SimpleScreenHeader>Telemetry Data</SimpleScreenHeader>
       
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}> Project </Text>

@@ -1,23 +1,12 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Image,
-} from 'react-native';
-import LoadingOverlay from '../../utility/LoadingOverlay';
+import React, {useCallback, useEffect, useMemo} from 'react';
+import {View, TextInput, Alert} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import {InputLabel} from '../../shared/components/InputLabel';
 import {
   useBridgeFormValidation,
   bridgeDtoToFormData,
-} from '../../shared/hooks/use-bridge-form-validation';
-import {BCWildLogo} from '../../shared/components/BCWildLogo';
-import {TitleText} from '../../shared/components/TitleText';
+} from './use-bridge-form-validation';
 import {
   abutmentData,
   beamsData,
@@ -32,21 +21,19 @@ import {
   waterIsData,
 } from '../../constants/bridges/bridge-data';
 import {useImmer} from 'use-immer';
-import {yesOrNoOptions} from '../constants/yes-or-no-options';
-import EncryptedStorage from 'react-native-encrypted-storage';
 import {getUsernameG} from '../../global';
 import RecordsRepo from '../../utility/RecordsRepo';
-import {BridgeDto} from '../../shared/hooks/use-bridge-form-validation';
-import {BridgeValidationError} from '../../shared/hooks/use-bridge-form-validation';
+import {BridgeDto, BridgeValidationError} from './use-bridge-form-validation';
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
 import {BaseButton} from '../../shared/components/BaseButton';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
-const BridgeFormScreen = ({route, navigation}) => {
+const BridgeFormScreen = ({route}) => {
   const styles = useFormScreenStyles();
   const currentBridge = (route.params && route.params.bridge) || null;
   const {validate} = useBridgeFormValidation();
-  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useImmer({
     region: '',
@@ -63,7 +50,7 @@ const BridgeFormScreen = ({route, navigation}) => {
     columns: '',
     heightFromBeamsOrDeckToSurfaceBelow: '',
     length: '',
-    bridgeIfFor: '',
+    bridgeIfFor: [],
     crossingType: '',
     waterCurrentlyUnderBridge: 'no',
     waterIs: '',
@@ -105,7 +92,7 @@ const BridgeFormScreen = ({route, navigation}) => {
       draft.beams = beamsData[2].id;
       draft.underdeck = underdeckData[0].id;
       draft.columns = columnsData[0].id;
-      draft.bridgeIfFor = bridgeIsForData[1].id;
+      draft.bridgeIfFor = [];
       draft.crossingType = crossingTypeData[1].id;
       draft.habitatAroundBridge = habitatData[0].id;
     });
@@ -125,21 +112,10 @@ const BridgeFormScreen = ({route, navigation}) => {
     setFormValues();
   }, [currentBridge, setDefaultValues, setFormValues]);
 
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
   return (
     <ScrollView>
       <View style={styles.container}>
-        <TouchableOpacity onPress={handleGoBack}>
-          <Image
-            source={require('../../assets/arrow_back_ios.png')}
-            style={{height: 25, width: 25, marginTop: 30}}
-          />
-        </TouchableOpacity>
-        <BCWildLogo />
-        <TitleText>{actionText} bridge</TitleText>
+        <SimpleScreenHeader>{actionText} bridge</SimpleScreenHeader>
         <View>
           <View>
             <View style={styles.inputContainer}>
@@ -377,22 +353,33 @@ const BridgeFormScreen = ({route, navigation}) => {
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>Bridge is for</InputLabel>
-              <Picker
-                selectedValue={form.bridgeIfFor}
-                onValueChange={value =>
-                  setForm(draft => {
-                    draft.bridgeIfFor = value;
-                  })
-                }>
-                <Picker.Item label="Select" value={null} />
-                {bridgeIsForData.map(item => (
-                  <Picker.Item
-                    key={item.id}
-                    label={item.value}
-                    value={item.id}
-                  />
-                ))}
-              </Picker>
+              {bridgeIsForData.map(item => (
+                <BouncyCheckbox
+                  key={item.id}
+                  onPress={value => {
+                    setForm(draft => {
+                      if (value) {
+                        if (draft.bridgeIfFor.includes(item.id)) {
+                          draft.bridgeIfFor = draft.bridgeIfFor.filter(
+                            id => id !== item.id,
+                          );
+                        }
+                      } else {
+                        if (!draft.bridgeIfFor.includes(item.id)) {
+                          draft.bridgeIfFor = [...draft.bridgeIfFor, item.id];
+                        }
+                      }
+                    });
+                  }}
+                  isChecked={form.bridgeIfFor.includes(item.id)}
+                  text={item.value}
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  textStyle={{textDecorationLine: 'none'}}
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  style={{marginBottom: 8}}
+                  disableBuiltInState
+                />
+              ))}
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>Crossing type</InputLabel>
@@ -455,7 +442,6 @@ const BridgeFormScreen = ({route, navigation}) => {
           </BaseButton>
         </View>
       </View>
-      <LoadingOverlay loading={loading} />
     </ScrollView>
   );
 };

@@ -119,6 +119,9 @@ const bridgeType = require("./src/model/BridgeType");
 const bridgeUnderdeck = require("./src/model/BridgeUnderdeck");
 const bridgeWater = require("./src/model/BridgeWater");
 const region = require("./src/model/Region");
+const atDefMacroPosition = require("./src/model/AtDefMacroPosition");
+const atDefMesoSlope = require("./src/model/AtDefMesoSlope");
+const atDefAspect = require("./src/model/AtDefAspect");
 const swallowNestType = require("./src/model/BBDefSwallowNestType");
 
 const tables = [
@@ -142,6 +145,9 @@ const tables = [
   bridgeWater,
   region,
   swallowNestType,
+  atDefMacroPosition,
+  atDefMesoSlope,
+  atDefAspect,
 ];
 
 const db = require("./src/config/database");

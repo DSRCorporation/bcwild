@@ -1,8 +1,7 @@
-import {useCallback} from 'react';
-import {getFormValidationErrorMessage} from '../../utils/get-form-validation-error-message';
 import {bridgeFormLabels} from '../../../constants/bridges/bridge-labels';
 import {BridgeValidationError} from './BridgeValidationError';
 import {BridgeDto} from './BridgeDto';
+import {getFormValidationErrorMessage} from '../../../shared/utils/get-form-validation-error-message';
 
 const parseStringValue = (data, prop) => {
   const value = data[prop];
@@ -30,14 +29,38 @@ const parseNumberDefaultZero = (data, prop) => {
   return value;
 };
 
+const returnAsIs = (data, prop) => data[prop];
+
+const formToDtoRules = [
+  {
+    form: 'bridgeName',
+    dto: 'bridgeName',
+    formToDto: parseStringValue,
+  },
+  {
+    form: 'motBridgeId',
+    dto: 'bridgeMotId',
+    formToDto: parseStringValue,
+  },
+  {
+    form: 'roadOrHighway',
+    dto: 'roadName',
+    formToDto: parseStringValue,
+  },
+  {
+    form: 'bridgeType',
+    dto: 'roadName',
+    formToDto: parseStringValue,
+  },
+];
 const simpleParsing = [
   {
-    parse: parseStringValue,
+    parse: returnAsIs,
     fieldDictionary: {
-      bridgeName: 'bridgeName',
-      motBridgeId: 'bridgeMotId',
+      timestamp: 'timestamp',
+      bridgeIfFor: 'bridgeFor',
+      habitatComments: 'habitatComments',
       region: 'regionId',
-      roadOrHighway: 'roadName',
       bridgeType: 'bridgeType',
       spanMaterial: 'spanMaterial',
       abutmentOrBackWall: 'abutment',
@@ -49,28 +72,49 @@ const simpleParsing = [
     },
   },
   {
+    parse: parseStringValue,
+    fieldDictionary: {
+      bridgeName: 'bridgeName',
+      motBridgeId: 'bridgeMotId',
+      roadOrHighway: 'roadName',
+    },
+  },
+  {
     parse: parseFloatValue,
     fieldDictionary: {
       heightFromBeamsOrDeckToSurfaceBelow: 'height',
       length: 'length',
+      longitude: 'longitude',
+      latitude: 'latitude',
     },
   },
 ];
 
 const bridgeFormToDto = (form, {timestamp}) => {
   const dto = new BridgeDto();
-  console.log("form", JSON.stringify(form));
   dto.timestamp = timestamp;
-  dto.bridgeId = parseNumberDefaultZero(form, 'bridgeId');
   simpleParsing.forEach(({parse, fieldDictionary}) => {
     for (const [formProperty, dtoProperty] of Object.entries(fieldDictionary)) {
       dto[dtoProperty] = parse(form, formProperty);
     }
   });
-  // FIXME must be multiselect
-  dto.bridgeFor = [parseStringValue(form, 'bridgeIfFor')];
-  dto.habitatComments = form.habitatComment;
   return dto;
+};
+
+export const bridgeDtoToFormData = dto => {
+  const formData = {};
+  simpleParsing.forEach(({parse, fieldDictionary}) => {
+    for (const [formProperty, dtoProperty] of Object.entries(fieldDictionary)) {
+      if (parse !== parseFloatValue) {
+        formData[formProperty] = dto[dtoProperty];
+      } else {
+        // Numerical values from text fields are converted to strings
+        formData[formProperty] = String(dto[dtoProperty]);
+      }
+    }
+  });
+  console.log('dto2form', dto, formData);
+  return formData;
 };
 
 const validate = (form, options) => {

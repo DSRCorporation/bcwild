@@ -33,7 +33,6 @@ const findLatestConfigurations = async () =>
 const listBridges = async () => {
   const configurations = await findLatestConfigurations();
   const bridges = configurations.map(bridgeConfigurationToDto);
-  console.log("lb", bridges);
   return { bridges };
 };
 

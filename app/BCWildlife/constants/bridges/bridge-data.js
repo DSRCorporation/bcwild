@@ -177,10 +177,6 @@ export const columnsData = [
 
 export const bridgeIsForData = [
   {
-    id: 1,
-    value: 'other',
-  },
-  {
     id: 2,
     value: 'vehicle',
   },
@@ -195,6 +191,10 @@ export const bridgeIsForData = [
   {
     id: 16,
     value: 'pedestrian',
+  },
+  {
+    id: 1,
+    value: 'other',
   },
 ];
 

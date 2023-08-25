@@ -1,17 +1,19 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import React, {useState} from 'react';
 import {BaseButton} from '../../shared/components/BaseButton';
-import {BCWildLogo} from '../../shared/components/BCWildLogo';
-import {TitleText} from '../../shared/components/TitleText';
-import {GoBackArrowButton} from '../../shared/components/GoBackArrowButton';
 import {ScrollView} from 'react-native-gesture-handler';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {useCardListStyles} from '../../shared/styles/card-list-styles';
 import {useAnimals} from './use-animals';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
 const AnimalListScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
-  const {animals, loading: loadingAnimals} = useAnimals();
+  const {
+    animals,
+    loading: loadingAnimals,
+    deleteLocalAnimalById,
+  } = useAnimals();
   const cardStyles = useCardListStyles();
   const styles = StyleSheet.create({
     container: {
@@ -21,12 +23,9 @@ const AnimalListScreen = ({navigation}) => {
     },
     ...cardStyles,
   });
-
   return (
     <View style={styles.container}>
-      <GoBackArrowButton />
-      <BCWildLogo />
-      <TitleText>Animals list</TitleText>
+      <SimpleScreenHeader>Animal list</SimpleScreenHeader>
       <View style={styles.cardList}>
         <ScrollView>
           {animals && animals.length === 0 ? (
@@ -44,10 +43,13 @@ const AnimalListScreen = ({navigation}) => {
                       style={[styles.cardButton, {backgroundColor: '#234075'}]}>
                       <Text style={styles.cardButtonText}>Edit</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.cardButton, {backgroundColor: '#ccc'}]}>
-                      <Text style={styles.cardButtonText}>Delete</Text>
-                    </TouchableOpacity>
+                    {animal.tag === 'local' && (
+                      <TouchableOpacity
+                        onPress={() => deleteLocalAnimalById(animal.id)}
+                        style={[styles.cardButton, {backgroundColor: '#ccc'}]}>
+                        <Text style={styles.cardButtonText}>Delete</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
               ))}
