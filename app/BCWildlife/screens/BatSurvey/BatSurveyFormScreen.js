@@ -36,8 +36,36 @@ import {parseBatSurvey} from './parseBatSurvey';
 import {getUsernameG} from '../../global';
 import RecordsRepo from '../../utility/RecordsRepo';
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
+import {RowList} from '../../shared/components/RowList';
 
 const linkColor = '#216de8';
+
+const CustomLocation = ({value, onDelete, onChange}) => {
+  const styles = useFormScreenStyles();
+  return (
+    <View style={styles.inputContainer}>
+      <InputLabel>
+        Location {value.key} <Text onPress={onDelete}>[Delete]</Text>
+      </InputLabel>
+      <TextInput
+        value={value.location}
+        onChangeText={text => onChange({...value, location: text})}
+        multiline={true}
+        placeholder="Describe the location"
+        style={styles.textInput}
+      />
+      <TextInput
+        value={value.description}
+        onChangeText={text => onChange({...value, description: text})}
+        multiline={true}
+        placeholder="Describe the bat signs"
+        style={styles.textInput}
+      />
+    </View>
+  );
+};
+
+const createCustomLocation = key => ({key, description: '', comments: ''});
 
 const BatSurveyFormScreen = () => {
   const styles = useFormScreenStyles();
@@ -52,6 +80,7 @@ const BatSurveyFormScreen = () => {
     bridgeMotId: '',
     batSign: [...transformListDataToCheckboxItems(batSignData)], // checkboxes, multiselect, no selection means None
     locationBatSign: [...transformListDataToCheckboxItems(batSignLocationData)], // checkboxes. If checked, "What" text field appears. Only shows if previous field is not None
+    otherLocations: [],
     guanoAmountInBiggestPile: '', // Only shows if Guano Bat sign is checked
     guanoDistribution: '', // Only shows if Guano Bat sign is checked
     guanoCollected: [...transformListDataToCheckboxItems(guanoCollectedData)], //checkboxes, multiselect, no selection means None. Only shows if Guano Bat sign is checked.
@@ -253,35 +282,51 @@ const BatSurveyFormScreen = () => {
               ))}
             </View>
             {isAnyBatSignSelected && (
-              <View style={styles.inputContainer}>
-                <InputLabel>{batSurveyFormLabels.locationBatSign}</InputLabel>
-                {form.locationBatSign.map((option, optionIndex) => (
-                  <View key={option.label}>
-                    <BouncyCheckbox
-                      onPress={value => {
-                        setForm(draft => {
-                          draft.locationBatSign[optionIndex].checked = value;
-                        });
-                      }}
-                      isChecked={option.checked}
-                      text={option.label}
-                      textStyle={{textDecorationLine: 'none'}}
-                      style={{marginBottom: 8}}
-                    />
-                    {option.checked && (
-                      <TextInput
-                        value={option.what}
-                        onChangeText={text =>
+              <View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>{batSurveyFormLabels.locationBatSign}</InputLabel>
+                  {form.locationBatSign.map((option, optionIndex) => (
+                    <View key={option.label}>
+                      <BouncyCheckbox
+                        onPress={value => {
                           setForm(draft => {
-                            draft.locationBatSign[optionIndex].what = text;
-                          })
-                        }
-                        placeholder="Enter text"
-                        style={[styles.textInput, {marginBottom: 8}]}
+                            draft.locationBatSign[optionIndex].checked = value;
+                          });
+                        }}
+                        isChecked={option.checked}
+                        text={option.label}
+                        textStyle={{textDecorationLine: 'none'}}
+                        style={{marginBottom: 8}}
                       />
-                    )}
-                  </View>
-                ))}
+                      {option.checked && (
+                        <TextInput
+                          value={option.what}
+                          onChangeText={text =>
+                            setForm(draft => {
+                              draft.locationBatSign[optionIndex].what = text;
+                            })
+                          }
+                          placeholder="Enter text"
+                          // eslint-disable-next-line react-native/no-inline-styles
+                          style={[styles.textInput, {marginBottom: 8}]}
+                        />
+                      )}
+                    </View>
+                  ))}
+                </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>Other locations</InputLabel>
+                  <RowList
+                    createRow={createCustomLocation}
+                    Row={CustomLocation}
+                    onChange={rows =>
+                      setForm(draft => {
+                        draft.otherLocations = rows;
+                      })
+                    }
+                    addLabel="Add location"
+                  />
+                </View>
               </View>
             )}
 

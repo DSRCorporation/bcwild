@@ -19,6 +19,11 @@ const BBDataBatSignCustomLocation = db.sequelize.define(
       type: DataTypes.STRING,
       unique: observationLocationSignUniqueness,
     },
+    description: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      unique: observationLocationSignUniqueness,
+    },
   },
 );
 
