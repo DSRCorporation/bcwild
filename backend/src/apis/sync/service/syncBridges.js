@@ -67,6 +67,10 @@ const bridgeDtoToConfiguration = (bridgeId, dto) => {
 
 const syncBridges = async (data) =>
   sequelize.transaction(async (transaction) => {
+    // Sync the tables
+    await Promise.all(
+      [Bridge, BridgeConfiguration].map((model) => model.sync({ transaction })),
+    );
     const dto = data.data;
     const { bridgeMotId } = dto;
     let bridgeId;

@@ -122,6 +122,7 @@ const region = require("./src/model/Region");
 const atDefMacroPosition = require("./src/model/AtDefMacroPosition");
 const atDefMesoSlope = require("./src/model/AtDefMesoSlope");
 const atDefAspect = require("./src/model/AtDefAspect");
+const swallowNestType = require("./src/model/BBDefSwallowNestType");
 
 const tables = [
   assessment,
@@ -143,6 +144,7 @@ const tables = [
   bridgeUnderdeck,
   bridgeWater,
   region,
+  swallowNestType,
   atDefMacroPosition,
   atDefMesoSlope,
   atDefAspect,

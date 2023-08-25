@@ -66,10 +66,41 @@ const parseGuanoFields = (form, dto, hasGuano) => {
   fn(form, dto);
 };
 
+const parseOtherLocations = (form, dto) => {
+  const otherLocations = form.otherLocations || [];
+  const nonemptyOtherLocations = [];
+  const seenLocations = new Set();
+  otherLocations.forEach(({location, description}) => {
+    if (location || description) {
+      if (seenLocations.has(seenLocations)) {
+        throw new BatSurveyValidationError([
+          'otherLocations',
+          `duplicate location ${location}`,
+        ]);
+      }
+      if (!location) {
+        throw new BatSurveyValidationError([
+          'otherLocations',
+          'no description of location',
+        ]);
+      }
+      if (!description) {
+        throw new BatSurveyValidationError([
+          'otherLocations',
+          'no description of bat signs',
+        ]);
+      }
+      seenLocations.add(location);
+      nonemptyOtherLocations.push({location, description});
+    }
+  });
+  dto.batSignCustomLocations = nonemptyOtherLocations;
+};
+
 const formToDto = (form, timestamp) => {
-  console.log('form', form);
   const dto = new BatSurveyDto();
   dto.timestamp = timestamp;
+  dto.observers = ensureNonemptyString(form, 'observers');
   dto.bridgeMotId = ensureNonemptyString(form, 'bridgeMotId');
   dto.waterUnderBridge = parseYesNo(form, 'waterCurrentlyUnderBridge');
   if (dto.waterUnderBridge) {
@@ -86,8 +117,7 @@ const formToDto = (form, timestamp) => {
     batSignLocationHasSigns: checked,
     batSignLocationDescription: what,
   }));
-  // FIXME: support in the form
-  dto.batSignCustomLocations = [];
+  parseOtherLocations(form, dto);
   const hasGuano = form.batSign.find(
     ({value}) => value === guanoBatSignId,
   ).checked;
@@ -117,7 +147,6 @@ const formToDto = (form, timestamp) => {
   );
   dto.speciesComments = form.speciesOtherComments;
   dto.comments = form.comments;
-  dto.observers = form.observers;
   return dto;
 };
 
@@ -130,10 +159,19 @@ export const parseBatSurvey = (form, timestamp) => {
     };
   } catch (error) {
     if (error instanceof BatSurveyValidationError) {
-      const invalidProp = error.message;
-      const errorMessage = getFormValidationErrorMessage(
-        batSurveyFormLabels[invalidProp] || invalidProp,
-      );
+      let errorMessage = 'Error';
+      if (typeof error.message === 'string') {
+        const invalidProp = error.message;
+        errorMessage = getFormValidationErrorMessage(
+          batSurveyFormLabels[invalidProp] || invalidProp,
+        );
+      }
+      if (Array.isArray(error.message)) {
+        if (error.message[0] === 'otherLocations') {
+          const errorText = error.message[1];
+          errorMessage = `Other locations: ${errorText}`;
+        }
+      }
       return {
         isValid: false,
         errorMessage,

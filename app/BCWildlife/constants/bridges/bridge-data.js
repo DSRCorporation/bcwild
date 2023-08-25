@@ -234,15 +234,15 @@ export const habitatData = [
 
 export const waterIsData = [
   {
-    id: 1,
+    id: 2,
     value: 'Quiet',
   },
   {
-    id: 2,
+    id: 3,
     value: 'Slightly audible',
   },
   {
-    id: 3,
+    id: 4,
     value: 'Loud',
   },
 ];

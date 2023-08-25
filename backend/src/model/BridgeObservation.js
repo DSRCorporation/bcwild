@@ -22,6 +22,10 @@ const BridgeObservation = db.sequelize.define("bb_data_observation", {
     type: DataTypes.DATE,
     unique: "bridge-timestamp",
   },
+  createdBy: {
+    allowNull: false,
+    type: DataTypes.STRING,
+  },
   emergenceBatCountDone: {
     type: DataTypes.BOOLEAN,
   },
@@ -42,6 +46,12 @@ const BridgeObservation = db.sequelize.define("bb_data_observation", {
     type: DataTypes.INTEGER,
   },
   swallowsFlying: {
+    type: DataTypes.BOOLEAN,
+  },
+  couldThisSiteBeSafelyOrEasilyNetted: {
+    type: DataTypes.BOOLEAN,
+  },
+  wouldRoostingBatsBeReachableWithoutLadder: {
     type: DataTypes.BOOLEAN,
   },
   speciesComments: {
