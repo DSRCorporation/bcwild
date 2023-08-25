@@ -119,6 +119,7 @@ const bridgeType = require("./src/model/BridgeType");
 const bridgeUnderdeck = require("./src/model/BridgeUnderdeck");
 const bridgeWater = require("./src/model/BridgeWater");
 const region = require("./src/model/Region");
+const swallowNestType = require("./src/model/BBDefSwallowNestType");
 
 const tables = [
   assessment,
@@ -140,6 +141,7 @@ const tables = [
   bridgeUnderdeck,
   bridgeWater,
   region,
+  swallowNestType,
 ];
 
 const db = require("./src/config/database");
