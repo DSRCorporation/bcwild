@@ -280,6 +280,7 @@ const DashboardScreen = ({route, navigation}) => {
             </TouchableOpacity>
           </View>
         ) : null}
+        {/*
         <View
           style={{
             flex: 1,
@@ -309,6 +310,7 @@ const DashboardScreen = ({route, navigation}) => {
         <View style={{flex: 2}}>
           <></>
         </View>
+        */}
       </ScrollView>
       <View
         style={{
