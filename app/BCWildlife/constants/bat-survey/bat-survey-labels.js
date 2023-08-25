@@ -5,7 +5,7 @@ export const batSurveyFormLabels = {
   batSign: 'Bat sign',
   locationBatSign: 'Location of bat sign',
   guanoAmountInBiggestPile: 'Guano amount in biggest pile',
-  guanoDistribution: 'Guano distribution',
+  guanoDistribution: 'Guano is',
   guanoCollected: 'Guano collected',
   guanoSampleLabel: 'Guano sample label',
   roostAssessmentNight: 'Roost assessment - Night',

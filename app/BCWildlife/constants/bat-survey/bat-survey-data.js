@@ -56,7 +56,7 @@ export const batSignLocationData = [
   },
   {
     id: 3,
-    value: 'On vertical surfaces or back wall',
+    value: 'On vertical surfaces of back wall',
   },
   {
     id: 4,

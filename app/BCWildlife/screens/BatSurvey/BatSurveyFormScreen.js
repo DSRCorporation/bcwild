@@ -402,7 +402,7 @@ const BatSurveyFormScreen = () => {
                         draft.guanoSampleLabel = text;
                       })
                     }
-                    placeholder="Enter guanoSampleLabel"
+                    placeholder="Enter guano sample label"
                     style={styles.textInput}
                   />
                 </View>
