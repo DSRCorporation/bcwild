@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert } fro
 import { Picker } from '@react-native-picker/picker';
 import { ScrollView } from 'react-native-gesture-handler';
 import { getTelemetryStr,setTelemetryStr } from '../global';
+import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 
 const TelemetryTriangulationScreen = () => {
   const [entries, setEntries] = useState([{ time: '', northing: '', easting: '', bearing: '', signal: '', bias: '' }]);
@@ -106,14 +107,7 @@ Alert.alert('Result',`Triang_easting: ${triangEasting.toFixed(4)}\nTriang_northi
 
   return (
     <View style={styles.container}>
-      {/* Header section */}
-      <View style={styles.header}>
-        <Image
-          source={require('../assets/bc_abbreviated.png')}
-          style={styles.logo}
-        />
-        <Text style={styles.label}>Radio Telemetry Triangulation Calculator</Text>
-      </View>
+      <SimpleScreenHeader>Radio Telemetry Triangulation Calculator</SimpleScreenHeader>
 
       {/* Add/remove entry section */}
       <View style={styles.entryControls}>

@@ -1,13 +1,11 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import React, {useState} from 'react';
 import {BaseButton} from '../../shared/components/BaseButton';
-import {BCWildLogo} from '../../shared/components/BCWildLogo';
-import {TitleText} from '../../shared/components/TitleText';
-import {GoBackArrowButton} from '../../shared/components/GoBackArrowButton';
 import {ScrollView} from 'react-native-gesture-handler';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {useCardListStyles} from '../../shared/styles/card-list-styles';
 import {useAnimals} from './use-animals';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
 const AnimalListScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
@@ -27,9 +25,7 @@ const AnimalListScreen = ({navigation}) => {
   });
   return (
     <View style={styles.container}>
-      <GoBackArrowButton />
-      <BCWildLogo />
-      <TitleText>Animals list</TitleText>
+      <SimpleScreenHeader>Animal list</SimpleScreenHeader>
       <View style={styles.cardList}>
         <ScrollView>
           {animals && animals.length === 0 ? (

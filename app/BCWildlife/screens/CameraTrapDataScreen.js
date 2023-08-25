@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { getUsernameG } from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
+import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 
 
 
@@ -516,11 +517,8 @@ const CameraTrapDataScreen = () => {
     
     <View style={styles.container}>
       <ScrollView>
-      <View style={styles.logoContainer}>
-        <Image source={require('../assets/bc_abbreviated.png')} style={styles.logo} />
-        <Text style={styles.label}>Camera Trap Data</Text>
-      </View>
-      
+        <SimpleScreenHeader>Camera Trap Data</SimpleScreenHeader>
+
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}> Project </Text>
               <View style={styles.dropdownContainer}>

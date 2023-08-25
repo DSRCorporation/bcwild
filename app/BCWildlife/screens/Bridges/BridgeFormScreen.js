@@ -16,8 +16,6 @@ import {
   useBridgeFormValidation,
   bridgeDtoToFormData,
 } from '../../shared/hooks/use-bridge-form-validation';
-import {BCWildLogo} from '../../shared/components/BCWildLogo';
-import {TitleText} from '../../shared/components/TitleText';
 import {
   abutmentData,
   beamsData,
@@ -32,8 +30,6 @@ import {
   waterIsData,
 } from '../../constants/bridges/bridge-data';
 import {useImmer} from 'use-immer';
-import {yesOrNoOptions} from '../constants/yes-or-no-options';
-import EncryptedStorage from 'react-native-encrypted-storage';
 import {getUsernameG} from '../../global';
 import RecordsRepo from '../../utility/RecordsRepo';
 import {BridgeDto} from '../../shared/hooks/use-bridge-form-validation';
@@ -41,8 +37,9 @@ import {BridgeValidationError} from '../../shared/hooks/use-bridge-form-validati
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
 import {BaseButton} from '../../shared/components/BaseButton';
+import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 
-const BridgeFormScreen = ({route, navigation}) => {
+const BridgeFormScreen = ({route}) => {
   const styles = useFormScreenStyles();
   const currentBridge = (route.params && route.params.bridge) || null;
   const {validate} = useBridgeFormValidation();
@@ -125,21 +122,10 @@ const BridgeFormScreen = ({route, navigation}) => {
     setFormValues();
   }, [currentBridge, setDefaultValues, setFormValues]);
 
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
   return (
     <ScrollView>
       <View style={styles.container}>
-        <TouchableOpacity onPress={handleGoBack}>
-          <Image
-            source={require('../../assets/arrow_back_ios.png')}
-            style={{height: 25, width: 25, marginTop: 30}}
-          />
-        </TouchableOpacity>
-        <BCWildLogo />
-        <TitleText>{actionText} bridge</TitleText>
+        <SimpleScreenHeader>{actionText} bridge</SimpleScreenHeader>
         <View>
           <View>
             <View style={styles.inputContainer}>
