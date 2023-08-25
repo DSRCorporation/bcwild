@@ -15,3 +15,4 @@ export const getuserdetails_url = base_url + "/user/userDetails";
 export const dataexport_url = base_url + "/dataExport";
 export const datasyncpush_url = base_url + "/pushChanges";
 export const listbridges_url = base_url + "/bridge/list";
+export const listanimals_url = base_url + "/animal/list";

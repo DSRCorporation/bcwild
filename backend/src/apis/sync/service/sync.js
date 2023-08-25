@@ -1,12 +1,10 @@
 const { Op } = require("sequelize");
-const { customCreate } = require("../sequelizeQuery/sync");
-const Telemetry = require("../models/telemetry");
-const CameraTrapData = require("../models/camera");
 const { customFindAll } = require("../../../helpers/commonSequelizeQueries");
 const { customErrors } = require("../../../errorHandler/error");
 const { sequelize } = require("../../../config/database");
 const { syncBridges } = require("./syncBridges");
 const { syncBats } = require("./syncBats");
+const { pushers } = require("./pushers");
 
 const pushChangesUpdatingModel =
   (model) =>
@@ -27,6 +25,8 @@ const pushers = {
 };
 
 const getPusherForRecordIdentifier = (recordIdentifier) => {
+  // eslint-disable-next-line no-console
+  console.log(`Pushing record ${recordIdentifier}`);
   const defaultPusher = async () => {
     // eslint-disable-next-line no-console
     console.warn(

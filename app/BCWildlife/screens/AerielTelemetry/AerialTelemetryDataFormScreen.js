@@ -2,7 +2,7 @@ import {BCWildLogo} from '../../shared/components/BCWildLogo';
 import {TitleText} from '../../shared/components/TitleText';
 import React, {useCallback} from 'react';
 import {InputLabel} from '../../shared/components/InputLabel';
-import {View, ScrollView, Text, TextInput} from 'react-native';
+import {Alert, View, ScrollView, Text, TextInput} from 'react-native';
 import {DateTimePicker} from '../../shared/components/DateTimePicker';
 import {useImmer} from 'use-immer';
 import {useAnimals} from '../Animals/use-animals';
@@ -16,29 +16,30 @@ import {
   macroPositionData,
   mesoSlopeData,
 } from '../../constants/aeriel-telemetry/aeriel-telemetry-data';
-import {useAerielTelemetryDataFormValidation} from './use-aeriel-telemetry-data-form-validation';
 import {useCardListStyles} from '../../shared/styles/card-list-styles';
+import {parseAerialTelemetryForm} from './parseAerialTelemetryForm';
+import {getUsernameG} from '../../global';
+import RecordsRepo from '../../utility/RecordsRepo';
 
-const ArielTelemetryDataFormScreen = () => {
+const ArielTelemetryDataFormScreen = ({navigation}) => {
   const styles = useFormScreenStyles();
   const cardStyles = useCardListStyles();
+  const now = new Date();
   const [form, setForm] = useImmer({
     locationId: '',
     pilot: '',
     navigator: '',
-    date: new Date(),
+    date: now,
     observer: '',
     gpsID: '',
     waypoint: '',
-    gpsCoordinates: {
-      lat: '',
-      long: '',
-    },
-    easing: '',
+    latitude: '',
+    longitude: '',
+    easting: '',
     northing: '',
     animal: null,
     frequency: '',
-    timeOfLocation: new Date(),
+    timeOfLocation: now,
     habitatType: '',
     aspect: null,
     mesoSlope: null,
@@ -47,11 +48,23 @@ const ArielTelemetryDataFormScreen = () => {
     comments: '',
   });
   const {animals} = useAnimals();
-  const {validate} = useAerielTelemetryDataFormValidation();
 
-  const submit = useCallback(() => {
-    const isValid = validate(form);
-  }, [validate, form]);
+  const submit = useCallback(async () => {
+    const timestamp = Date.now();
+    const parsed = parseAerialTelemetryForm(form, timestamp);
+    if (parsed.isValid) {
+      const {dto} = parsed;
+      const strvalue = JSON.stringify(dto);
+      const timeNowEpoch = Math.round(timestamp / 1000);
+      const username = getUsernameG();
+      const recordIdentifier = `AERIALTELEMETRY_${username}_${timeNowEpoch}`;
+      await RecordsRepo.addRecord(recordIdentifier, strvalue);
+      Alert.alert('Success', 'Aerial telemetry saved locally');
+      navigation.goBack();
+    } else {
+      Alert.alert('Error', parsed.errorMessage);
+    }
+  }, [form, navigation]);
 
   return (
     <ScrollView>
@@ -99,6 +112,7 @@ const ArielTelemetryDataFormScreen = () => {
                 style={styles.textInput}
               />
             </View>
+            {/* Automatic?
             <View style={styles.inputContainer}>
               <InputLabel>{aerielTelemetryFormLabels.date}</InputLabel>
               <DateTimePicker
@@ -110,6 +124,7 @@ const ArielTelemetryDataFormScreen = () => {
                 }
               />
             </View>
+            */}
             <View style={styles.inputContainer}>
               <InputLabel>{aerielTelemetryFormLabels.observer}</InputLabel>
               <TextInput
@@ -166,10 +181,10 @@ const ArielTelemetryDataFormScreen = () => {
                       placeholder="Enter longitude"
                       onChangeText={value =>
                         setForm(draft => {
-                          draft.gpsCoordinates.long = value;
+                          draft.longitude = value;
                         })
                       }
-                      value={form.gpsCoordinates.long}
+                      value={form.longitude}
                       style={styles.textInput}
                     />
                   </View>
@@ -179,26 +194,26 @@ const ArielTelemetryDataFormScreen = () => {
                       placeholder="Enter latitude"
                       onChangeText={value =>
                         setForm(draft => {
-                          draft.gpsCoordinates.lat = value;
+                          draft.latitude = value;
                         })
                       }
-                      value={form.gpsCoordinates.lat}
+                      value={form.latitude}
                       style={[styles.textInput, {flex: 2}]}
                     />
                   </View>
                 </View>
               </View>
               <View style={styles.inputContainer}>
-                <InputLabel>{aerielTelemetryFormLabels.easing}</InputLabel>
+                <InputLabel>{aerielTelemetryFormLabels.easting}</InputLabel>
                 <TextInput
-                  value={form.easing}
+                  value={form.easting}
                   keyboardType="numeric"
                   onChangeText={value =>
                     setForm(draft => {
-                      draft.easing = value;
+                      draft.easting = value;
                     })
                   }
-                  placeholder="Enter easing"
+                  placeholder="Enter easting"
                   style={styles.textInput}
                 />
               </View>
@@ -228,13 +243,18 @@ const ArielTelemetryDataFormScreen = () => {
                 }>
                 <Picker.Item label="Select" value={null} />
                 {animals.map(item => (
-                  <Picker.Item key={item.id} label={item.name} value={item} />
+                  <Picker.Item
+                    key={item.id}
+                    label={item.name}
+                    value={item.id}
+                  />
                 ))}
               </Picker>
             </View>
             <View style={styles.inputContainer}>
               <InputLabel>{aerielTelemetryFormLabels.frequency}</InputLabel>
               <TextInput
+                keyboardType="numeric"
                 value={form.frequency}
                 onChangeText={value =>
                   setForm(draft => {
