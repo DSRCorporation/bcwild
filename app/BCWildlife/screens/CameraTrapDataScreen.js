@@ -120,7 +120,7 @@ const CameraTrapDataScreen = () => {
     }
   
     if (distanceFeature) {
-      data.distan_feature = distanceFeature;
+      data.distant_feature = distanceFeature;
     }
     if (quitePeriod) {
       data.quiet_period = quitePeriod;
@@ -147,7 +147,7 @@ const CameraTrapDataScreen = () => {
     }
 
     if (cameraAttached) {
-     // data.camera_attached = cameraAttached;
+      data.camera_attached = cameraAttached;
     }
 
     if(selectedValueProject){
