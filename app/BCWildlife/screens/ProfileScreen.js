@@ -16,6 +16,7 @@ import axiosUtility from '../network/AxiosUtility';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import { generateNewAccessToken } from '../network/AxiosUtility';
 import {useBridges} from '../shared/hooks/use-bridges/useBridges';
+import {localAnimalToRecord, useAnimals} from './Animals/use-animals';
 
 const ProfileScreen = ({navigation}) => {
   const [fname,setFname] = useState('');
@@ -28,7 +29,8 @@ const ProfileScreen = ({navigation}) => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const {pullBridges} = useBridges();
-  var refreshTokenCount=0;
+  const {animals, pullAnimals} = useAnimals();
+  let refreshTokenCount=0;
 
 
   const handleDialogSubmit = (selectedProject, email) => {
@@ -151,6 +153,16 @@ const ProfileScreen = ({navigation}) => {
     // Syncing the bridges:
     // 1. Locally stored changes are pushed among other records
     // 2. Fresh list of bridges is loaded; obsolete local changes are discarded.
+    // Same for animals
+    //
+    console.debug('animals', animals);
+
+    // Copy local animals to records
+    animals.forEach(async animal => {
+      if (animal.tag === 'local') {
+        await RecordsRepo.addRecord(...localAnimalToRecord(animal));
+      }
+    });
     try {
       await RecordsRepo.getUnsyncedRecords().then((records) => {
           console.log(records);
@@ -245,9 +257,20 @@ const ProfileScreen = ({navigation}) => {
       });
       try {
         await pullBridges();
-        Alert.alert('Success','Bridge data loaded');
       } catch (error) {
         console.error('Failed to pull bridges', error, JSON.stringify(error));
+        if (error.response) {
+          Alert.alert('Error', error.response.data.message);
+        } else if (error.request) {
+          Alert.alert('Error', `Request error: ${error.request}`);
+        } else {
+          Alert.alert('Error', error.message);
+        }
+      }
+      try {
+        await pullAnimals();
+      } catch (error) {
+        console.error('Failed to pull animals', error, JSON.stringify(error));
         if (error.response) {
           Alert.alert('Error', error.response.data.message);
         } else if (error.request) {
