@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/database");
-const { BatSign } = require("./BatSign");
 const { BridgeObservation } = require("./BridgeObservation");
 
 const observationLocationSignUniqueness = "observationLocationSign";

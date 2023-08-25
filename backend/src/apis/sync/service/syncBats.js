@@ -5,7 +5,10 @@ const { BridgeObservation } = require("../../../model/BridgeObservation");
 const {
   BBDataBatSignStandardLocation,
 } = require("../../../model/BBDataBatSignStandardLocation");
-const {BBDataBatSignCustomLocation} = require("../../../model/BBDataBatSignCustomLocation");
+const {
+  BBDataBatSignCustomLocation,
+} = require("../../../model/BBDataBatSignCustomLocation");
+const { BBDataBatSign } = require("../../../model/BBDataBatSigns");
 
 // eslint-disable-next-line no-bitwise
 const arrayToBitmask = (masks) => masks.reduce((acc, val) => acc | val, 0);
@@ -51,6 +54,10 @@ const bridgeObservationToDtoProperties = {
       return noWater;
     },
   },
+  couldThisSiteBeSafelyOrEasilyNetted: { property: "couldBeSafelyNetted" },
+  wouldRoostingBatsBeReachableWithoutLadder: {
+    property: "wouldBatsBeReachable",
+  },
 };
 
 const batDtoToObservation = (bridgeId, dto) => {
@@ -71,6 +78,15 @@ const batDtoToObservation = (bridgeId, dto) => {
     observation[observationProperty] = value;
   }
   return observation;
+};
+
+const batDtoBatSignToTable = (observationId) => (batSign) => {
+  const { batSignId, batSignPresent } = batSign;
+  return {
+    bridgeObservation: observationId,
+    batSign: batSignId,
+    isPresent: batSignPresent,
+  };
 };
 
 const batDtoBatSignLocationToTable = (observationId) => (batSignLocation) => {
@@ -99,6 +115,17 @@ const batDtoBatCustomSignLocationToTable =
 
 const syncBats = async (data) =>
   sequelize.transaction(async (transaction) => {
+    // Sync the tables
+    await Promise.all(
+      [
+        Bridge,
+        BridgeConfiguration,
+        BridgeObservation,
+        BBDataBatSign,
+        BBDataBatSignStandardLocation,
+        BBDataBatSignCustomLocation,
+      ].map((model) => model.sync({ transaction })),
+    );
     const dto = data.data;
     // DTO is supposed to have MOT ID, not the internal bridge ID.
     // Find the internal bridge ID.
@@ -121,7 +148,8 @@ const syncBats = async (data) =>
       batDtoToObservation(bridgeId, dto),
     );
     const observationId = bridgeObservation.id;
-    // Now that we have the observation ID, populate standard sign locations.
+    // Now that we have the observation ID, populate bat signs data.
+    const batSigns = dto.batSigns.map(batDtoBatSignToTable(observationId));
     const signLocations = dto.batSignLocations.map(
       batDtoBatSignLocationToTable(observationId),
     );
@@ -129,11 +157,12 @@ const syncBats = async (data) =>
       batDtoBatCustomSignLocationToTable(observationId),
     );
     const signCreation = signLocations
-      .map((loc) => BBDataBatSignStandardLocation.create(loc))
+      .map((loc) => BBDataBatSignStandardLocation.create(loc, { transaction }))
       .concat(
         customSignLocations.map((loc) =>
-          BBDataBatSignCustomLocation.create(loc),
+          BBDataBatSignCustomLocation.create(loc, { transaction }),
         ),
+        batSigns.map((sign) => BBDataBatSign.create(sign, { transaction })),
       );
     await Promise.all(signCreation);
   });

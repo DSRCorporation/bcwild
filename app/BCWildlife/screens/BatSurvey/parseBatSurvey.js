@@ -98,9 +98,9 @@ const parseOtherLocations = (form, dto) => {
 };
 
 const formToDto = (form, timestamp) => {
-  console.log('form', form);
   const dto = new BatSurveyDto();
   dto.timestamp = timestamp;
+  dto.observers = ensureNonemptyString(form, 'observers');
   dto.bridgeMotId = ensureNonemptyString(form, 'bridgeMotId');
   dto.waterUnderBridge = parseYesNo(form, 'waterCurrentlyUnderBridge');
   if (dto.waterUnderBridge) {
@@ -147,7 +147,6 @@ const formToDto = (form, timestamp) => {
   );
   dto.speciesComments = form.speciesOtherComments;
   dto.comments = form.comments;
-  dto.observers = form.observers;
   return dto;
 };
 
