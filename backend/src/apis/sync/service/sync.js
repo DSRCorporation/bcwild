@@ -2,27 +2,9 @@ const { Op } = require("sequelize");
 const { customFindAll } = require("../../../helpers/commonSequelizeQueries");
 const { customErrors } = require("../../../errorHandler/error");
 const { sequelize } = require("../../../config/database");
-const { syncBridges } = require("./syncBridges");
-const { syncBats } = require("./syncBats");
 const { pushers } = require("./pushers");
-
-const pushChangesUpdatingModel =
-  (model) =>
-  async (data, { transaction }) => {
-    await customCreate(
-      model,
-      data.data,
-      { transaction },
-      { record_identifier: data.record_identifier },
-    );
-  };
-
-const pushers = {
-  TELE: pushChangesUpdatingModel(Telemetry),
-  CAM: pushChangesUpdatingModel(CameraTrapData),
-  BRIDGE: syncBridges,
-  BAT: syncBats,
-};
+const Telemetry = require("../models/telemetry");
+const CameraTrapData = require("../models/camera");
 
 const getPusherForRecordIdentifier = (recordIdentifier) => {
   // eslint-disable-next-line no-console
