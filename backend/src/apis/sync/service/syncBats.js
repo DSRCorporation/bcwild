@@ -146,6 +146,7 @@ const syncBats = async (data) =>
     // Populate main observation table
     const bridgeObservation = await BridgeObservation.create(
       batDtoToObservation(bridgeId, dto),
+      { transaction },
     );
     const observationId = bridgeObservation.id;
     // Now that we have the observation ID, populate bat signs data.

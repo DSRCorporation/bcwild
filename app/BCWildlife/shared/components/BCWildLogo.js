@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View, TouchableOpacity} from 'react-native';
 import bcWildLogoImage from '../../assets/bc_abbreviated.png';
 
 const imageSize = 150;
@@ -16,10 +16,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export const BCWildLogo = () => {
+export const BCWildLogo = ({onPress}) => {
   return (
-    <View style={styles.logoContainer}>
+    <TouchableOpacity style={styles.logoContainer} onPress={onPress}>
       <Image source={bcWildLogoImage} style={styles.logo} />
-    </View>
+    </TouchableOpacity>
   );
 };

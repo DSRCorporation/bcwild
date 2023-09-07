@@ -13,11 +13,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export const GoBackArrowButton = () => {
+export const GoBackArrowButton = ({onGoBack}) => {
   const navigation = useNavigation();
+  const onPress = onGoBack || navigation.goBack;
 
   return (
-    <TouchableOpacity onPress={() => navigation.goBack()}>
+    <TouchableOpacity onPress={onPress}>
       <Image style={styles.arrow} source={arrowImage} />
     </TouchableOpacity>
   );

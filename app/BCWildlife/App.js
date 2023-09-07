@@ -26,6 +26,9 @@ import BatSurveyFormScreen from './screens/BatSurvey/BatSurveyFormScreen';
 import AnimalFormScreen from './screens/Animals/AnimalFormScreen';
 import AnimalListScreen from './screens/Animals/AnimalListScreen';
 import AerialTelemetryDataFormScreen from './screens/AerielTelemetry/AerialTelemetryDataFormScreen';
+import {EncounterFormScreen} from './screens/transect/EncounterFormScreen';
+import {StandFormScreen} from './screens/transect/StandFormScreen';
+import {TransectFormScreen} from './screens/transect/TransectFormScreen';
 
 const Stack = createStackNavigator();
 
@@ -109,6 +112,12 @@ function App() {
             name="AerialTelemetryDataForm"
             component={AerialTelemetryDataFormScreen}
           />
+          <Stack.Screen
+            name="TransectEncounter"
+            component={EncounterFormScreen}
+          />
+          <Stack.Screen name="TransectStand" component={StandFormScreen} />
+          <Stack.Screen name="Transect" component={TransectFormScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

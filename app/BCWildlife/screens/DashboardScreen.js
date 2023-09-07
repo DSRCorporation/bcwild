@@ -79,6 +79,10 @@ const DashboardScreen = ({route, navigation}) => {
     navigation.navigate('AerialTelemetryDataForm');
   };
 
+  const handleTransectSurvey = () => {
+    navigation.navigate('Transect');
+  };
+
   const handleTelemetryTriangulation = () => {
     navigation.navigate('TelemetryTriangulation');
   };
@@ -232,6 +236,13 @@ const DashboardScreen = ({route, navigation}) => {
               style={styles.listItemWithoutImage}
               onPress={() => handleAerialTelemetryDataClick()}>
               <Text style={styles.listItemText}>Aerial Telemetry Data</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={styles.listItemWithoutImage}
+              onPress={handleTransectSurvey}>
+              <Text style={styles.listItemText}>Transect Survey</Text>
             </TouchableOpacity>
           </View>
         </View>
