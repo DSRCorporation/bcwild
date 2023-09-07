@@ -313,10 +313,8 @@ const navigateOnState = navigation => async state => {
   await saveState(state);
   const routeName = routeNameForState(state);
   if (routeName == null) {
-    console.debug('navigate back')
     navigation.goBack();
   } else {
-    console.debug('navigate to', routeName)
     navigation.navigate(routeName);
   }
 };

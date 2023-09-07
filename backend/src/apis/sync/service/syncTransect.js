@@ -17,7 +17,6 @@ const dtoToModelData = (config) => {
         : value;
       modelData[modelProperty] = modelValue;
     }
-    console.debug('modelData', modelData);
     return modelData;
   };
 };
@@ -75,7 +74,6 @@ const syncTransect = async (data) =>
   sequelize.transaction(async (transaction) => {
     syncModels();
     const dto = data.data;
-    console.debug('transect dto', dto);
     // Populate main observation table
     const transect = await createTransectRecord(dto, transaction);
     const transectId = transect.id;

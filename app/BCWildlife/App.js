@@ -103,7 +103,7 @@ function App() {
             component={TelemetryTriangulationScreen}
           />
           <Stack.Screen name="TelemetryForm" component={TelemetryFormScreen} />
-          <Stack.Screen name="BridgesList" component={BridgeListScreen} />
+          <Stack.Screen name="BridgesList" component={BridgesListScreen} />
           <Stack.Screen name="BridgeForm" component={BridgeFormScreen} />
           <Stack.Screen name="BatSurveyForm" component={BatSurveyFormScreen} />
           <Stack.Screen name="AnimalList" component={AnimalListScreen} />
