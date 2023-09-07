@@ -123,6 +123,7 @@ const atDefMacroPosition = require("./src/model/AtDefMacroPosition");
 const atDefMesoSlope = require("./src/model/AtDefMesoSlope");
 const atDefAspect = require("./src/model/AtDefAspect");
 const swallowNestType = require("./src/model/BBDefSwallowNestType");
+const trDefs = require("./src/model/TrDefs");
 
 const tables = [
   assessment,
@@ -148,6 +149,7 @@ const tables = [
   atDefMacroPosition,
   atDefMesoSlope,
   atDefAspect,
+  trDefs,
 ];
 
 const db = require("./src/config/database");

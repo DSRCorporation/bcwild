@@ -1,0 +1,90 @@
+{
+  "types": [
+    {
+      "name": "SurveyType",
+      "values": [
+        {"id": 1, "value": "Snow Track"},
+        {"id": 2, "value": "Scat"}
+      ]
+    },
+    {
+      "name": "Precipitation",
+      "values": [
+        {"id": 1, "value": "None"},
+        {"id": 2, "value": "Fog"},
+        {"id": 3, "value": "Misty drizzle"},
+        {"id": 4, "value": "Drizzle"},
+        {"id": 5, "value": "Light rain"},
+        {"id": 6, "value": "Hard rain"},
+        {"id": 7, "value": "Snow"}
+      ]
+    },
+    {
+      "name": "CloudCover",
+      "values": [
+        {"id": 1, "value": "No Cloud"},
+        {"id": 2, "value": "< 50%"},
+        {"id": 3, "value": "> 50%"},
+        {"id": 4, "value": "100%"}
+      ]
+    },
+    {
+      "name": "Wind",
+      "values": [
+        {"id": 0, "value": "Calm"},
+        {"id": 1, "value": "2-5 km/hr"},
+        {"id": 2, "value": "leaves rustle"},
+        {"id": 3, "value": "leaves and twigs constantly move"},
+        {"id": 4, "value": "small branches move"},
+        {"id": 5, "value": "small trees sway"},
+        {"id": 6, "value": "large branches moving, wind whistling"}
+      ]
+    },
+    {
+      "name": "Temperature",
+      "values": [
+        {"id": 1, "value": "Temperature 1"},
+        {"id": 2, "value": "Temperature 2"},
+        {"id": 3, "value": "Temperature 3"}
+      ]
+    },
+    {
+      "name": "Reliability",
+      "values": [
+        {"id": 1, "value": "high reliability; <1 in 10 chance other species"},
+        {"id": 2, "value": "75% reliability; 1 in 4 chance other species"},
+        {"id": 3, "value": "50% reliability; 1 in 2 chance other species"},
+        {"id": 4, "value": "low reliability; quite uncertain as to species"}
+      ]
+    },
+    {
+      "name": "NumberOfObservations",
+      "values": [
+        {"id": 1, "value": "< 5 observations (tracks or scats)"},
+        {"id": 2, "value": "6 - 10 tracks or scats"},
+        {"id": 3, "value": "10 - 20 tracks or scats"},
+        {"id": 4, "value": ">20 tracks or scats"}
+      ]
+    },
+    {
+      "name": "Species",
+      "stringId": true,
+      "stringIdLength": 4,
+      "values": [
+        {"id": "TAHU", "value": "red squirrel"},
+        {"id": "LEAM", "value": "snowshoe hare"},
+        {"id": "GALL", "value": "grouse or ptarmigan spp."},
+        {"id": "MICE", "value": "undifferentiated voles and mice"},
+        {"id": "PEMA", "value": "deermouse"},
+        {"id": "VOLE", "value": "Microtus or Clethrionomys spp."},
+        {"id": "PEPA", "value": "fisher"},
+        {"id": "MAAM", "value": "American martent"},
+        {"id": "MUST", "value": "undifferentiated Mustela spp."},
+        {"id": "MUER", "value": "short-tailed weasel"},
+        {"id": "MUFR", "value": "long-tailed weasel"},
+        {"id": "MUNI", "value": "least weasel"},
+        {"id": "GUGU", "value": "wolverine"}
+      ]
+    }
+  ]
+}

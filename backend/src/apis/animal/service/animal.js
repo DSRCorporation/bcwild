@@ -6,6 +6,7 @@ const animalToDto = (animal) => ({
 });
 
 const listAnimals = async () => {
+  console.debug('list animals')
   const animals = await Animal.findAll();
   const dtos = animals.map(animalToDto);
   dtos.sort((a, b) => a.name.localeCompare(b.name));

@@ -5,6 +5,7 @@ const { syncBridges } = require("./syncBridges");
 const { syncAnimals } = require("./syncAnimals");
 const { syncAerialTelemetry } = require("./syncAerialTelemetry");
 const { syncBats } = require("./syncBats");
+const { syncTransect } = require("./syncTransect");
 
 const pushChangesUpdatingModel =
   (model) =>
@@ -23,6 +24,7 @@ const pushers = {
   BAT: syncBats,
   ANIMAL: syncAnimals,
   AERIALTELEMETRY: syncAerialTelemetry,
+  TRANSECT: syncTransect,
 };
 
 module.exports = {
