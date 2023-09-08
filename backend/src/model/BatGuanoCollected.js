@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const BatGuanoCollected = db.sequelize.define(
   "bb_def_guano_collected",
@@ -21,12 +22,7 @@ const BatGuanoCollected = db.sequelize.define(
   },
 );
 
-async function init() {
-  await BatGuanoCollected.sync({ force: true });
-  await BatGuanoCollected.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "GuanoCollected").values,
-  );
-}
+const init = createDefInit(BatGuanoCollected, datasheetTypes, "GuanoCollected");
 
 module.exports = {
   BatGuanoCollected,

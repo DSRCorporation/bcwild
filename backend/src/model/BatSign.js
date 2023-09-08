@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const BatSign = db.sequelize.define(
   "bb_def_sign",
@@ -21,12 +22,7 @@ const BatSign = db.sequelize.define(
   },
 );
 
-async function init() {
-  await BatSign.sync({ force: true });
-  await BatSign.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "BatSign"),
-  );
-}
+const init = createDefInit(BatSign, datasheetTypes, "BatSign");
 
 module.exports = {
   BatSign,

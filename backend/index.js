@@ -155,8 +155,14 @@ const tables = [
 const db = require("./src/config/database");
 
 async function initDB() {
-  await db.sequelize.sync();
-  tables.forEach(async ({ init }) => init && await init());
+  db.sequelize.transaction(async (transaction) => {
+    await db.sequelize.sync({ transaction });
+    await Promise.all(tables.map(async ({ init }) => {
+      if (init != null) {
+        await init(transaction);
+      }
+    }));
+  });
 }
 
 initDB().then(() =>  console.log("Database initialized"));
