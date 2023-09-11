@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const BridgeUnderdeck = db.sequelize.define(
   "bb_def_underdeck",
@@ -21,12 +22,7 @@ const BridgeUnderdeck = db.sequelize.define(
   },
 );
 
-async function init() {
-  await BridgeUnderdeck.sync({ force: true });
-  await BridgeUnderdeck.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "Underdeck").values,
-  );
-}
+const init = createDefInit(BridgeUnderdeck, datasheetTypes, "Underdeck");
 
 module.exports = {
   BridgeUnderdeck,

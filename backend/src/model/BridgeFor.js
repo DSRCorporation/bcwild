@@ -10,18 +10,22 @@ const BridgeFor = db.sequelize.define(
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
+    value: {
+      type: Sequelize.STRING(16),
+      allowNull: false,
+    },
   },
   {
     timestamps: false,
   },
 );
 
-async function init() {
-  await BridgeFor.sync({ force: true });
+async function init(transaction) {
   await BridgeFor.bulkCreate(
     datasheetTypes.types
       .find(({ name }) => name === "BridgeFor")
       .values.map(({ id, value }) => ({ bit: id, value })),
+    { transaction, updateOnDuplicate: ["bit"] },
   );
 }
 

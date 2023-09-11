@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/ArialTelemetry.json");
+const { createDefInit } = require("./createDefInit");
 
 const AtDefMacroPosition = db.sequelize.define(
   "at_def_macro_position",
@@ -21,12 +22,7 @@ const AtDefMacroPosition = db.sequelize.define(
   },
 );
 
-async function init() {
-  await AtDefMacroPosition.sync({ force: true });
-  await AtDefMacroPosition.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "MacroPosition"),
-  );
-}
+const init = createDefInit(AtDefMacroPosition, datasheetTypes, "MacroPosition");
 
 module.exports = {
   AtDefMacroPosition,

@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const BridgeCrossingType = db.sequelize.define(
   "bb_def_crossing_type",
@@ -21,12 +22,7 @@ const BridgeCrossingType = db.sequelize.define(
   },
 );
 
-async function init() {
-  await BridgeCrossingType.sync({ force: true });
-  await BridgeCrossingType.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "CrossingType").values,
-  );
-}
+const init = createDefInit(BridgeCrossingType, datasheetTypes, "CrossingType");
 
 module.exports = {
   BridgeCrossingType,
