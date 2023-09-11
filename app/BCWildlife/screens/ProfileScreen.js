@@ -1,26 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Alert,
-} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {View, Text, StyleSheet, Image, Alert} from 'react-native';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import RecordsRepo from '../utility/RecordsRepo';
 import CustomDialogProject from '../utility/CustomDialogProject';
-import { getAccessToken } from '../global';
-import { dataexport_url, datasyncpush_url } from '../network/path';
+import {getAccessToken} from '../global';
+import {dataexport_url, datasyncpush_url} from '../network/path';
 import axiosUtility from '../network/AxiosUtility';
 import LoadingOverlay from '../utility/LoadingOverlay';
-import { generateNewAccessToken } from '../network/AxiosUtility';
+import {generateNewAccessToken} from '../network/AxiosUtility';
 import {useBridges} from '../shared/hooks/use-bridges/useBridges';
 import {localAnimalToRecord, useAnimals} from './Animals/use-animals';
 
 const ProfileScreen = ({navigation}) => {
-  const [fname,setFname] = useState('');
-  const [lname,setLname] = useState('');
+  const [fname, setFname] = useState('');
+  const [lname, setLname] = useState('');
   const [userPhoto, setUserPhoto] = useState(null);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -30,108 +24,116 @@ const ProfileScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const {pullBridges} = useBridges();
   const {animals, pullAnimals} = useAnimals();
-  let refreshTokenCount=0;
-
+  let refreshTokenCount = 0;
 
   const handleDialogSubmit = (selectedProject, email) => {
-
-    console.log(`Exporting data for project ${selectedProject} to email ${email}`);
+    console.log(
+      `Exporting data for project ${selectedProject} to email ${email}`,
+    );
     setDialogVisible(false);
     setLoading(true);
 
     const data = {
       email,
-      project_id:selectedProject
+      project_id: selectedProject,
     };
 
-
     const USER_TOKEN = getAccessToken();
-      const AuthStr = 'Bearer '.concat(USER_TOKEN);
-      try {
-        axiosUtility.post(dataexport_url, data,
-          { headers: { Authorization: AuthStr } })
+    const AuthStr = 'Bearer '.concat(USER_TOKEN);
+    try {
+      axiosUtility
+        .post(dataexport_url, data, {headers: {Authorization: AuthStr}})
         .then(response => {
           setDialogVisible(false);
           setLoading(false);
           console.log(response);
 
-          Alert.alert('Success',response.data.message);
+          Alert.alert('Success', response.data.message);
 
           //getPendingProjectAccessRequests();
-        }).catch((error) => {
+        })
+        .catch(error => {
           setLoading(false);
           setDialogVisible(false);
           //setLoading(false);
           if (error.response) {
-              let errorMessage = error.response.data.message;
-              if(errorMessage.indexOf('token') > -1){
-                console.log('token expired');
-                if(refreshTokenCount > 0){
-                  return;
-                }
-                generateNewAccessToken()
-                .then((response) => {
+            let errorMessage = error.response.data.message;
+            if (errorMessage.indexOf('token') > -1) {
+              console.log('token expired');
+              if (refreshTokenCount > 0) {
+                return;
+              }
+              generateNewAccessToken()
+                .then(response => {
                   refreshTokenCount++;
                   console.log('new access token generated');
-                  axiosUtility.post(dataexport_url, data,configAuth())
-                  .then(response => {
-                    setDialogVisible(false);
-                    Alert.alert('Success',response.message);
-                    //getPendingProjectAccessRequests();
-                  }).catch((error) => {
-                    setDialogVisible(false);
-                    //setLoading(false);
-                    if (error.response) {
-                      console.log('Response error:', error.response.data);
-                      Alert.alert('Error',error.response.data.message);
-                    } else if (error.request) {
-                      console.log('Request error:', error.request);
-                      Alert.alert('Error','Request error' +error.response.data.message);
-                    } else {
-                      console.log('Error message:', error.message);
-                      Alert.alert('Error',error.response.data.message);
-                    }
-                  });
-                }).catch((error) => {
+                  axiosUtility
+                    .post(dataexport_url, data, configAuth())
+                    .then(response => {
+                      setDialogVisible(false);
+                      Alert.alert('Success', response.message);
+                      //getPendingProjectAccessRequests();
+                    })
+                    .catch(error => {
+                      setDialogVisible(false);
+                      //setLoading(false);
+                      if (error.response) {
+                        console.log('Response error:', error.response.data);
+                        Alert.alert('Error', error.response.data.message);
+                      } else if (error.request) {
+                        console.log('Request error:', error.request);
+                        Alert.alert(
+                          'Error',
+                          'Request error' + error.response.data.message,
+                        );
+                      } else {
+                        console.log('Error message:', error.message);
+                        Alert.alert('Error', error.response.data.message);
+                      }
+                    });
+                })
+                .catch(error => {
                   setDialogVisible(false);
                   refreshTokenCount++;
                   console.log('error generating new access token');
                 });
-              }else{
-                setDialogVisible(false);
-                console.log('error message:', errorMessage+' with index '+errorMessage.indexOf('token'));
-              }
-              Alert.alert('Error',errorMessage);
+            } else {
+              setDialogVisible(false);
+              console.log(
+                'error message:',
+                errorMessage + ' with index ' + errorMessage.indexOf('token'),
+              );
+            }
+            Alert.alert('Error', errorMessage);
             console.log('Response error:', error.response.data);
             setDialogVisible(false);
           } else if (error.request) {
             setDialogVisible(false);
             console.log('Request error:', error.request);
-            Alert.alert('Error','Request error');
+            Alert.alert('Error', 'Request error');
           } else {
             setDialogVisible(false);
             console.log('Error', error.message);
-            Alert.alert('Error','Error');
+            Alert.alert('Error', 'Error');
           }
         });
-      } catch (error) {
-        setLoading(false);
-        console.error(error);
-      }
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
   };
 
-
-
-
   useEffect(() => {
-    renderProfile();
-  }, []);
+    if (renderProfile) {
+      renderProfile();
+    }
+  }, [renderProfile]);
 
   const configAuth = () => {
     let token = getAccessToken();
     let AuthStr = 'Bearer '.concat(token);
-    return { headers: { Authorization: AuthStr } };
-  }
+    return {headers: {Authorization: AuthStr}};
+  };
 
   const handleResetPassword = () => {
     // navigation to ResetPasswordScreen
@@ -158,102 +160,121 @@ const ProfileScreen = ({navigation}) => {
     console.debug('animals', animals);
 
     // Copy local animals to records
-    animals.forEach(async animal => {
+    for (const animal of animals) {
       if (animal.tag === 'local') {
         await RecordsRepo.addRecord(...localAnimalToRecord(animal));
       }
-    });
+    }
     try {
-      await RecordsRepo.getUnsyncedRecords().then((records) => {
-          console.log(records);
-          console.log('Sync');
-          var recordsObj;
-          try{
-           recordsObj = JSON.parse(records);
-          }catch(e){
-            Alert.alert('Success','No records to sync');
-            console.log('error parsing records');
-            return;
-          }
+      await RecordsRepo.getUnsyncedRecords().then(records => {
+        console.log(`Records to sync: ${JSON.stringify(records)}`);
+        console.log('Sync');
+        let recordsObj;
+        try {
+          recordsObj = JSON.parse(records);
+        } catch (e) {
+          Alert.alert('Success', 'No records to sync');
+          console.log('error parsing records');
+          return;
+        }
 
-          if(recordsObj.length < 1){
-            Alert.alert('Success','No records to sync');
-            return;
-          }else{
-            console.log(`records to sync: ${recordsObj.length}`);
-          }
+        if (recordsObj.length < 1) {
+          Alert.alert('Success', 'No records to sync');
+          return;
+        } else {
+          console.log(`records to sync: ${recordsObj.length}`);
+        }
 
-          const USER_TOKEN = getAccessToken();
-          const AuthStr = 'Bearer '.concat(USER_TOKEN);
-          try {
-            axiosUtility.post(datasyncpush_url, recordsObj,
-              { headers: { Authorization: AuthStr } })
+        const USER_TOKEN = getAccessToken();
+        const AuthStr = 'Bearer '.concat(USER_TOKEN);
+        try {
+          axiosUtility
+            .post(datasyncpush_url, recordsObj, {
+              headers: {Authorization: AuthStr},
+            })
             .then(response => {
               console.log(response);
-              Alert.alert('Success',response.message);
+              Alert.alert('Success', response.message);
               RecordsRepo.deleteUnsyncedRecords()
                 .then(() => {
                   console.log('Successfully deleted all unsynced records');
                 })
-                .catch((error) => {
+                .catch(error => {
                   console.error('Error deleting unsynced records:', error);
                 });
               //getPendingProjectAccessRequests();
-            }).catch((error) => {
+            })
+            .catch(error => {
               if (error.response) {
-                  let errorMessage = error.response.data.message;
-                  if(errorMessage.indexOf('token') > -1){
-                    console.log('token expired');
-                    if(refreshTokenCount > 0){
-                      return;
-                    }
-                    generateNewAccessToken()
-                    .then((response) => {
+                let errorMessage = error.response.data.message;
+                if (errorMessage.indexOf('token') > -1) {
+                  console.log('token expired');
+                  if (refreshTokenCount > 0) {
+                    return;
+                  }
+                  generateNewAccessToken()
+                    .then(response => {
                       refreshTokenCount++;
                       console.log('new access token generated');
-                      axiosUtility.post(datasyncpush_url, recordsObj,configAuth())
-                      .then(response => {
-                        Alert.alert('Success',response.message);
-                        RecordsRepo.deleteUnsyncedRecords()
-                        .then(() => {
-                          console.log('Successfully deleted all unsynced records');
+                      axiosUtility
+                        .post(datasyncpush_url, recordsObj, configAuth())
+                        .then(response => {
+                          Alert.alert('Success', response.message);
+                          RecordsRepo.deleteUnsyncedRecords()
+                            .then(() => {
+                              console.log(
+                                'Successfully deleted all unsynced records',
+                              );
+                            })
+                            .catch(error => {
+                              console.error(
+                                'Error deleting unsynced records:',
+                                error,
+                              );
+                            });
+                          //getPendingProjectAccessRequests();
                         })
-                        .catch((error) => {
-                          console.error('Error deleting unsynced records:', error);
+                        .catch(error => {
+                          if (error.response) {
+                            console.log('Response error:', error.response.data);
+                            Alert.alert('Error', error.response.data.message);
+                          } else if (error.request) {
+                            console.log('Request error:', error.request);
+                            Alert.alert(
+                              'Error',
+                              'Request error' + error.response.data.message,
+                            );
+                          } else {
+                            console.log('Error message:', error.message);
+                            Alert.alert('Error', error.response.data.message);
+                          }
                         });
-                        //getPendingProjectAccessRequests();
-                      }).catch((error) => {
-                        if (error.response) {
-                          console.log('Response error:', error.response.data);
-                          Alert.alert('Error',error.response.data.message);
-                        } else if (error.request) {
-                          console.log('Request error:', error.request);
-                          Alert.alert('Error','Request error' +error.response.data.message);
-                        } else {
-                          console.log('Error message:', error.message);
-                          Alert.alert('Error',error.response.data.message);
-                        }
-                      });
-                    }).catch((error) => {
+                    })
+                    .catch(error => {
                       refreshTokenCount++;
                       console.log('error generating new access token');
                     });
-                  }else{
-                    console.log('error message:', errorMessage+' with index '+errorMessage.indexOf('token'));
-                  }
-                  Alert.alert('Error',errorMessage);
+                } else {
+                  console.log(
+                    'error message:',
+                    errorMessage +
+                      ' with index ' +
+                      errorMessage.indexOf('token'),
+                  );
+                }
+                Alert.alert('Error', errorMessage);
                 console.log('Response error:', error.response.data);
               } else if (error.request) {
                 console.log('Request error:', error.request);
-                Alert.alert('Error','Request error');
+                Alert.alert('Error', 'Request error');
               } else {
                 console.log('Error', error.message);
-                Alert.alert('Error','Error');
+                Alert.alert('Error', 'Error');
               }
             });
-          } catch (error) {
-            console.error(error);
-          }
+        } catch (error) {
+          console.error(error);
+        }
       });
       try {
         await pullBridges();
@@ -283,199 +304,216 @@ const ProfileScreen = ({navigation}) => {
     } finally {
       setLoading(false);
     }
-  }
-
+  };
 
   const handleUpdatePhoto = () => {
     // handle user photo update logic
     console.log('Update Photo');
-    showAlert('Update Photo','Are you sure you want to Replace your photo?');
+    showAlert('Update Photo', 'Are you sure you want to Replace your photo?');
   };
 
-  const renderProfile = async() => {
-    try{
-    const session = await EncryptedStorage.getItem("user_session");
+  const renderProfile = useCallback(async () => {
+    try {
+      const session = await EncryptedStorage.getItem('user_session');
       console.log(session);
-      if(!session){
+      if (!session) {
         return;
       }
       const obj = JSON.parse(session);
-      setFullname(obj.data.first_name+' ' +obj.data.last_name);
+      setFullname(obj.data.first_name + ' ' + obj.data.last_name);
       setFname(obj.data.first_name);
       setLname(obj.data.last_name);
-      console.log(obj.data.first_name+' ' +obj.data.last_name);
-      console.log(fullname)
+      console.log(obj.data.first_name + ' ' + obj.data.last_name);
+      console.log(fullname);
       setUserEmail(obj.data.email);
       console.log(obj.data.email);
       setProjects(obj.data.projects);
       console.log(obj.data.projects);
-
-    } catch(e){
+    } catch (e) {
       console.log(e);
     }
-
-
-  };
-
-
+  }, [fullname]);
 
   const handleLogout = async () => {
-    try{
-       await EncryptedStorage.clear()
-    .then(() => console.log('success'))
-    .catch(err => console.log(err));
+    try {
+      await EncryptedStorage.clear()
+        .then(() => console.log('success'))
+        .catch(err => console.log(err));
       navigation.navigate('Login');
-    }catch(e){
+    } catch (e) {
       console.log(e);
     }
   };
 
   const navigateToDashboard = async () => {
-    const session = await EncryptedStorage.getItem("user_session");
+    const session = await EncryptedStorage.getItem('user_session');
     console.log(session);
-    if(!session){
+    if (!session) {
       return;
     }
     const obj = JSON.parse(session);
-    if(obj.data.role=='admin'){
-      navigation.navigate('Dashboard',{admin:true});
-    }else{
-      navigation.navigate('Dashboard',{admin:false});
+    if (obj.data.role == 'admin') {
+      navigation.navigate('Dashboard', {admin: true});
+    } else {
+      navigation.navigate('Dashboard', {admin: false});
     }
-  }
+  };
 
-  const showAlert=(title, message)=> {
-    Alert.alert(
-      title,
-      message,
-      [
-        {
-          text: 'Yes',
-          onPress: () =>{
-            console.log('Yes Pressed')
-            if(title=='Logout'){
-              handleLogout();
-            }
+  const showAlert = (title, message) => {
+    Alert.alert(title, message, [
+      {
+        text: 'Yes',
+        onPress: () => {
+          console.log('Yes Pressed');
+          if (title == 'Logout') {
+            handleLogout();
           }
         },
-        {
-          text: 'No',
-          onPress: () =>{
-            console.log('No Pressed')
-          }
-        }
-      ]
-    );
-  }
-
-
+      },
+      {
+        text: 'No',
+        onPress: () => {
+          console.log('No Pressed');
+        },
+      },
+    ]);
+  };
 
   return (
     <ScrollView>
-    <View style={styles.container}>
-
-        <View style={{ flexDirection:'row' , width:'100%',justifyContent:'space-between'}}>
-            <TouchableOpacity onPress={() => navigateToDashboard()}>
-                <Image source={require('../assets/arrow_back_ios.png')}
-                style={{height:25,width:25 , marginTop:30}} />
-                </TouchableOpacity>
-            <Image source={require('../assets/bc_abbreviated.png')}
-            style={{height:90,
-                width:90,resizeMode:'contain',marginLeft:35}} />
-            <TouchableOpacity
-             onPress={() => showAlert('Logout','Are you sure you want to Logout?')}>
-              <Image style={styles.l_image} source={require('../assets/logout.png')} />
-            </TouchableOpacity>
-        </View>
-
-
-      <View style={styles.photoContainer}>
-        <TouchableOpacity onPress={handleUpdatePhoto}>
+      <View style={styles.container}>
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'space-between',
+          }}>
+          <TouchableOpacity onPress={() => navigateToDashboard()}>
+            <Image
+              source={require('../assets/arrow_back_ios.png')}
+              style={{height: 25, width: 25, marginTop: 30}}
+            />
+          </TouchableOpacity>
           <Image
-            style={styles.photo}
-            source={userPhoto ? { uri: userPhoto } : require('../assets/placeholder_profile.png')}
+            source={require('../assets/bc_abbreviated.png')}
+            style={{
+              height: 90,
+              width: 90,
+              resizeMode: 'contain',
+              marginLeft: 35,
+            }}
           />
-        </TouchableOpacity>
-        <Text style={styles.title}>{fullname}</Text>
-      </View>
-
-      <Text style={styles.sectionHeader}>User Details</Text>
-      <View style={styles.section}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ marginLeft:15 ,marginTop:10,fontSize:20}}>First Name</Text>
-        <Text style={{marginRight:15 ,marginTop:10,fontSize:20}}>{fname}</Text>
-        </View>
-        <View
-                    style={{
-                      borderBottomColor: 'black',
-                      borderBottomWidth: StyleSheet.hairlineWidth,
-                      }}
+          <TouchableOpacity
+            onPress={() =>
+              showAlert('Logout', 'Are you sure you want to Logout?')
+            }>
+            <Image
+              style={styles.l_image}
+              source={require('../assets/logout.png')}
             />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ marginLeft:15 ,fontSize:20}}>Last Name</Text>
-        <Text style={{ marginRight:15 ,fontSize:20}}>{lname}</Text>
+          </TouchableOpacity>
         </View>
-        <View
-                    style={{
-                      borderBottomColor: 'black',
-                      borderBottomWidth: StyleSheet.hairlineWidth,
-                      }}
+
+        <View style={styles.photoContainer}>
+          <TouchableOpacity onPress={handleUpdatePhoto}>
+            <Image
+              style={styles.photo}
+              source={
+                userPhoto
+                  ? {uri: userPhoto}
+                  : require('../assets/placeholder_profile.png')
+              }
             />
-
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ marginLeft:15 ,marginBottom:10,fontSize:20}}>Contact Email</Text>
-        <Text style={{ marginRight:15 ,marginBottom:10,fontSize:18}}>{userEmail}</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>{fullname}</Text>
         </View>
-      </View>
 
-      <View style={styles.sectionPlain}>
-        <TouchableOpacity onPress={handleResetPassword}>
-          <Text style={styles.sectionHeaderResetPass}>Click Here to Reset Password</Text>
-        </TouchableOpacity>
-      </View>
+        <Text style={styles.sectionHeader}>User Details</Text>
+        <View style={styles.section}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{marginLeft: 15, marginTop: 10, fontSize: 20}}>
+              First Name
+            </Text>
+            <Text style={{marginRight: 15, marginTop: 10, fontSize: 20}}>
+              {fname}
+            </Text>
+          </View>
+          <View
+            style={{
+              borderBottomColor: 'black',
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            }}
+          />
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{marginLeft: 15, fontSize: 20}}>Last Name</Text>
+            <Text style={{marginRight: 15, fontSize: 20}}>{lname}</Text>
+          </View>
+          <View
+            style={{
+              borderBottomColor: 'black',
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            }}
+          />
 
-      <Text style={styles.sectionHeader}>Project Authorization </Text>
-      <View style={styles.section}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{marginLeft: 15, marginBottom: 10, fontSize: 20}}>
+              Contact Email
+            </Text>
+            <Text style={{marginRight: 15, marginBottom: 10, fontSize: 18}}>
+              {userEmail}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.sectionPlain}>
+          <TouchableOpacity onPress={handleResetPassword}>
+            <Text style={styles.sectionHeaderResetPass}>
+              Click Here to Reset Password
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.sectionHeader}>Project Authorization </Text>
+        <View style={styles.section}>
           <View>
             {projects.map((project, index) => (
               <View key={project.id}>
-                <Text style={{fontSize:20,marginLeft:15}}>{project.project_id}</Text>
-                {index !== projects.length - 1 && <View
-                style={{
-                  borderBottomColor: 'black',
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                  }}
-                />
-                }
+                <Text style={{fontSize: 20, marginLeft: 15}}>
+                  {project.project_id}
+                </Text>
+                {index !== projects.length - 1 && (
+                  <View
+                    style={{
+                      borderBottomColor: 'black',
+                      borderBottomWidth: StyleSheet.hairlineWidth,
+                    }}
+                  />
+                )}
               </View>
             ))}
           </View>
-      </View>
-
-      <View style={styles.containerExport}>
-            <TouchableOpacity style={styles.button}
-            onPress={handleSync}>
-              <Text style={styles.textButton}>Sync Offline Data</Text>
-            </TouchableOpacity>
-       </View>
+        </View>
 
         <View style={styles.containerExport}>
-            <TouchableOpacity style={styles.button}
-            onPress={handleExport}>
-              <Text style={styles.textButton}>Export Project Data</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleSync}>
+            <Text style={styles.textButton}>Sync Offline Data</Text>
+          </TouchableOpacity>
         </View>
-        <View style={{marginBottom:80}}>
-        </View>
-        <CustomDialogProject
-        visible={dialogVisible}
-        onClose={() => setDialogVisible(false)}
-        projects={projects}
-        onSubmit={handleDialogSubmit}
-      />
-      <LoadingOverlay loading={loading} />
 
-    </View>
+        <View style={styles.containerExport}>
+          <TouchableOpacity style={styles.button} onPress={handleExport}>
+            <Text style={styles.textButton}>Export Project Data</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{marginBottom: 80}} />
+        <CustomDialogProject
+          visible={dialogVisible}
+          onClose={() => setDialogVisible(false)}
+          projects={projects}
+          onSubmit={handleDialogSubmit}
+        />
+        <LoadingOverlay loading={loading} />
+      </View>
     </ScrollView>
   );
 };
@@ -497,13 +535,13 @@ const styles = StyleSheet.create({
   photo: {
     width: 120,
     height: 120,
-    resizeMode: 'contain'
+    resizeMode: 'contain',
   },
   name: {
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 10,
-    marginBottom: 5
+    marginBottom: 5,
   },
   title: {
     fontSize: 28,
@@ -550,7 +588,7 @@ const styles = StyleSheet.create({
   l_image: {
     width: 60,
     height: 60,
-    resizeMode: 'contain'
+    resizeMode: 'contain',
   },
 
   text: {
@@ -571,7 +609,6 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 10,
   },
-
 });
 
 export default ProfileScreen;
