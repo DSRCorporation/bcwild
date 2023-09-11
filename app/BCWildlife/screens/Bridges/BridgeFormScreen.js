@@ -82,6 +82,7 @@ const BridgeFormScreen = ({route}) => {
     () => (currentBridge ? 'Edit' : 'Create'),
     [currentBridge],
   );
+  const isCreating = currentBridge == null;
 
   const setDefaultValues = useCallback(() => {
     setForm(draft => {
@@ -198,6 +199,7 @@ const BridgeFormScreen = ({route}) => {
               <InputLabel>MOT Bridge ID</InputLabel>
               <TextInput
                 value={form.motBridgeId}
+                editable={isCreating}
                 onChangeText={value =>
                   setForm(draft => {
                     draft.motBridgeId = value;
