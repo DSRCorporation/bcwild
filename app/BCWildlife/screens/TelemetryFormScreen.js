@@ -7,6 +7,7 @@ import { getUsernameG } from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
 import { getTelemetryStr,setTelemetryStr } from '../global';
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
+import { RecordType } from "../utility/RecordType";
 
 
 
@@ -60,7 +61,7 @@ const TelemetryFormScreen = ({navigation}) => {
         z: z
       };
     });
-  
+
     // Calculate centroid of bearings
     const centroid = vectors.reduce((acc, vector) => {
       acc.x += vector.x;
@@ -68,18 +69,18 @@ const TelemetryFormScreen = ({navigation}) => {
       acc.z += vector.z;
       return acc;
     }, { x: 0, y: 0, z: 0 });
-  
+
     centroid.x /= vectors.length;
     centroid.y /= vectors.length;
     centroid.z /= vectors.length;
-  
+
     // Calculate error ellipse
     const errorEllipse = calculateErrorEllipse(vectors, centroid);
-  
+
     // Return results
     return { point: centroid, err_ellipse: errorEllipse };
   }
-  
+
   function calculateErrorEllipse(vectors, centroid) {
     // Calculate distance from each bearing to centroid
     const distances = vectors.map(vector => {
@@ -88,11 +89,11 @@ const TelemetryFormScreen = ({navigation}) => {
       const dz = vector.z - centroid.z;
       return Math.sqrt(dx*dx + dy*dy + dz*dz);
     });
-  
+
     // Calculate mean distance and standard deviation
     const mean = distances.reduce((acc, d) => acc + d, 0) / distances.length;
     const stdev = Math.sqrt(distances.reduce((acc, d) => acc + (d - mean)**2, 0) / distances.length);
-  
+
     // Calculate error ellipse
     const ellipse = {
       a: stdev,
@@ -100,7 +101,7 @@ const TelemetryFormScreen = ({navigation}) => {
       rho: 0,
       c: centroid
     };
-  
+
     return ellipse;
   }
 
@@ -115,7 +116,7 @@ const TelemetryFormScreen = ({navigation}) => {
       };
       bearings.push(bearing);
     });
-  
+
     const triangulation = triangulate(bearings);
     const { x: Triang_easting, y: Triang_northing } = triangulation.point;
     const Errror_area = Math.PI * triangulation.err_ellipse.a * triangulation.err_ellipse.b / 4;
@@ -124,10 +125,10 @@ const TelemetryFormScreen = ({navigation}) => {
     const Triang_SEy = Math.sqrt(triangulation.err_ellipse.b);
     const Triang_corr = triangulation.err_ellipse.rho;
     const Number_bearings_used = bearings.length;
-  
+
     return { Triang_easting, Triang_northing, Errror_area, Triang_SD, Triang_SEx, Triang_SEy, Triang_corr, Number_bearings_used };
   }
-  
+
   // Example usage:
   const data = [
     { time: '2023-04-20 15:40:00', easting: '595121', northing: '5741086', bearing: '107', signal: '5', bias: '0.2' },
@@ -136,7 +137,7 @@ const TelemetryFormScreen = ({navigation}) => {
     { time: '2023-04-20 16:21:00', easting: '595743', northing: '5740347', bearing: '70', signal: '3', bias: '0.3' },
     { time: '2023-04-20 16:28:00', easting: '595252', northing: '5740502', bearing: '90', signal: '3', bias: '0.3' },
   ];
-  
+
 
   function setDefaultValues() {
     const defaultDateTime = '';
@@ -152,7 +153,7 @@ const TelemetryFormScreen = ({navigation}) => {
     const defaultWindSpeed = '';
     const defaultElementIdentified = '';
     const defaultComments = '';
-  
+
     setDateTime(defaultDateTime);
     setSurveyId(defaultSurveyId);
     setLocationId(defaultLocationId);
@@ -176,7 +177,7 @@ const TelemetryFormScreen = ({navigation}) => {
         Alert.alert('Please select a project');
         return;
     }
-    
+
     if(!dateTime){
         Alert.alert('Please enter date and time');
         return;
@@ -240,7 +241,7 @@ const TelemetryFormScreen = ({navigation}) => {
     }else{
       setTriangulationText(getTelemetryStr());
     }
-  
+
     const data = {
       date: dateTime,
       survey_id: surveyId,
@@ -262,7 +263,7 @@ const TelemetryFormScreen = ({navigation}) => {
     var timeNowEpoch = Math.round((new Date()).getTime() / 1000);
         console.log(timeNowEpoch);
         var username = getUsernameG();
-        var recordIdentifier ='TELE_' + username + '_' + timeNowEpoch;
+        var recordIdentifier = RecordType.GroundTelemetry + '_' + username + '_' + timeNowEpoch;
         setRecordIdentifier(recordIdentifier);
     RecordsRepo.addRecord(recordIdentifier, recordsValue);
     setDefaultValues();
@@ -271,7 +272,7 @@ const TelemetryFormScreen = ({navigation}) => {
   }
 
   const handleTriangulation = () => {
-    
+
     console.log('triangulation');
     navigation.navigate('TelemetryTriangulation');
     }
@@ -293,7 +294,7 @@ const TelemetryFormScreen = ({navigation}) => {
       var proj = JSON.parse(projectsData);
       setProjects(proj);
 
-          // datetime 
+          // datetime
       const currentDate = new Date();
       const day = currentDate.getDate();
       const month = currentDate.toLocaleString('default', { month: 'short' });
@@ -311,24 +312,24 @@ const TelemetryFormScreen = ({navigation}) => {
         var timeNowEpoch = Math.round((new Date()).getTime() / 1000);
         console.log(timeNowEpoch);
         var username = getUsernameG();
-        var recordIdentifier ='TELE_' + username + '_' + timeNowEpoch;
+        var recordIdentifier = RecordType.GroundTelemetry + '_' + username + '_' + timeNowEpoch;
         setRecordIdentifier(recordIdentifier);
     }
 
   }
 
- 
 
 
- 
+
+
 
 
   return (
-    
+
     <View style={styles.container}>
       <ScrollView>
         <SimpleScreenHeader>Telemetry Data</SimpleScreenHeader>
-      
+
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}> Project </Text>
               <View style={styles.dropdownContainer}>
@@ -345,7 +346,7 @@ const TelemetryFormScreen = ({navigation}) => {
                       />
                     ))}
               </Picker>
-             
+
               </View>
               <Text style={styles.inputLabel}> Survey ID </Text>
               <TextInput

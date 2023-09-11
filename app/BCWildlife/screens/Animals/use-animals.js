@@ -3,6 +3,7 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import {getUsernameG} from '../../global';
 import {getWithAuth} from '../../network/auth';
 import {listanimals_url} from '../../network/path';
+import {RecordType} from '../../utility/RecordType';
 
 const ENCRYPTED_STORAGE_KEY = 'animals';
 
@@ -82,7 +83,7 @@ export const localAnimalToRecord = animal => {
   const timeNowEpoch = Math.round((timestamp || 0) / 1000);
   const strvalue = JSON.stringify({id, name});
   const username = getUsernameG();
-  const recordIdentifier = `ANIMAL_${username}_${timeNowEpoch}`;
+  const recordIdentifier = `${RecordType.Animal}_${username}_${timeNowEpoch}`;
   return [recordIdentifier, strvalue];
 };
 
