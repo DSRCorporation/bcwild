@@ -38,6 +38,7 @@ import RecordsRepo from '../../utility/RecordsRepo';
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 import {RowList} from '../../shared/components/RowList';
+import {RecordType} from '../../utility/RecordType';
 
 const linkColor = '#216de8';
 
@@ -138,7 +139,7 @@ const BatSurveyFormScreen = () => {
       const strvalue = JSON.stringify(dto);
       const timeNowEpoch = Math.round(timestamp / 1000);
       const username = getUsernameG();
-      const recordIdentifier = `BAT_${username}_${timeNowEpoch}`;
+      const recordIdentifier = `${RecordType.Bat}_${username}_${timeNowEpoch}`;
       await RecordsRepo.addRecord(recordIdentifier, strvalue);
       setCreateDisabled(true);
     }

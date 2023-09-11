@@ -19,6 +19,7 @@ import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 import {parseAerialTelemetryForm} from './parseAerialTelemetryForm';
 import {getUsernameG} from '../../global';
 import RecordsRepo from '../../utility/RecordsRepo';
+import {RecordType} from '../../utility/RecordType';
 
 const ArielTelemetryDataFormScreen = ({navigation}) => {
   const styles = useFormScreenStyles();
@@ -56,7 +57,7 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
       const strvalue = JSON.stringify(dto);
       const timeNowEpoch = Math.round(timestamp / 1000);
       const username = getUsernameG();
-      const recordIdentifier = `AERIALTELEMETRY_${username}_${timeNowEpoch}`;
+      const recordIdentifier = `${RecordType.AerialTelemetry}_${username}_${timeNowEpoch}`;
       await RecordsRepo.addRecord(recordIdentifier, strvalue);
       Alert.alert('Success', 'Aerial telemetry saved locally');
       navigation.goBack();

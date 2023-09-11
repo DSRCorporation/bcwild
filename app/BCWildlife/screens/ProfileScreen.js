@@ -11,6 +11,7 @@ import LoadingOverlay from '../utility/LoadingOverlay';
 import {generateNewAccessToken} from '../network/AxiosUtility';
 import {useBridges} from '../shared/hooks/use-bridges/useBridges';
 import {localAnimalToRecord, useAnimals} from './Animals/use-animals';
+import {RecordType} from '../utility/RecordType';
 
 const ProfileScreen = ({navigation}) => {
   const [fname, setFname] = useState('');
@@ -185,12 +186,39 @@ const ProfileScreen = ({navigation}) => {
           console.log(`records to sync: ${recordsObj.length}`);
         }
 
+        const animals = []; // syncing animals before aerial telemetry
+        const bridges = []; //syncing bridges before bats
+        const commonRecords = [];
+        for (const record of recordsObj) {
+          if (record.record_identifier.startsWith(RecordType.Animal)) {
+            animals.push(record);
+          } else if (record.record_identifier.startsWith(RecordType.Bridge)) {
+            bridges.push(record);
+          } else {
+            commonRecords.push(record);
+          }
+        }
+
         const USER_TOKEN = getAccessToken();
         const AuthStr = 'Bearer '.concat(USER_TOKEN);
         try {
+          console.log('Starting sync');
+          console.log('Syncing animals');
           axiosUtility
-            .post(datasyncpush_url, recordsObj, {
+            .post(datasyncpush_url, animals, {
               headers: {Authorization: AuthStr},
+            })
+            .then(_ => {
+              console.log('Syncing bridges');
+              return axiosUtility.post(datasyncpush_url, bridges, {
+                headers: {Authorization: AuthStr},
+              });
+            })
+            .then(_ => {
+              console.log('Syncing everything else');
+              return axiosUtility.post(datasyncpush_url, commonRecords, {
+                headers: {Authorization: AuthStr},
+              });
             })
             .then(response => {
               console.log(response);
