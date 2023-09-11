@@ -7,7 +7,11 @@ const stateStorageKey = 'TransectEditState';
 
 export const loadState = async () => {
   const json = await EncryptedStorage.getItem(stateStorageKey);
-  return JSON.parse(json);
+  if (json) {
+    return JSON.parse(json);
+  } else {
+    return null;
+  }
 };
 
 export const saveState = async state => {
