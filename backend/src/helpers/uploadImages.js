@@ -1,5 +1,6 @@
 const multer = require("multer");
 const crypto = require("crypto");
+const fs = require("fs");
 
 // Form data key to append image to
 const formDataKey = "image";
@@ -37,9 +38,16 @@ const imageUploadResult = (req) => {
   return { files: files.map(multerFileToFileResult) };
 };
 
+const ensureImageDir = () => {
+  if (!fs.existsSync(imageDir)) {
+    fs.mkdirSync(imageDir, { recursive: true });
+  }
+};
+
 const storage = multer.diskStorage({
   destination: imageDir,
   filename: (req, file, cb) => {
+    ensureImageDir();
     const ext = file.mimetype.split("/").pop();
     randomString((err, name) => (err ? cb(err) : cb(null, `${name}.${ext}`)));
   },
