@@ -6,6 +6,7 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import { getUsernameG } from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
+import { RecordType } from "../utility/RecordType";
 
 
 
@@ -26,7 +27,7 @@ const CameraTrapDataScreen = () => {
   const [customTargetFeature, setCustomTargetFeature] = React.useState('');
 
 
-  
+
   const [fieldcrew, setFieldcrew] = React.useState('');
   const [dateTime, setDateTime] = React.useState('');
   const [stationId, setStationId] = React.useState('');
@@ -70,8 +71,8 @@ const CameraTrapDataScreen = () => {
   const [locationPermission, setLocationPermission] = useState(null);
 
 
- 
-  
+
+
 
   useEffect(() => {
     handleLocalValues();
@@ -109,16 +110,16 @@ const CameraTrapDataScreen = () => {
     if (customHabitat) {
       data.habitat_type = customHabitatValue;
     }
-  
-    
-  
+
+
+
     if (targetFeature) {
       data.target_feature = targetFeature;
     }
     if (customTargetFeature) {
       data.target_feature = customTargetFeatureValue;
     }
-  
+
     if (distanceFeature) {
       data.distant_feature = distanceFeature;
     }
@@ -191,7 +192,7 @@ const CameraTrapDataScreen = () => {
       Alert.alert('Deploy Check is required');
       return;
     }
-    
+
     if(deployCheck == 'deploy'){
       if(stationNorthing){
         data.station_northing = stationNorthing;
@@ -247,14 +248,14 @@ const CameraTrapDataScreen = () => {
       if (isCamActive!=null){
         data.camera_active = isCamActive;
       }
-      
+
       if(comments){
         data.comments = comments;
       }else{
         Alert.alert('Comments is required');
         return;
       }
-      
+
     } else{
 
       if (isCamActiveArrival!=null  ){
@@ -279,7 +280,7 @@ const CameraTrapDataScreen = () => {
           return;
         }
       }
-      
+
       if (purposeVisit){
         data.purpose_visit = purposeVisit;
       }else{
@@ -314,7 +315,7 @@ const CameraTrapDataScreen = () => {
 
     var username = getUsernameG();
 
-    var recordIdentifier ='CAM_' + username + '_' + timeNowEpoch;
+    var recordIdentifier = RecordType.Cam + '_' + username + '_' + timeNowEpoch;
 
     RecordsRepo.addRecord(recordIdentifier, strvalue);
     Alert.alert('Record Saved');
@@ -383,7 +384,7 @@ const CameraTrapDataScreen = () => {
       var proj = JSON.parse(projectsData);
       setProjects(proj);
 
-          // datetime 
+          // datetime
       const currentDate = new Date();
       const day = currentDate.getDate();
       const month = currentDate.toLocaleString('default', { month: 'short' });
@@ -420,7 +421,7 @@ const CameraTrapDataScreen = () => {
       setCustomHabitat(true);
     }else{
       setCustomHabitat(false);
-    } 
+    }
   }
 
   const showCustomInputForHabitat = () => {
@@ -514,7 +515,7 @@ const CameraTrapDataScreen = () => {
 
 
   return (
-    
+
     <View style={styles.container}>
       <ScrollView>
         <SimpleScreenHeader>Camera Trap Data</SimpleScreenHeader>
@@ -611,7 +612,7 @@ const CameraTrapDataScreen = () => {
                     <Picker.Item label="Other" value="other" />
                   </Picker>
               </View>
-              
+
               <Text style={styles.inputLabel}> Security Box </Text>
                 <View style={styles.dropdownContainer}>
                   <Picker
@@ -673,7 +674,7 @@ const CameraTrapDataScreen = () => {
                 placeholder="Enter Camera Model"
                 value={cameraModel}
                 onChangeText={(text) => setCameraModel(text)}
-                
+
               />
 
 
@@ -821,9 +822,9 @@ const CameraTrapDataScreen = () => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
-                  handleImageUpload();}}  
+                  handleImageUpload();}}
               >
-                <Text style={styles.inputLabel}> Click to Add Photos </Text>   
+                <Text style={styles.inputLabel}> Click to Add Photos </Text>
               </TouchableOpacity>
               </View>) : (
                 <View style={styles.inputContainer} >
@@ -843,7 +844,7 @@ const CameraTrapDataScreen = () => {
                   <View style={styles.dropdownContainer}>
                       <Picker
                         selectedValue={cameraDamaged}
-                        onValueChange={(itemValue) => 
+                        onValueChange={(itemValue) =>
                             setCameraDamaged(itemValue)
                         }
                       >
@@ -852,9 +853,9 @@ const CameraTrapDataScreen = () => {
                         <Picker.Item label="No" value="no" />
                       </Picker>
                   </View>
-                  {cameraDamaged == 'yes'? 
+                  {cameraDamaged == 'yes'?
                   <View>
-                  <Text style={styles.inputLabel}> Camera Damaged Reason </Text>  
+                  <Text style={styles.inputLabel}> Camera Damaged Reason </Text>
                   <TextInput
                     style={styles.input}
                     value={cameraDamagedReason}
@@ -886,7 +887,7 @@ const CameraTrapDataScreen = () => {
                   <View style={styles.dropdownContainer}>
                       <Picker
                         selectedValue={purposeVisit}
-                        onValueChange={(itemValue) => 
+                        onValueChange={(itemValue) =>
                             setPurposeVisit(itemValue)
                         }
                       >
@@ -900,7 +901,7 @@ const CameraTrapDataScreen = () => {
                   <View style={styles.dropdownContainer}>
                       <Picker
                         selectedValue={cameraRemoved}
-                        onValueChange={(itemValue) => 
+                        onValueChange={(itemValue) =>
                             setCameraRemoved(itemValue)
                         }
                       >
@@ -914,7 +915,7 @@ const CameraTrapDataScreen = () => {
                   <View style={styles.dropdownContainer}>
                       <Picker
                         selectedValue={cameraReplaced}
-                        onValueChange={(itemValue) => 
+                        onValueChange={(itemValue) =>
                             setCameraReplaced(itemValue)
                         }
                       >
@@ -928,7 +929,7 @@ const CameraTrapDataScreen = () => {
                   <View style={styles.dropdownContainer}>
                       <Picker
                         selectedValue={batteriesReplaced}
-                        onValueChange={(itemValue) => 
+                        onValueChange={(itemValue) =>
                             setBatteriesReplaced(itemValue)
                         }
                       >
@@ -943,7 +944,7 @@ const CameraTrapDataScreen = () => {
                   <View style={styles.dropdownContainer}>
                       <Picker
                         selectedValue={sdCardReplaced}
-                        onValueChange={(itemValue) => 
+                        onValueChange={(itemValue) =>
                             setSdCardReplaced(itemValue)
                         }
                       >
@@ -956,7 +957,7 @@ const CameraTrapDataScreen = () => {
                   </View>)}
 
         <TouchableOpacity
-            style={{ backgroundColor: '#234075', borderRadius: 10, 
+            style={{ backgroundColor: '#234075', borderRadius: 10,
             marginTop: 20, padding: 10,
             marginBottom: 20
             ,justifyContent:'center'}}
@@ -966,7 +967,7 @@ const CameraTrapDataScreen = () => {
         >
           <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18,textAlign:'center' }}>Save</Text>
         </TouchableOpacity>
-                    
+
             </View>
           </ScrollView>
         </View>

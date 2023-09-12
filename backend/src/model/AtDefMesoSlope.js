@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/ArialTelemetry.json");
+const { createDefInit } = require("./createDefInit");
 
 const AtDefMesoSlope = db.sequelize.define(
   "at_def_meso_slope",
@@ -21,12 +22,7 @@ const AtDefMesoSlope = db.sequelize.define(
   },
 );
 
-async function init() {
-  await AtDefMesoSlope.sync({ force: true });
-  await AtDefMesoSlope.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "MesoSlope"),
-  );
-}
+const init = createDefInit(AtDefMesoSlope, datasheetTypes, "MesoSlope");
 
 module.exports = {
   AtDefMesoSlope,

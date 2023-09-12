@@ -3,6 +3,9 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 class RecordsRepo {
   static async addRecord(recordIdentifier, jsonValue) {
     // Store the value in the given key
+    console.log(
+      `setting item with id ${recordIdentifier} and value ${jsonValue}`,
+    );
     await EncryptedStorage.setItem(recordIdentifier, jsonValue);
 
     // Fetch the unsynced records
@@ -16,10 +19,15 @@ class RecordsRepo {
     }
 
     // Add the new record identifier to the array
-    unsyncedRecords.push(recordIdentifier);
+    if (!unsyncedRecords.includes(recordIdentifier)) {
+      unsyncedRecords.push(recordIdentifier);
+    }
 
     // Convert the array to a JSON string and store it back
-    await EncryptedStorage.setItem('unsynced_records', JSON.stringify(unsyncedRecords));
+    await EncryptedStorage.setItem(
+      'unsynced_records',
+      JSON.stringify(unsyncedRecords),
+    );
   }
 
   static async getUnsyncedRecords() {
@@ -42,6 +50,10 @@ class RecordsRepo {
 
       // Fetch the record value from the local storage
       const recordValue = await EncryptedStorage.getItem(recordIdentifier);
+
+      if (!recordValue) {
+        continue;
+      }
 
       // Add the record identifier and data to the temporary array
       temp.push({
@@ -69,9 +81,18 @@ class RecordsRepo {
     for (let i = 0; i < unsyncedRecordIdentifiers.length; i++) {
       const recordIdentifier = unsyncedRecordIdentifiers[i];
 
-      // Delete the record value from the local storage
-      await EncryptedStorage.removeItem(recordIdentifier);
+      console.log(`trying to delete ${recordIdentifier}`);
+
+      const item = await EncryptedStorage.getItem(recordIdentifier);
+      if (item) {
+        // Delete the record value from the local storage
+        await EncryptedStorage.removeItem(recordIdentifier);
+      } else {
+        console.warn('Tried to delete non-existing item');
+      }
     }
+
+    console.log('deleted all items');
 
     // Delete the list of unsynced records from local storage
     await EncryptedStorage.removeItem('unsynced_records');

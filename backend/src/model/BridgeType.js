@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const BridgeType = db.sequelize.define(
   "bb_def_type",
@@ -21,12 +22,7 @@ const BridgeType = db.sequelize.define(
   },
 );
 
-async function init() {
-  await BridgeType.sync({ force: true });
-  await BridgeType.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "BridgeType").values,
-  );
-}
+const init = createDefInit(BridgeType, datasheetTypes, "BridgeType");
 
 module.exports = {
   BridgeType,

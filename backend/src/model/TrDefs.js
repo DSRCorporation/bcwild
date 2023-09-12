@@ -46,9 +46,11 @@ function defineModel(typeName) {
       timestamps: false,
     },
   );
-  const initModel = async () => {
-    await model.sync({ force: true });
-    await model.bulkCreate(typeDescription.values);
+  const initModel = async (transaction) => {
+    await model.bulkCreate(typeDescription.values, {
+      transaction,
+      updateOnDuplicate: ["id"],
+    });
   };
   return [model, initModel];
 }
@@ -81,8 +83,8 @@ const TrDefWind = modelFor("Wind");
 // const TrDefTemperature = modelFor("Temperature");
 const TrDefReliability = modelFor("Reliability");
 
-async function init() {
-  Promise.all(initFunctions.map((fn) => fn()));
+async function init(transaction) {
+  await Promise.all(initFunctions.map((fn) => fn(transaction)));
 }
 
 module.exports = {

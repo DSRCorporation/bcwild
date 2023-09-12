@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const BridgeColumns = db.sequelize.define(
   "bb_def_columns",
@@ -21,12 +22,7 @@ const BridgeColumns = db.sequelize.define(
   },
 );
 
-async function init() {
-  await BridgeColumns.sync({ force: true });
-  await BridgeColumns.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "Columns").values,
-  );
-}
+const init = createDefInit(BridgeColumns, datasheetTypes, "Columns");
 
 module.exports = {
   BridgeColumns,

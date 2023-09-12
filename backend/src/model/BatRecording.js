@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const BatRecording = db.sequelize.define(
   "bb_def_bat_recording",
@@ -21,12 +22,7 @@ const BatRecording = db.sequelize.define(
   },
 );
 
-async function init() {
-  await BatRecording.sync({ force: true });
-  await BatRecording.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "BatRecording").values,
-  );
-}
+const init = createDefInit(BatRecording, datasheetTypes, "BatRecording");
 
 module.exports = {
   BatRecording,

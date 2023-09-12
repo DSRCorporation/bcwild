@@ -46,6 +46,7 @@ const AnimalFormScreen = ({route, navigation}) => {
     () => (currentAnimalId ? 'Edit' : 'Create'),
     [currentAnimalId],
   );
+  const isCreating = !currentAnimalId;
 
   const fillForm = useCallback(() => {
     if (!currentAnimal) {
@@ -87,6 +88,7 @@ const AnimalFormScreen = ({route, navigation}) => {
             <InputLabel>ID</InputLabel>
             <TextInput
               value={form.id}
+              editable={isCreating}
               onChangeText={value =>
                 setForm(draft => {
                   draft.id = value;

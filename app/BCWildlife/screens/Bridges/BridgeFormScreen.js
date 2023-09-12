@@ -29,6 +29,7 @@ import {useFormScreenStyles} from '../../shared/styles/use-form-screen-styles';
 import {BaseButton} from '../../shared/components/BaseButton';
 import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import {RecordType} from '../../utility/RecordType';
 
 const BridgeFormScreen = ({route}) => {
   const styles = useFormScreenStyles();
@@ -68,7 +69,7 @@ const BridgeFormScreen = ({route}) => {
       const strvalue = JSON.stringify(dto);
       const timeNowEpoch = Math.round(timestamp / 1000);
       const username = getUsernameG();
-      const recordIdentifier = `BRIDGE_${username}_${timeNowEpoch}`;
+      const recordIdentifier = `${RecordType.Bridge}_${username}_${timeNowEpoch}`;
       RecordsRepo.addRecord(recordIdentifier, strvalue);
       await updateBridgeLocally(dto);
       Alert.alert('Bridge data saved');
@@ -82,6 +83,7 @@ const BridgeFormScreen = ({route}) => {
     () => (currentBridge ? 'Edit' : 'Create'),
     [currentBridge],
   );
+  const isCreating = currentBridge == null;
 
   const setDefaultValues = useCallback(() => {
     setForm(draft => {
@@ -198,6 +200,7 @@ const BridgeFormScreen = ({route}) => {
               <InputLabel>MOT Bridge ID</InputLabel>
               <TextInput
                 value={form.motBridgeId}
+                editable={isCreating}
                 onChangeText={value =>
                   setForm(draft => {
                     draft.motBridgeId = value;

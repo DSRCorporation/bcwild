@@ -12,6 +12,7 @@ import {
   transectNavCallback,
 } from './navigation';
 import {TransectForm} from './TransectForm';
+import {RecordType} from '../../utility/RecordType';
 
 const saveRecord = async dto => {
   const timestamp = Date.now();
@@ -19,7 +20,7 @@ const saveRecord = async dto => {
   const strvalue = JSON.stringify(dto);
   const timeNowEpoch = Math.round(timestamp / 1000);
   const username = getUsernameG();
-  const recordIdentifier = `TRANSECT_${username}_${timeNowEpoch}`;
+  const recordIdentifier = `${RecordType.Transect}_${username}_${timeNowEpoch}`;
   await RecordsRepo.addRecord(recordIdentifier, strvalue);
   await clearState();
   Alert.alert('Success', 'Transect survey saved locally');

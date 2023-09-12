@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { createDefInit } = require("./createDefInit");
 
 const Assessment = db.sequelize.define(
   "def_assessment",
@@ -21,12 +22,7 @@ const Assessment = db.sequelize.define(
   },
 );
 
-async function init() {
-  await Assessment.sync({ force: true });
-  await Assessment.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "Assessment").values,
-  );
-}
+const init = createDefInit(Assessment, datasheetTypes, "Assessment");
 
 module.exports = {
   Assessment,

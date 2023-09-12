@@ -21,12 +21,12 @@ const Region = db.sequelize.define(
   },
 );
 
-async function init() {
-  await Region.sync({ force: true });
+async function init(transaction) {
   await Region.bulkCreate(
     datasheetTypes.types
       .find(({ name }) => name === "Region")
       .values.map(({ id, value }) => ({ id, name: value })),
+    { transaction, updateOnDuplicate: ["id"] },
   );
 }
 

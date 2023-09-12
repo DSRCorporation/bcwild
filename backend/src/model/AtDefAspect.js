@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/ArialTelemetry.json");
+const { createDefInit } = require("./createDefInit");
 
 const AtDefAspect = db.sequelize.define(
   "at_def_aspect",
@@ -21,12 +22,7 @@ const AtDefAspect = db.sequelize.define(
   },
 );
 
-async function init() {
-  await AtDefAspect.sync({ force: true });
-  await AtDefAspect.bulkCreate(
-    datasheetTypes.types.find(({ name }) => name === "Aspect"),
-  );
-}
+const init = createDefInit(AtDefAspect, datasheetTypes, "Aspect");
 
 module.exports = {
   AtDefAspect,
