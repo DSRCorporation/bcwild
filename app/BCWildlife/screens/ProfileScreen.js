@@ -17,6 +17,59 @@ import LoadingOverlay from '../utility/LoadingOverlay';
 import { generateNewAccessToken } from '../network/AxiosUtility';
 import {useBridges} from '../shared/hooks/use-bridges/useBridges';
 import {localAnimalToRecord, useAnimals} from './Animals/use-animals';
+import {uploadImages} from '../shared/utils/uploadImages';
+
+// Uploading images
+
+const singleImagePusher = property => async record => {
+  const imageFile = record.data[property];
+  const response = await uploadImages([imageFile]);
+  const fixedData = {...record.data};
+  fixedData[property] = response.files[0].filename;
+  const fixedRecord = {...record, data: fixedData};
+  return fixedRecord;
+};
+
+// quick & dirty
+const uriBasename = uri => uri.split('/').pop();
+
+const multipleImagePusher = property => async record => {
+  const imageFiles = record.data[property];
+  const response = await uploadImages(imageFiles);
+  const resultFiles = response.data.files;
+  const findResultFilename = ({fileName}) => {
+    const basename = uriBasename(fileName);
+    const resultFile = resultFiles.find(
+      ({originalname}) => originalname === basename,
+    );
+    return resultFile && resultFile.filename;
+  };
+  const fixedFiles = imageFiles
+    .map(findResultFilename)
+    .filter(file => file != null);
+  const fixedData = {...record.data};
+  fixedData[property] = fixedFiles;
+  const fixedRecord = {...record, data: fixedData};
+  return fixedRecord;
+};
+
+const noOpImagePusher = async record => record;
+
+const imagePushers = {
+  BAT: multipleImagePusher('photos'),
+  AERIALTELEMETRY: multipleImagePusher('photos'),
+};
+
+const pushRecordImages = async record => {
+  const prefix = record.record_identifier.split('_')[0];
+  const pusher = imagePushers[prefix] || noOpImagePusher;
+  return pusher(record);
+};
+
+const pushRecordsImages = async records =>
+  Promise.all(records.map(pushRecordImages));
+
+// End uploading images
 
 const ProfileScreen = ({navigation}) => {
   const [fname,setFname] = useState('');
@@ -155,7 +208,11 @@ const ProfileScreen = ({navigation}) => {
     // 2. Fresh list of bridges is loaded; obsolete local changes are discarded.
     // Same for animals
     //
-    console.debug('animals', animals);
+    // When records are pushed:
+    // First pass: upload images associated with each record optionally "fixing" the request
+    // The upload function is defined by the prefix of the record name.
+    // The prefix is the part of the record name before the first "_".
+    // Second pass: "fixed" records are pushed.
 
     // Copy local animals to records
     animals.forEach(async animal => {
@@ -164,17 +221,24 @@ const ProfileScreen = ({navigation}) => {
       }
     });
     try {
-      await RecordsRepo.getUnsyncedRecords().then((records) => {
-          console.log(records);
-          console.log('Sync');
-          var recordsObj;
-          try{
-           recordsObj = JSON.parse(records);
-          }catch(e){
-            Alert.alert('Success','No records to sync');
-            console.log('error parsing records');
-            return;
-          }
+      let recordsObj;
+      let recArray;
+      try {
+        const records = await RecordsRepo.getUnsyncedRecords();
+        console.log(records);
+        console.log('Sync');
+        recArray = JSON.parse(records);
+        try {
+          recArray = await pushRecordsImages(recArray); // "fixed" records"
+        } catch (error) {
+          console.error('Could not push images', error);
+          Alert.alert('Error', 'Could not push images');
+        }
+      } catch (error) {
+        console.error('Could not create records object');
+      }
+      recordsObj = recArray;
+      // recordsObj.append('records', recArray);
 
           if(recordsObj.length < 1){
             Alert.alert('Success','No records to sync');
@@ -187,7 +251,7 @@ const ProfileScreen = ({navigation}) => {
           const AuthStr = 'Bearer '.concat(USER_TOKEN);
           try {
             axiosUtility.post(datasyncpush_url, recordsObj,
-              { headers: { Authorization: AuthStr } })
+              { headers: { Authorization: AuthStr, Content: 'application/x-www-form-urlencoded' } })
             .then(response => {
               console.log(response);
               Alert.alert('Success',response.message);
@@ -254,7 +318,6 @@ const ProfileScreen = ({navigation}) => {
           } catch (error) {
             console.error(error);
           }
-      });
       try {
         await pullBridges();
         // Alert.alert('Success','Bridge data loaded');

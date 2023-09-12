@@ -6,13 +6,17 @@ import LoadingOverlay from '../utility/LoadingOverlay';
 import axiosInstance from '../network/AxiosUtility';
 import { setAccessToken,setRefreshToken,setUsernameG } from '../global';
 import { ScrollView } from 'react-native-gesture-handler';
+import {useBridges} from '../shared/hooks/use-bridges/useBridges';
+import {useAnimals} from './Animals/use-animals';
 
 
 const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  var axiosUtility = new axiosInstance.getInstanceWithoutToken();
+  const {pullBridges} = useBridges();
+  const {pullAnimals} = useAnimals();
+  const axiosUtility = new axiosInstance.getInstanceWithoutToken();
 
   useEffect(() => {
     
@@ -42,6 +46,18 @@ const LoginScreen = ({ navigation }) => {
         console.log(error)
       });
 
+      try {
+        await pullBridges();
+        console.log('Bridge list pulled');
+      } catch (error) {
+        console.error('Failed to pull bridges', error, JSON.stringify(error));
+      }
+      try {
+        await pullAnimals();
+        console.log('Animal list pulled');
+      } catch (error) {
+        console.error('Failed to pull animals', error, JSON.stringify(error));
+      }
 
       const obj = JSON.parse(session);
       if(obj.data.role=='admin'){
