@@ -29,7 +29,6 @@ const TelemetryFormScreen = ({navigation}) => {
     const [useTriangulation,setUseTriangulation] = useState('');
     const [comments, setComments] = React.useState('');
     const [recordIdentifier, setRecordIdentifier] = React.useState('');
-    const [triangulationText, setTriangulationText] = React.useState('');
 
 
   useEffect(() => {
@@ -208,7 +207,7 @@ const TelemetryFormScreen = ({navigation}) => {
         return;
     }
     if(!ambientTemprature){
-        Alert.alert('Please enter ambient temprature');
+        Alert.alert('Please enter ambient temperature');
         return;
     }
     if(!cloudCover){
@@ -228,19 +227,13 @@ const TelemetryFormScreen = ({navigation}) => {
         return;
 
     }
-    if(!comments){
-        comments='';
-    }
+    const location_comments = comments || '';
     if(!useTriangulation){
         Alert.alert('Please select use triangulation');
         return;
     }
 
-    if(getTelemetryStr() == ''){
-      // do nothing
-    }else{
-      setTriangulationText(getTelemetryStr());
-    }
+    const triangulation = useTriangulation === 'yes' ? getTelemetryStr() : null;
 
     const data = {
       date: dateTime,
@@ -255,11 +248,10 @@ const TelemetryFormScreen = ({navigation}) => {
       precip: precipitation,
       wind: windSpeed,
       element_identified: elementIdentified,
-      location_comments: comments,
-      triangulation:triangulationText
+      location_comments,
+      triangulation,
     };
     var recordsValue = JSON.stringify(data);
-    console.log(recordsValue);
     var timeNowEpoch = Math.round((new Date()).getTime() / 1000);
         console.log(timeNowEpoch);
         var username = getUsernameG();
