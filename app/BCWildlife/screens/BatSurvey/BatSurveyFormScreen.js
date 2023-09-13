@@ -6,14 +6,12 @@ import {Picker} from '@react-native-picker/picker';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {useImmer} from 'use-immer';
 import {InputLabel} from '../../shared/components/InputLabel';
-import {BCWildLogo} from '../../shared/components/BCWildLogo';
 import {TitleText} from '../../shared/components/TitleText';
 import {
   noValue,
   yesOrNoOptions,
   yesValue,
 } from '../../constants/yes-or-no-options';
-import {useBatSurveyFormValidation} from './use-bat-survey-form-validation';
 import {batSurveyFormLabels} from '../../constants/bat-survey/bat-survey-labels';
 import {transformListDataToCheckboxItems} from '../../shared/utils/form-data';
 import {
@@ -135,7 +133,7 @@ const BatSurveyFormScreen = () => {
       Alert.alert(parsed.errorMessage);
     } else {
       const {dto} = parsed;
-      console.log('Bat dto', dto);
+      dto.photos = attachedImages;
       const strvalue = JSON.stringify(dto);
       const timeNowEpoch = Math.round(timestamp / 1000);
       const username = getUsernameG();
@@ -143,7 +141,7 @@ const BatSurveyFormScreen = () => {
       await RecordsRepo.addRecord(recordIdentifier, strvalue);
       setCreateDisabled(true);
     }
-  }, [form]);
+  }, [form, attachedImages]);
 
   const setDefaultValues = useCallback(() => {
     setForm(draft => {

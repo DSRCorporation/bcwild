@@ -81,6 +81,9 @@ const dtoProperties = [
   {
     property: 'comments',
   },
+  {
+    property: 'photos',
+  },
 ];
 
 const aerialTelemetryFormParser = applyPropertyTransforms(dtoProperties);

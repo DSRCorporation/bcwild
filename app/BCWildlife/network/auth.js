@@ -39,7 +39,7 @@ const addAuthHeader = options => {
   const optionObj = options == null ? {} : options;
   const header = authHeader();
   const oldHeaders = optionObj.headers;
-  const newHeaders = oldHeaders == null ? header : {...oldHeaders, header};
+  const newHeaders = oldHeaders == null ? header : {...oldHeaders, ...header};
   return {...optionObj, headers: newHeaders};
 };
 

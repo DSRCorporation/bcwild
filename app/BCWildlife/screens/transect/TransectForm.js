@@ -17,6 +17,7 @@ import {errorMessage, parseTransect} from './parse';
 import {ValidationError} from '../../shared/utils/form-validation';
 import {InputLabel} from '../../shared/components/InputLabel';
 import {NotInitialized} from './NotInitialized';
+import {useLocation} from '../Location';
 
 export const createDefaultTransectForm = defaultValues => {
   const form = {stands: []};
@@ -79,9 +80,11 @@ const Stands = ({stands, onEdit, onAddStand}) => {
 };
 
 const TransectFormBody = ({callback, params, state, onSave, onCancel}) => {
-  const {styles, form} = useSimpleFormContext();
-  const [loading, setLoading] = useState(true);
+  const {styles, form, setLoading, loading} = useSimpleFormContext();
   const [defaultValues, setDefaultValues] = useState(null);
+  const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
+    useLocation();
+
   const onAddStand = async () => {
     setLoading(true);
     let standDefaultValues = {};
@@ -106,6 +109,23 @@ const TransectFormBody = ({callback, params, state, onSave, onCancel}) => {
     }
   }, [form, onSave]);
 
+  const getCurrentLocation = useCallback(async () => {
+    const permissionGranted = await requestLocationPermission();
+    if (permissionGranted) {
+      setLoading(true);
+      const coords = await getLocation();
+      setLoading(false);
+      return coords;
+    } else {
+      showPermissionRequiredAlert();
+    }
+  }, [
+    requestLocationPermission,
+    getLocation,
+    setLoading,
+    showPermissionRequiredAlert,
+  ]);
+
   useEffect(() => {
     const loadDefaultValues = async () => {
       let loadedDefaultValues = {};
@@ -120,28 +140,30 @@ const TransectFormBody = ({callback, params, state, onSave, onCancel}) => {
     loadDefaultValues().catch(err =>
       console.error('This should not happen', err),
     );
-  }, [state]);
+  }, [setLoading, state]);
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <SimpleScreenHeader onLogoPress={onCancel}>
-          {transectConfig.title}
-        </SimpleScreenHeader>
-        {defaultValues && (
-          <>
-            <Inputs inputConfigs={transectConfig.inputs} />
-            <Stands
-              stands={form.stands}
-              onEdit={stand => callback.onEditStand(form, stand)}
-              onAddStand={onAddStand}
-            />
-            <TransectButtons onSave={onSaveValidating} onCancel={onCancel} />
-          </>
-        )}
-      </View>
+    <View>
+      <ScrollView>
+        <View style={styles.container}>
+          <SimpleScreenHeader onLogoPress={onCancel}>
+            {transectConfig.title}
+          </SimpleScreenHeader>
+          {defaultValues && (
+            <>
+              <Inputs inputConfigs={transectConfig.inputs} />
+              <Stands
+                stands={form.stands}
+                onEdit={stand => callback.onEditStand(form, stand)}
+                onAddStand={onAddStand}
+              />
+              <TransectButtons onSave={onSaveValidating} onCancel={onCancel} />
+            </>
+          )}
+        </View>
+      </ScrollView>
       <LoadingOverlay loading={loading} />
-    </ScrollView>
+    </View>
   );
 };
 

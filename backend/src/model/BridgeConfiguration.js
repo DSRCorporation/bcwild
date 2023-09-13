@@ -44,14 +44,14 @@ const BridgeConfiguration = db.sequelize.define(
     longitude: {
       type: DataTypes.REAL,
       validate: {
-        min: 0,
+        min: -180,
         max: 180,
       },
     },
     latitude: {
       type: DataTypes.REAL,
       validate: {
-        min: 0,
+        min: -180,
         max: 180,
       },
     },
