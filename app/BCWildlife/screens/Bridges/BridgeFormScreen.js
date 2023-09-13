@@ -75,7 +75,20 @@ const BridgeFormScreen = ({route}) => {
       const timeNowEpoch = Math.round(timestamp / 1000);
       const username = getUsernameG();
       const recordIdentifier = `${RecordType.Bridge}_${username}_${timeNowEpoch}`;
-      RecordsRepo.addRecord(recordIdentifier, strvalue);
+      try {
+        const unsyncedRecords = JSON.parse(
+          await RecordsRepo.getUnsyncedRecords(),
+        );
+        const existingRecords = unsyncedRecords.filter(
+          item => item.data.motBridgeId === dto.motBridgeId,
+        );
+        if (existingRecords[0]) {
+          await RecordsRepo.deleteRecord(existingRecords[0].record_identifier);
+        }
+      } catch {
+        // error removing existing record, unsynced records array is probably empty
+      }
+      await RecordsRepo.addRecord(recordIdentifier, strvalue);
       await updateBridgeLocally(dto);
       Alert.alert('Bridge data saved');
     }
