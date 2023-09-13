@@ -104,6 +104,13 @@ export const transectConfig = {
       placeholder: 'Enter easting',
     },
     {
+      name: 'getCurrentCoordinatesButton',
+      displayName: 'Get current location',
+      inputType: 'coordinates_button',
+      firstCoordinateName: 'coordinateNorthingStart',
+      secondCoordinateName: 'coordinateEastingStart',
+    },
+    {
       name: 'bearingStart',
       databaseFieldName: 'Bearing_start',
       displayName: 'Start Bearing',
@@ -236,6 +243,13 @@ export const transectConfig = {
       editable: true,
       defaultValue: undefined,
       placeholder: 'Enter easting',
+    },
+    {
+      name: 'getCurrentEndCoordinatesButton',
+      displayName: 'Get current location',
+      inputType: 'coordinates_button',
+      firstCoordinateName: 'coordinateNorthingEnd',
+      secondCoordinateName: 'coordinateEastingEnd',
     },
   ],
   getDefaultValues: state => state.defaultValues,
