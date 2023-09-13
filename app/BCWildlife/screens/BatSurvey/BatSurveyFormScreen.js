@@ -39,6 +39,7 @@ import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
 import {RowList} from '../../shared/components/RowList';
 import {RecordType} from '../../utility/RecordType';
+import {DateTimePicker} from '../../shared/components/DateTimePicker';
 
 const linkColor = '#216de8';
 
@@ -78,6 +79,7 @@ const BatSurveyFormScreen = () => {
   const [createDisabled, setCreateDisabled] = useState(false);
 
   const [form, setForm] = useImmer({
+    dateTime: Date.now(),
     observers: '',
     bridgeMotId: '',
     batSign: [...transformListDataToCheckboxItems(batSignData)], // checkboxes, multiselect, no selection means None
@@ -128,6 +130,8 @@ const BatSurveyFormScreen = () => {
 
   const isNestsSelected = useMemo(() => form.nests === yesValue, [form.nests]);
 
+  const currentDateTime = new Date(form.dateTime);
+
   const submit = useCallback(async () => {
     const timestamp = Date.now();
     const parsed = parseBatSurvey(form, timestamp);
@@ -135,7 +139,6 @@ const BatSurveyFormScreen = () => {
       Alert.alert(parsed.errorMessage);
     } else {
       const {dto} = parsed;
-      console.log('Bat dto', dto);
       const strvalue = JSON.stringify(dto);
       const timeNowEpoch = Math.round(timestamp / 1000);
       const username = getUsernameG();
@@ -186,6 +189,47 @@ const BatSurveyFormScreen = () => {
     <ScrollView>
       <View style={styles.container}>
         <SimpleScreenHeader>Bat survey</SimpleScreenHeader>
+        <View
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 8,
+          }}>
+          <View style={styles.inputContainer}>
+            <InputLabel>Date</InputLabel>
+            <DateTimePicker
+              value={currentDateTime}
+              mode="date"
+              onChange={date =>
+                setForm(draft => {
+                  const newDate = new Date(currentDateTime);
+                  newDate.setFullYear(date.getFullYear());
+                  newDate.setMonth(date.getMonth());
+                  newDate.setDate(date.getDate());
+                  newDate.setSeconds(0, 0);
+                  draft.dateTime = newDate.getTime();
+                })
+              }
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <InputLabel>Time</InputLabel>
+            <DateTimePicker
+              value={currentDateTime}
+              mode="time"
+              onChange={date =>
+                setForm(draft => {
+                  const newDate = new Date(currentDateTime);
+                  newDate.setHours(date.getHours());
+                  newDate.setMinutes(date.getMinutes());
+                  newDate.setSeconds(0, 0);
+                  draft.dateTime = newDate.getTime();
+                })
+              }
+            />
+          </View>
+        </View>
         <View>
           <View style={styles.inputContainer}>
             <InputLabel>{batSurveyFormLabels.observers}</InputLabel>

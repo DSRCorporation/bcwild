@@ -58,6 +58,11 @@ const bridgeObservationToDtoProperties = {
   wouldRoostingBatsBeReachableWithoutLadder: {
     property: "wouldBatsBeReachable",
   },
+  userDateTime: {
+    property: "dateTime",
+    transform: (timestamp) => new Date(timestamp),
+    transformToDto: (time) => time.getTime(),
+  },
 };
 
 const batDtoToObservation = (bridgeId, dto) => {

@@ -48,6 +48,7 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
     comments: '',
   });
   const {animals} = useAnimals();
+  const currentDateTime = form.date;
 
   const submit = useCallback(async () => {
     const timestamp = Date.now();
@@ -111,19 +112,47 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                 style={styles.textInput}
               />
             </View>
-            {/* Automatic?
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.date}</InputLabel>
-              <DateTimePicker
-                value={form.date}
-                onChange={date =>
-                  setForm(draft => {
-                    draft.date = date;
-                  })
-                }
-              />
+            <View
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 8,
+              }}>
+              <View style={styles.inputContainer}>
+                <InputLabel>Date</InputLabel>
+                <DateTimePicker
+                  value={currentDateTime}
+                  mode="date"
+                  onChange={date =>
+                    setForm(draft => {
+                      const newDate = new Date(currentDateTime);
+                      newDate.setFullYear(date.getFullYear());
+                      newDate.setMonth(date.getMonth());
+                      newDate.setDate(date.getDate());
+                      newDate.setSeconds(0, 0);
+                      draft.date = newDate;
+                    })
+                  }
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>Time</InputLabel>
+                <DateTimePicker
+                  value={currentDateTime}
+                  mode="time"
+                  onChange={date =>
+                    setForm(draft => {
+                      const newDate = new Date(currentDateTime);
+                      newDate.setHours(date.getHours());
+                      newDate.setMinutes(date.getMinutes());
+                      newDate.setSeconds(0, 0);
+                      draft.date = newDate;
+                    })
+                  }
+                />
+              </View>
             </View>
-            */}
             <View style={styles.inputContainer}>
               <InputLabel>{aerielTelemetryFormLabels.observer}</InputLabel>
               <TextInput
@@ -262,20 +291,6 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                 }
                 placeholder="Enter frequency"
                 style={styles.textInput}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>
-                {aerielTelemetryFormLabels.timeOfLocation}
-              </InputLabel>
-              <DateTimePicker
-                value={form.timeOfLocation}
-                mode="time"
-                onChange={date =>
-                  setForm(draft => {
-                    draft.timeOfLocation = date;
-                  })
-                }
               />
             </View>
             <View style={styles.inputContainer}>
