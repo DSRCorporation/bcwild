@@ -30,6 +30,37 @@ class RecordsRepo {
     );
   }
 
+  static async deleteRecord(recordIdentifier) {
+    try {
+      await EncryptedStorage.removeItem(recordIdentifier);
+    } catch (e) {
+      console.warn(`Could not delete record, error: ${JSON.stringify(e)}`);
+    }
+
+    // Fetch the unsynced records
+    let unsyncedRecords = await EncryptedStorage.getItem('unsynced_records');
+    if (!unsyncedRecords) {
+      return;
+    } else {
+      // Otherwise, parse the JSON string into an array
+      unsyncedRecords = JSON.parse(unsyncedRecords);
+    }
+
+    // Add the new record identifier to the array
+    if (!unsyncedRecords.includes(recordIdentifier)) {
+      // remove an item
+      unsyncedRecords = unsyncedRecords.filter(
+        item => item !== recordIdentifier,
+      );
+    }
+
+    // Convert the array to a JSON string and store it back
+    await EncryptedStorage.setItem(
+      'unsynced_records',
+      JSON.stringify(unsyncedRecords),
+    );
+  }
+
   static async getUnsyncedRecords() {
     // Fetch the unsynced record identifiers
     const unsyncedRecords = await EncryptedStorage.getItem('unsynced_records');
