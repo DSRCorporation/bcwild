@@ -38,20 +38,25 @@ export const transectConfig = {
     {
       name: 'dateTime',
       databaseFieldName: 'Date_Time',
-      displayName: 'Date Time',
+      displayNameDate: 'Date',
+      displayNameTime: 'Time',
       type: 'date',
       optional: false,
-      inputType: 'text',
-      editable: false,
-      defaultValue: ({timestamp}) => {
-        const date = new Date(timestamp);
+      inputType: 'timestamp',
+      mode: 'datetime',
+      editable: true,
+      dateTextFormat: date => {
         const dd = date.getDate().toString().padStart(2, '0');
-        const mm = date.getMonth().toString().padStart(2, '0');
+        const mm = (date.getMonth() + 1).toString().padStart(2, '0');
         const yyyy = date.getFullYear();
-        const HH = date.getHours().toString().padStart(2, '0');
-        const MM = date.getMinutes().toString().padStart(2, '0');
-        return `${dd}-${mm}-${yyyy} ${HH}:${MM}`;
+        return `${dd}-${mm}-${yyyy}`;
       },
+      timeTextFormat: date => {
+        const hh = date.getHours().toString().padStart(2, '0');
+        const mm = date.getMinutes().toString().padStart(2, '0');
+        return `${hh}:${mm}`;
+      },
+      defaultValue: ({timestamp}) => timestamp,
     },
     {
       name: 'transectId',
@@ -64,7 +69,7 @@ export const transectConfig = {
       defaultValue: ({initials, timestamp, transectNumber}) => {
         const date = new Date(timestamp);
         const dd = date.getDate().toString().padStart(2, '0');
-        const mm = date.getMonth().toString().padStart(2, '0');
+        const mm = (date.getMonth() + 1).toString().padStart(2, '0');
         const yyyy = date.getFullYear();
         const transect = transectNumber.toString().padStart(2, '0');
         return `${initials}_${dd}${mm}${yyyy}_${transect}`;
@@ -131,7 +136,14 @@ export const transectConfig = {
       displayName: 'Date Last Snow',
       type: 'date',
       optional: false,
-      inputType: 'date',
+      inputType: 'timestamp',
+      mode: 'date',
+      textFormat: date => {
+        const dd = date.getDate().toString().padStart(2, '0');
+        const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+        const yyyy = date.getFullYear();
+        return `${dd}-${mm}-${yyyy}`;
+      },
       editable: true,
       defaultValue: ({timestamp}) => timestamp,
       ifForm: form => form.surveyType === snowTrackSurveyType,
@@ -437,7 +449,7 @@ export const encounterConfig = {
       }) => {
         const date = new Date(timestamp);
         const dd = date.getDate().toString().padStart(2, '0');
-        const mm = date.getMonth().toString().padStart(2, '0');
+        const mm = (date.getMonth() + 1).toString().padStart(2, '0');
         const yyyy = date.getFullYear();
         const transect = transectNumber.toString().padStart(2, '0');
         const stand = standId.toString().padStart(2, '0');
