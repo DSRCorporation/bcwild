@@ -296,6 +296,13 @@ export const standConfig = {
       placeholder: 'Enter easting',
     },
     {
+      name: 'getCurrentCoordinatesButton',
+      displayName: 'Get current location',
+      inputType: 'coordinates_button',
+      firstCoordinateName: 'coordinateNorthing',
+      secondCoordinateName: 'coordinateEasting',
+    },
+    {
       name: 'beu',
       databaseFieldName: 'BEU',
       displayName: 'Broad Ecosystem Unit',
@@ -370,6 +377,13 @@ export const encounterConfig = {
       optional: false,
       defaultValue: undefined,
       placeholder: 'Enter easting',
+    },
+    {
+      name: 'getCurrentCoordinatesButton',
+      displayName: 'Get current location',
+      inputType: 'coordinates_button',
+      firstCoordinateName: 'coordinateNorthingObservation',
+      secondCoordinateName: 'coordinateEastingObservation',
     },
     {
       name: 'waypoint',
