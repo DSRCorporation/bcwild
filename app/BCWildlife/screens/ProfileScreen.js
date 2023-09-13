@@ -204,15 +204,7 @@ const ProfileScreen = ({navigation}) => {
     setDialogVisible(true);
   };
 
-  const handleSync = async () => {
-    setLoading(true);
-    // handle sync logic
-    // Syncing the bridges:
-    // 1. Locally stored changes are pushed among other records
-    // 2. Fresh list of bridges is loaded; obsolete local changes are discarded.
-    // Same for animals
-    //
-
+  const pushChanges = async () => {
     // Copy local animals to records
     for (const animal of animals) {
       if (animal.tag === 'local') {
@@ -341,9 +333,7 @@ const ProfileScreen = ({navigation}) => {
               } else {
                 console.log(
                   'error message:',
-                  errorMessage +
-                  ' with index ' +
-                  errorMessage.indexOf('token'),
+                  errorMessage + ' with index ' + errorMessage.indexOf('token'),
                 );
               }
               Alert.alert('Error', errorMessage);
@@ -359,31 +349,43 @@ const ProfileScreen = ({navigation}) => {
       } catch (error) {
         console.error(error);
       }
-      try {
-        await pullBridges();
-        // Alert.alert('Success','Bridge data loaded');
-      } catch (error) {
-        console.error('Failed to pull bridges', error, JSON.stringify(error));
-        // if (error.response) {
-        //   Alert.alert('Error', error.response.data.message);
-        // } else if (error.request) {
-        //   Alert.alert('Error', `Request error: ${error.request}`);
-        // } else {
-        //   Alert.alert('Error', error.message);
-        // }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const pullChanges = async () => {
+    try {
+      await pullBridges();
+    } catch (error) {
+      console.error('Failed to pull bridges', error, JSON.stringify(error));
+    }
+    try {
+      await pullAnimals();
+    } catch (error) {
+      console.error('Failed to pull animals', error, JSON.stringify(error));
+      if (error.response) {
+        Alert.alert('Error', error.response.data.message);
+      } else if (error.request) {
+        Alert.alert('Error', `Request error: ${error.request}`);
+      } else {
+        Alert.alert('Error', error.message);
       }
-      try {
-        await pullAnimals();
-      } catch (error) {
-        console.error('Failed to pull animals', error, JSON.stringify(error));
-        if (error.response) {
-          Alert.alert('Error', error.response.data.message);
-        } else if (error.request) {
-          Alert.alert('Error', `Request error: ${error.request}`);
-        } else {
-          Alert.alert('Error', error.message);
-        }
-      }
+    }
+  };
+
+  const handleSync = async () => {
+    setLoading(true);
+    // handle sync logic
+    // Syncing the bridges:
+    // 1. Locally stored changes are pushed among other records
+    // 2. Fresh list of bridges is loaded; obsolete local changes are discarded.
+    // Same for animals
+    //
+
+    try {
+      await pushChanges();
+      await pullChanges();
     } finally {
       setLoading(false);
     }
