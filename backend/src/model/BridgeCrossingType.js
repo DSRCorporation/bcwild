@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BridgeCrossingType = db.sequelize.define(
   "bb_def_crossing_type",
@@ -22,9 +22,8 @@ const BridgeCrossingType = db.sequelize.define(
   },
 );
 
-const init = createDefInit(BridgeCrossingType, datasheetTypes, "CrossingType");
+addAutoPopulateHook(BridgeCrossingType, datasheetTypes, "CrossingType");
 
 module.exports = {
   BridgeCrossingType,
-  init,
 };

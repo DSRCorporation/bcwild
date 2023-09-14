@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BridgeColumns = db.sequelize.define(
   "bb_def_columns",
@@ -22,9 +22,8 @@ const BridgeColumns = db.sequelize.define(
   },
 );
 
-const init = createDefInit(BridgeColumns, datasheetTypes, "Columns");
+addAutoPopulateHook(BridgeColumns, datasheetTypes, "Columns");
 
 module.exports = {
   BridgeColumns,
-  init,
 };

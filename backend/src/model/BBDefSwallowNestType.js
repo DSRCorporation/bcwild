@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BBDefSwallowNestType = db.sequelize.define(
   "bb_def_swallow_nest_type",
@@ -22,13 +22,8 @@ const BBDefSwallowNestType = db.sequelize.define(
   },
 );
 
-const init = createDefInit(
-  BBDefSwallowNestType,
-  datasheetTypes,
-  "SwallowNestType",
-);
+addAutoPopulateHook(BBDefSwallowNestType, datasheetTypes, "SwallowNestType");
 
 module.exports = {
   BBDefSwallowNestType,
-  init,
 };

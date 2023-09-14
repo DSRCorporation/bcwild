@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BridgeUnderdeck = db.sequelize.define(
   "bb_def_underdeck",
@@ -22,9 +22,8 @@ const BridgeUnderdeck = db.sequelize.define(
   },
 );
 
-const init = createDefInit(BridgeUnderdeck, datasheetTypes, "Underdeck");
+addAutoPopulateHook(BridgeUnderdeck, datasheetTypes, "Underdeck");
 
 module.exports = {
   BridgeUnderdeck,
-  init,
 };

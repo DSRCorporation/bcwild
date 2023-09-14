@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BatGuanoDistribution = db.sequelize.define(
   "bb_def_guano_distribution",
@@ -22,13 +22,8 @@ const BatGuanoDistribution = db.sequelize.define(
   },
 );
 
-const init = createDefInit(
-  BatGuanoDistribution,
-  datasheetTypes,
-  "GuanoDistribution",
-);
+addAutoPopulateHook(BatGuanoDistribution, datasheetTypes, "GuanoDistribution");
 
 module.exports = {
   BatGuanoDistribution,
-  init,
 };

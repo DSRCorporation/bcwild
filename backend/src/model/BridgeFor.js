@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BridgeFor = db.sequelize.define(
   "bb_def_for",
@@ -20,16 +21,12 @@ const BridgeFor = db.sequelize.define(
   },
 );
 
-async function init(transaction) {
-  await BridgeFor.bulkCreate(
-    datasheetTypes.types
-      .find(({ name }) => name === "BridgeFor")
-      .values.map(({ id, value }) => ({ bit: id, value })),
-    { transaction, updateOnDuplicate: ["bit"] },
-  );
-}
+addAutoPopulateHook(BridgeFor, datasheetTypes, "BridgeFor", {
+  primaryKey: "bit",
+  valuesTransform: (values) =>
+    values.map(({ id, value }) => ({ bit: id, value })),
+});
 
 module.exports = {
   BridgeFor,
-  init,
 };

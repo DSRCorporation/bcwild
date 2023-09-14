@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BatSignLocation = db.sequelize.define(
   "bb_def_location",
@@ -22,9 +22,8 @@ const BatSignLocation = db.sequelize.define(
   },
 );
 
-const init = createDefInit(BatSignLocation, datasheetTypes, "BatSignLocation");
+addAutoPopulateHook(BatSignLocation, datasheetTypes, "BatSignLocation");
 
 module.exports = {
   BatSignLocation,
-  init,
 };

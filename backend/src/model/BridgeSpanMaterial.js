@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BridgeSpanMaterial = db.sequelize.define(
   "bb_def_span_material",
@@ -22,9 +22,8 @@ const BridgeSpanMaterial = db.sequelize.define(
   },
 );
 
-const init = createDefInit(BridgeSpanMaterial, datasheetTypes, "SpanMaterial");
+addAutoPopulateHook(BridgeSpanMaterial, datasheetTypes, "SpanMaterial");
 
 module.exports = {
   BridgeSpanMaterial,
-  init,
 };
