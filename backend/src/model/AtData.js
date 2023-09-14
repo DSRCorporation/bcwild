@@ -18,6 +18,9 @@ const AtData = db.sequelize.define("at_data", {
     type: DataTypes.DATE,
     unique: "location-timestamp",
   },
+  userDateTime: {
+    type: DataTypes.DATE,
+  },
   locationId: {
     type: DataTypes.STRING,
     allowNull: false,

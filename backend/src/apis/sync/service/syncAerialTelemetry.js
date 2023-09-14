@@ -1,6 +1,7 @@
 const { sequelize } = require("../../../config/database");
 const { Animal } = require("../../../model/Animal");
 const { AtData } = require("../../../model/AtData");
+const { AtDataPhotos } = require("../../../model/AtDataPhotos");
 
 const observationToDtoProperties = {
   time: {
@@ -17,7 +18,7 @@ const observationToDtoProperties = {
   habitatType: { property: "habitatType" },
   locationTime: {
     property: "locationTimestamp",
-    transform: (timestamp) => new Date(timestamp),
+    transform: (timestamp) => timestamp && new Date(timestamp),
   },
   navigator: { property: "navigator" },
   observer: { property: "observer" },
@@ -28,6 +29,10 @@ const observationToDtoProperties = {
   macroPositionId: { property: "macroPosition" },
   createdBy: { property: "created_by" },
   comments: { property: "comments" },
+  userDateTime: {
+    property: "date",
+    transform: (timestamp) => new Date(timestamp),
+  },
 };
 
 const dtoToObservation = (dto, { animalId }) => {
@@ -67,7 +72,24 @@ const syncAerialTelemetry = async (data) =>
       );
     }
     // Populate main table
-    await AtData.create(dtoToObservation(dto, { animalId: animal.id }));
+    const aerialTelemetry = await AtData.create(
+      dtoToObservation(dto, { animalId: animal.id }),
+      { transaction },
+    );
+    // Populate photos
+    const aerialTelemetryId = aerialTelemetry.id;
+    const photos = dto.photos || [];
+    await Promise.all(
+      photos.map((image) =>
+        AtDataPhotos.create(
+          {
+            aerialTelemetryId,
+            image,
+          },
+          { transaction },
+        ),
+      ),
+    );
   });
 
 module.exports = {

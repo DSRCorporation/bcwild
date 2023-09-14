@@ -12,6 +12,60 @@ import {generateNewAccessToken} from '../network/AxiosUtility';
 import {useBridges} from '../shared/hooks/use-bridges/useBridges';
 import {localAnimalToRecord, useAnimals} from './Animals/use-animals';
 import {RecordType} from '../utility/RecordType';
+import {uploadImages} from '../shared/utils/uploadImages';
+
+// Uploading images
+
+const singleImagePusher = property => async record => {
+  const imageFile = record.data[property];
+  const response = await uploadImages([imageFile]);
+  const fixedData = {...record.data};
+  fixedData[property] = response.files[0].filename;
+  const fixedRecord = {...record, data: fixedData};
+  return fixedRecord;
+};
+
+// quick & dirty
+const uriBasename = uri => uri.split('/').pop();
+
+const multipleImagePusher = property => async record => {
+  const imageFiles = record.data[property];
+  const response = await uploadImages(imageFiles);
+  const resultFiles = response.data.files;
+  const findResultFilename = ({fileName}) => {
+    const basename = uriBasename(fileName);
+    const resultFile = resultFiles.find(
+      ({originalname}) => originalname === basename,
+    );
+    return resultFile && resultFile.filename;
+  };
+  const fixedFiles = imageFiles
+    .map(findResultFilename)
+    .filter(file => file != null);
+  const fixedData = {...record.data};
+  fixedData[property] = fixedFiles;
+  const fixedRecord = {...record, data: fixedData};
+  return fixedRecord;
+};
+
+const noOpImagePusher = async record => record;
+
+const imagePushers = {
+  BAT: multipleImagePusher('photos'),
+  AERIALTELEMETRY: multipleImagePusher('photos'),
+};
+
+const pushRecordImages = async record => {
+  const prefix = record.record_identifier.split('_')[0];
+  const pusher = imagePushers[prefix] || noOpImagePusher;
+  return pusher(record);
+};
+
+const pushRecordsImages = async records =>
+  Promise.all(records.map(pushRecordImages));
+
+// End uploading images
+
 
 const ProfileScreen = ({navigation}) => {
   const [fname, setFname] = useState('');
@@ -150,6 +204,176 @@ const ProfileScreen = ({navigation}) => {
     setDialogVisible(true);
   };
 
+  const pushChanges = async () => {
+    // Copy local animals to records
+    for (const animal of animals) {
+      if (animal.tag === 'local') {
+        await RecordsRepo.addRecord(...localAnimalToRecord(animal));
+      }
+    }
+    try {
+      const records = await RecordsRepo.getUnsyncedRecords();
+      console.log(`Records to sync: ${JSON.stringify(records)}`);
+      console.log('Sync');
+      let recordsObj;
+      try {
+        recordsObj = JSON.parse(records);
+      } catch (e) {
+        Alert.alert('Success', 'No records to sync');
+        console.log('error parsing records');
+        return;
+      }
+
+      if (recordsObj.length < 1) {
+        Alert.alert('Success', 'No records to sync');
+        return;
+      } else {
+        console.log(`records to sync: ${recordsObj.length}`);
+      }
+
+      recordsObj = await pushRecordsImages(recordsObj); // "fixed" records"
+      console.debug('ro', recordsObj);
+
+      const animalRecords = []; // syncing animals before aerial telemetry
+      const bridgeRecords = []; //syncing bridges before bats
+      const commonRecords = [];
+      for (const record of recordsObj) {
+        if (record.record_identifier.startsWith(RecordType.Animal)) {
+          animalRecords.push(record);
+        } else if (record.record_identifier.startsWith(RecordType.Bridge)) {
+          bridgeRecords.push(record);
+        } else {
+          commonRecords.push(record);
+        }
+      }
+
+      const USER_TOKEN = getAccessToken();
+      const AuthStr = 'Bearer '.concat(USER_TOKEN);
+      try {
+        console.log('Starting sync');
+        console.log('Syncing animals');
+        await axiosUtility
+          .post(datasyncpush_url, animalRecords, {
+            headers: {Authorization: AuthStr},
+          })
+          .then(_ => {
+            console.log('Syncing bridges');
+            return axiosUtility.post(datasyncpush_url, bridgeRecords, {
+              headers: {Authorization: AuthStr},
+            });
+          })
+          .then(_ => {
+            console.log('Syncing everything else');
+            return axiosUtility.post(datasyncpush_url, commonRecords, {
+              headers: {Authorization: AuthStr},
+            });
+          })
+          .then(response => {
+            console.log(response);
+            Alert.alert('Success', response.message);
+            RecordsRepo.deleteUnsyncedRecords()
+              .then(() => {
+                console.log('Successfully deleted all unsynced records');
+              })
+              .catch(error => {
+                console.error('Error deleting unsynced records:', error);
+              });
+            //getPendingProjectAccessRequests();
+          })
+          .catch(error => {
+            if (error.response) {
+              let errorMessage = error.response.data.message;
+              if (errorMessage.indexOf('token') > -1) {
+                console.log('token expired');
+                if (refreshTokenCount > 0) {
+                  return;
+                }
+                generateNewAccessToken()
+                  .then(response => {
+                    refreshTokenCount++;
+                    console.log('new access token generated');
+                    axiosUtility
+                      .post(datasyncpush_url, recordsObj, configAuth())
+                      .then(response => {
+                        Alert.alert('Success', response.message);
+                        RecordsRepo.deleteUnsyncedRecords()
+                          .then(() => {
+                            console.log(
+                              'Successfully deleted all unsynced records',
+                            );
+                          })
+                          .catch(error => {
+                            console.error(
+                              'Error deleting unsynced records:',
+                              error,
+                            );
+                          });
+                        //getPendingProjectAccessRequests();
+                      })
+                      .catch(error => {
+                        if (error.response) {
+                          console.log('Response error:', error.response.data);
+                          Alert.alert('Error', error.response.data.message);
+                        } else if (error.request) {
+                          console.log('Request error:', error.request);
+                          Alert.alert(
+                            'Error',
+                            'Request error' + error.response.data.message,
+                          );
+                        } else {
+                          console.log('Error message:', error.message);
+                          Alert.alert('Error', error.response.data.message);
+                        }
+                      });
+                  })
+                  .catch(error => {
+                    refreshTokenCount++;
+                    console.log('error generating new access token');
+                  });
+              } else {
+                console.log(
+                  'error message:',
+                  errorMessage + ' with index ' + errorMessage.indexOf('token'),
+                );
+              }
+              Alert.alert('Error', errorMessage);
+              console.log('Response error:', error.response.data);
+            } else if (error.request) {
+              console.log('Request error:', error.request);
+              Alert.alert('Error', 'Request error');
+            } else {
+              console.log('Error', error.message);
+              Alert.alert('Error', 'Error');
+            }
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const pullChanges = async () => {
+    try {
+      await pullBridges();
+    } catch (error) {
+      console.error('Failed to pull bridges', error, JSON.stringify(error));
+    }
+    try {
+      await pullAnimals();
+    } catch (error) {
+      console.error('Failed to pull animals', error, JSON.stringify(error));
+      if (error.response) {
+        Alert.alert('Error', error.response.data.message);
+      } else if (error.request) {
+        Alert.alert('Error', `Request error: ${error.request}`);
+      } else {
+        Alert.alert('Error', error.message);
+      }
+    }
+  };
+
   const handleSync = async () => {
     setLoading(true);
     // handle sync logic
@@ -158,177 +382,10 @@ const ProfileScreen = ({navigation}) => {
     // 2. Fresh list of bridges is loaded; obsolete local changes are discarded.
     // Same for animals
     //
-    console.debug('animals', animals);
 
-    // Copy local animals to records
-    for (const animal of animals) {
-      if (animal.tag === 'local') {
-        await RecordsRepo.addRecord(...localAnimalToRecord(animal));
-      }
-    }
     try {
-      await RecordsRepo.getUnsyncedRecords().then(records => {
-        console.log(`Records to sync: ${JSON.stringify(records)}`);
-        console.log('Sync');
-        let recordsObj;
-        try {
-          recordsObj = JSON.parse(records);
-        } catch (e) {
-          Alert.alert('Success', 'No records to sync');
-          console.log('error parsing records');
-          return;
-        }
-
-        if (recordsObj.length < 1) {
-          Alert.alert('Success', 'No records to sync');
-          return;
-        } else {
-          console.log(`records to sync: ${recordsObj.length}`);
-        }
-
-        const animals = []; // syncing animals before aerial telemetry
-        const bridges = []; //syncing bridges before bats
-        const commonRecords = [];
-        for (const record of recordsObj) {
-          if (record.record_identifier.startsWith(RecordType.Animal)) {
-            animals.push(record);
-          } else if (record.record_identifier.startsWith(RecordType.Bridge)) {
-            bridges.push(record);
-          } else {
-            commonRecords.push(record);
-          }
-        }
-
-        const USER_TOKEN = getAccessToken();
-        const AuthStr = 'Bearer '.concat(USER_TOKEN);
-        try {
-          console.log('Starting sync');
-          console.log('Syncing animals');
-          axiosUtility
-            .post(datasyncpush_url, animals, {
-              headers: {Authorization: AuthStr},
-            })
-            .then(_ => {
-              console.log('Syncing bridges');
-              return axiosUtility.post(datasyncpush_url, bridges, {
-                headers: {Authorization: AuthStr},
-              });
-            })
-            .then(_ => {
-              console.log('Syncing everything else');
-              return axiosUtility.post(datasyncpush_url, commonRecords, {
-                headers: {Authorization: AuthStr},
-              });
-            })
-            .then(response => {
-              console.log(response);
-              Alert.alert('Success', response.message);
-              RecordsRepo.deleteUnsyncedRecords()
-                .then(() => {
-                  console.log('Successfully deleted all unsynced records');
-                })
-                .catch(error => {
-                  console.error('Error deleting unsynced records:', error);
-                });
-              //getPendingProjectAccessRequests();
-            })
-            .catch(error => {
-              if (error.response) {
-                let errorMessage = error.response.data.message;
-                if (errorMessage.indexOf('token') > -1) {
-                  console.log('token expired');
-                  if (refreshTokenCount > 0) {
-                    return;
-                  }
-                  generateNewAccessToken()
-                    .then(response => {
-                      refreshTokenCount++;
-                      console.log('new access token generated');
-                      axiosUtility
-                        .post(datasyncpush_url, recordsObj, configAuth())
-                        .then(response => {
-                          Alert.alert('Success', response.message);
-                          RecordsRepo.deleteUnsyncedRecords()
-                            .then(() => {
-                              console.log(
-                                'Successfully deleted all unsynced records',
-                              );
-                            })
-                            .catch(error => {
-                              console.error(
-                                'Error deleting unsynced records:',
-                                error,
-                              );
-                            });
-                          //getPendingProjectAccessRequests();
-                        })
-                        .catch(error => {
-                          if (error.response) {
-                            console.log('Response error:', error.response.data);
-                            Alert.alert('Error', error.response.data.message);
-                          } else if (error.request) {
-                            console.log('Request error:', error.request);
-                            Alert.alert(
-                              'Error',
-                              'Request error' + error.response.data.message,
-                            );
-                          } else {
-                            console.log('Error message:', error.message);
-                            Alert.alert('Error', error.response.data.message);
-                          }
-                        });
-                    })
-                    .catch(error => {
-                      refreshTokenCount++;
-                      console.log('error generating new access token');
-                    });
-                } else {
-                  console.log(
-                    'error message:',
-                    errorMessage +
-                      ' with index ' +
-                      errorMessage.indexOf('token'),
-                  );
-                }
-                Alert.alert('Error', errorMessage);
-                console.log('Response error:', error.response.data);
-              } else if (error.request) {
-                console.log('Request error:', error.request);
-                Alert.alert('Error', 'Request error');
-              } else {
-                console.log('Error', error.message);
-                Alert.alert('Error', 'Error');
-              }
-            });
-        } catch (error) {
-          console.error(error);
-        }
-      });
-      try {
-        await pullBridges();
-        // Alert.alert('Success','Bridge data loaded');
-      } catch (error) {
-        console.error('Failed to pull bridges', error, JSON.stringify(error));
-        // if (error.response) {
-        //   Alert.alert('Error', error.response.data.message);
-        // } else if (error.request) {
-        //   Alert.alert('Error', `Request error: ${error.request}`);
-        // } else {
-        //   Alert.alert('Error', error.message);
-        // }
-      }
-      try {
-        await pullAnimals();
-      } catch (error) {
-        console.error('Failed to pull animals', error, JSON.stringify(error));
-        if (error.response) {
-          Alert.alert('Error', error.response.data.message);
-        } else if (error.request) {
-          Alert.alert('Error', `Request error: ${error.request}`);
-        } else {
-          Alert.alert('Error', error.message);
-        }
-      }
+      await pushChanges();
+      await pullChanges();
     } finally {
       setLoading(false);
     }

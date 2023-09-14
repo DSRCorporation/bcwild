@@ -10,6 +10,8 @@ import {
   FormInput,
   useSimpleFormContext,
 } from '../../shared/components/SimpleForm';
+import { BaseButton } from "../../shared/components/BaseButton";
+import { useLocation } from "../Location";
 
 const InputText = ({inputConfig}) => {
   const {name, displayName, type, placeholder, editable, hint} = inputConfig;
@@ -138,10 +140,41 @@ const InputTimestamp = ({inputConfig}) => {
   return <I inputConfig={inputConfig} />;
 };
 
+const CoordinatesButton = ({inputConfig}) => {
+  const {firstCoordinateName, secondCoordinateName, displayName} = inputConfig;
+  const {styles, setLoading, form, setForm} = useSimpleFormContext();
+  const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
+    useLocation();
+
+  return (
+    <BaseButton
+      onPress={async () => {
+        const permissionGranted = await requestLocationPermission();
+        if (permissionGranted) {
+          setLoading(true);
+          const {northing, easting} = await getLocation();
+          setForm(draft => {
+            draft[firstCoordinateName] = northing.toString();
+            draft[secondCoordinateName] = easting.toString();
+          });
+          setLoading(false);
+        } else {
+          showPermissionRequiredAlert();
+        }
+      }}
+      style={styles.button}
+      accessibilityLabel="get current location"
+      testID="getCurrentLocation">
+      <Text style={styles.buttonText}>Get current location</Text>
+    </BaseButton>
+  );
+};
+
 const InputTypes = {
   text: InputText,
   choice: InputChoice,
   timestamp: InputTimestamp,
+  coordinates_button: CoordinatesButton,
 };
 
 export const Input = ({inputConfig}) => {

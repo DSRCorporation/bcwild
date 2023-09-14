@@ -69,17 +69,24 @@ const dtoProperties = [
     property: 'macroPosition',
     transform: ensureNonnegativeNumberProperty,
   },
-  {
-    fromProperty: 'timeOfLocation',
-    toProperty: 'locationTimestamp',
-    transform: datePropertyToTimestamp,
-  },
+  // {
+  //   fromProperty: 'timeOfLocation',
+  //   toProperty: 'locationTimestamp',
+  //   transform: datePropertyToTimestamp,
+  // },
   {
     property: 'habitatType',
     transform: ensureNonemptyStringProperty,
   },
   {
     property: 'comments',
+  },
+  {
+    property: 'photos',
+  },
+  {
+    property: 'date',
+    transform: datePropertyToTimestamp,
   },
 ];
 

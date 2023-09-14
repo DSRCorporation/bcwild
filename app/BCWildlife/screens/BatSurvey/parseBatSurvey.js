@@ -147,6 +147,7 @@ const formToDto = (form, timestamp) => {
   );
   dto.speciesComments = form.speciesOtherComments;
   dto.comments = form.comments;
+  dto.dateTime = form.dateTime;
   return dto;
 };
 

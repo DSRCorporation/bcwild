@@ -22,6 +22,9 @@ const BridgeObservation = db.sequelize.define("bb_data_observation", {
     type: DataTypes.DATE,
     unique: "bridge-timestamp",
   },
+  userDateTime: {
+    type: DataTypes.DATE,
+  },
   createdBy: {
     allowNull: false,
     type: DataTypes.STRING,

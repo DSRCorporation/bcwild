@@ -17,8 +17,28 @@ const pushChangesUpdatingModel =
       { record_identifier: data.record_identifier },
     );
 
+const addDataTransform = (pusher, dataTransform) => async (data, options) => {
+  const transformedData = dataTransform(data);
+  await pusher(transformedData, options);
+};
+
+/* eslint-disable node/no-unsupported-features/es-syntax */
+const parseTelemetryTriangulations = (data) => {
+  let { triangulation } = data.data;
+  if (triangulation === "") {
+    triangulation = [];
+  }
+  return {
+    ...data,
+    data: { ...data.data, triangulation },
+  };
+};
+
 const pushers = {
-  TELE: pushChangesUpdatingModel(Telemetry),
+  TELE: addDataTransform(
+    pushChangesUpdatingModel(Telemetry),
+    parseTelemetryTriangulations,
+  ),
   CAM: pushChangesUpdatingModel(CameraTrapData),
   BRIDGE: syncBridges,
   BAT: syncBats,

@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import {InputLabel} from '../../shared/components/InputLabel';
 import {Alert, View, ScrollView, Text, TextInput} from 'react-native';
 import {DateTimePicker} from '../../shared/components/DateTimePicker';
@@ -20,11 +20,14 @@ import {parseAerialTelemetryForm} from './parseAerialTelemetryForm';
 import {getUsernameG} from '../../global';
 import RecordsRepo from '../../utility/RecordsRepo';
 import {RecordType} from '../../utility/RecordType';
+import {useLocation} from '../Location';
+import LoadingOverlay from '../../utility/LoadingOverlay';
 
 const ArielTelemetryDataFormScreen = ({navigation}) => {
   const styles = useFormScreenStyles();
   const cardStyles = useCardListStyles();
   const now = new Date();
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useImmer({
     locationId: '',
     pilot: '',
@@ -48,6 +51,9 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
     comments: '',
   });
   const {animals} = useAnimals();
+  const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
+    useLocation();
+  const currentDateTime = form.date;
 
   const submit = useCallback(async () => {
     const timestamp = Date.now();
@@ -66,64 +72,114 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
     }
   }, [form, navigation]);
 
+  const getCurrentLocation = useCallback(async () => {
+    const permissionGranted = await requestLocationPermission();
+    if (permissionGranted) {
+      setLoading(true);
+      const {northing, easting} = await getLocation();
+      setForm(draft => {
+        draft.northing = northing;
+        draft.easting = easting;
+      });
+      setLoading(false);
+    } else {
+      showPermissionRequiredAlert();
+    }
+  }, [
+    requestLocationPermission,
+    getLocation,
+    setForm,
+    setLoading,
+    showPermissionRequiredAlert,
+  ]);
+
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <SimpleScreenHeader>Aerial Telemetry data</SimpleScreenHeader>
-        <View>
+    <View>
+      <ScrollView>
+        <View style={styles.container}>
+          <SimpleScreenHeader>Aerial Telemetry data</SimpleScreenHeader>
           <View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.locationId}</InputLabel>
-              <TextInput
-                value={form.locationId}
-                onChangeText={value =>
-                  setForm(draft => {
-                    draft.locationId = value;
-                  })
-                }
-                placeholder="Enter location ID"
-                style={styles.textInput}
-              />
+            <View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.locationId}</InputLabel>
+                <TextInput
+                  value={form.locationId}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.locationId = value;
+                    })
+                  }
+                  placeholder="Enter location ID"
+                  style={styles.textInput}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.pilot}</InputLabel>
+                <TextInput
+                  value={form.pilot}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.pilot = value;
+                    })
+                  }
+                  placeholder="Enter pilot"
+                  style={styles.textInput}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.navigator}</InputLabel>
+                <TextInput
+                  value={form.navigator}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.navigator = value;
+                    })
+                  }
+                  placeholder="Enter navigator"
+                  style={styles.textInput}
+                />
+              </View>
+              <View
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 8,
+              }}>
+              <View style={styles.inputContainer}>
+                <InputLabel>Date</InputLabel>
+                <DateTimePicker
+                  value={currentDateTime}
+                  mode="date"
+                  onChange={date =>
+                    setForm(draft => {
+                      const newDate = new Date(currentDateTime);
+                      newDate.setFullYear(date.getFullYear());
+                      newDate.setMonth(date.getMonth());
+                      newDate.setDate(date.getDate());
+                      newDate.setSeconds(0, 0);
+                      draft.date = newDate;
+                    })
+                  }
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>Time</InputLabel>
+                <DateTimePicker
+                  value={currentDateTime}
+                  mode="time"
+                  onChange={date =>
+                    setForm(draft => {
+                      const newDate = new Date(currentDateTime);
+                      newDate.setHours(date.getHours());
+                      newDate.setMinutes(date.getMinutes());
+                      newDate.setSeconds(0, 0);
+                      draft.date = newDate;
+                    })
+                  }
+                />
+              </View>
             </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.pilot}</InputLabel>
-              <TextInput
-                value={form.pilot}
-                onChangeText={value =>
-                  setForm(draft => {
-                    draft.pilot = value;
-                  })
-                }
-                placeholder="Enter pilot"
-                style={styles.textInput}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.navigator}</InputLabel>
-              <TextInput
-                value={form.navigator}
-                onChangeText={value =>
-                  setForm(draft => {
-                    draft.navigator = value;
-                  })
-                }
-                placeholder="Enter navigator"
-                style={styles.textInput}
-              />
-            </View>
-            {/* Automatic?
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.date}</InputLabel>
-              <DateTimePicker
-                value={form.date}
-                onChange={date =>
-                  setForm(draft => {
-                    draft.date = date;
-                  })
-                }
-              />
-            </View>
-            */}
             <View style={styles.inputContainer}>
               <InputLabel>{aerielTelemetryFormLabels.observer}</InputLabel>
               <TextInput
@@ -205,32 +261,39 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
               <View style={styles.inputContainer}>
                 <InputLabel>{aerielTelemetryFormLabels.easting}</InputLabel>
                 <TextInput
-                  value={form.easting}
-                  keyboardType="numeric"
-                  onChangeText={value =>
-                    setForm(draft => {
-                      draft.easting = value;
-                    })
-                  }
-                  placeholder="Enter easting"
-                  style={styles.textInput}
-                />
+                  value={form.easting.toString()}
+                    keyboardType="numeric"
+                    onChangeText={value =>
+                      setForm(draft => {
+                        draft.easting = value;
+                      })
+                    }
+                    placeholder="Enter easting"
+                    style={styles.textInput}
+                  />
+                </View>
+                <View style={styles.inputContainer}>
+                  <InputLabel>{aerielTelemetryFormLabels.northing}</InputLabel>
+                  <TextInput
+                    value={form.northing.toString()}
+                    keyboardType="numeric"
+                    onChangeText={value =>
+                      setForm(draft => {
+                        draft.northing = value;
+                      })
+                    }
+                    placeholder="Enter northing"
+                    style={styles.textInput}
+                  />
+                </View>
+                <BaseButton
+                  onPress={getCurrentLocation}
+                  style={styles.button}
+                  accessibilityLabel="get current location"
+                  testID="getCurrentLocation">
+                  <Text style={styles.buttonText}>Get current location</Text>
+                </BaseButton>
               </View>
-              <View style={styles.inputContainer}>
-                <InputLabel>{aerielTelemetryFormLabels.northing}</InputLabel>
-                <TextInput
-                  value={form.northing}
-                  keyboardType="numeric"
-                  onChangeText={value =>
-                    setForm(draft => {
-                      draft.northing = value;
-                    })
-                  }
-                  placeholder="Enter northing"
-                  style={styles.textInput}
-                />
-              </View>
-            </View>
             <View style={styles.inputContainer}>
               <InputLabel>{aerielTelemetryFormLabels.animal}</InputLabel>
               <Picker
@@ -262,126 +325,116 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                 }
                 placeholder="Enter frequency"
                 style={styles.textInput}
-              />
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.habitatType}</InputLabel>
+                <TextInput
+                  value={form.habitatType}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.habitatType = value;
+                    })
+                  }
+                  placeholder="Enter habitat type"
+                  style={styles.textInput}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.aspect}</InputLabel>
+                <Picker
+                  selectedValue={form.aspect}
+                  onValueChange={value =>
+                    setForm(draft => {
+                      draft.aspect = value;
+                    })
+                  }>
+                  <Picker.Item label="Select" value={null} />
+                  {aspectData.map(option => (
+                    <Picker.Item
+                      key={option.id}
+                      label={option.value}
+                      value={option.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.mesoSlope}</InputLabel>
+                <Picker
+                  selectedValue={form.mesoSlope}
+                  onValueChange={value =>
+                    setForm(draft => {
+                      draft.mesoSlope = value;
+                    })
+                  }>
+                  <Picker.Item label="Select" value={null} />
+                  {mesoSlopeData.map(option => (
+                    <Picker.Item
+                      key={option.id}
+                      label={option.value}
+                      value={option.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>
+                  {aerielTelemetryFormLabels.macroPosition}
+                </InputLabel>
+                <Picker
+                  selectedValue={form.macroPosition}
+                  onValueChange={value =>
+                    setForm(draft => {
+                      draft.macroPosition = value;
+                    })
+                  }>
+                  <Picker.Item label="Select" value={null} />
+                  {macroPositionData.map(option => (
+                    <Picker.Item
+                      key={option.id}
+                      label={option.value}
+                      value={option.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.inputContainer}>
+                <GalleryPicker
+                  onChange={photos =>
+                    setForm(draft => {
+                      draft.photos = photos;
+                    })
+                  }
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>Comments</InputLabel>
+                <TextInput
+                  value={form.comments}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.comments = value;
+                    })
+                  }
+                  multiline={true}
+                  placeholder="Enter comments"
+                  style={styles.textInput}
+                />
+              </View>
             </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>
-                {aerielTelemetryFormLabels.timeOfLocation}
-              </InputLabel>
-              <DateTimePicker
-                value={form.timeOfLocation}
-                mode="time"
-                onChange={date =>
-                  setForm(draft => {
-                    draft.timeOfLocation = date;
-                  })
-                }
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.habitatType}</InputLabel>
-              <TextInput
-                value={form.habitatType}
-                onChangeText={value =>
-                  setForm(draft => {
-                    draft.habitatType = value;
-                  })
-                }
-                placeholder="Enter habitat type"
-                style={styles.textInput}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.aspect}</InputLabel>
-              <Picker
-                selectedValue={form.aspect}
-                onValueChange={value =>
-                  setForm(draft => {
-                    draft.aspect = value;
-                  })
-                }>
-                <Picker.Item label="Select" value={null} />
-                {aspectData.map(option => (
-                  <Picker.Item
-                    key={option.id}
-                    label={option.value}
-                    value={option.id}
-                  />
-                ))}
-              </Picker>
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.mesoSlope}</InputLabel>
-              <Picker
-                selectedValue={form.mesoSlope}
-                onValueChange={value =>
-                  setForm(draft => {
-                    draft.mesoSlope = value;
-                  })
-                }>
-                <Picker.Item label="Select" value={null} />
-                {mesoSlopeData.map(option => (
-                  <Picker.Item
-                    key={option.id}
-                    label={option.value}
-                    value={option.id}
-                  />
-                ))}
-              </Picker>
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.macroPosition}</InputLabel>
-              <Picker
-                selectedValue={form.macroPosition}
-                onValueChange={value =>
-                  setForm(draft => {
-                    draft.macroPosition = value;
-                  })
-                }>
-                <Picker.Item label="Select" value={null} />
-                {macroPositionData.map(option => (
-                  <Picker.Item
-                    key={option.id}
-                    label={option.value}
-                    value={option.id}
-                  />
-                ))}
-              </Picker>
-            </View>
-            <View style={styles.inputContainer}>
-              <GalleryPicker
-                onChange={photos =>
-                  setForm(draft => {
-                    draft.photos = photos;
-                  })
-                }
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <InputLabel>Comments</InputLabel>
-              <TextInput
-                value={form.comments}
-                onChangeText={value =>
-                  setForm(draft => {
-                    draft.comments = value;
-                  })
-                }
-                multiline={true}
-                placeholder="Enter comments"
-                style={styles.textInput}
-              />
-            </View>
+            <BaseButton
+              onPress={submit}
+              style={styles.button}
+              accessibilityLabel="create aerial telemetry data button"
+              testID="createAerialTelemetryDataButton">
+              <Text style={styles.buttonText}>Create</Text>
+            </BaseButton>
           </View>
-          <BaseButton
-            onPress={submit}
-            style={styles.button}
-            accessibilityLabel="create aerial telemetry data button"
-            testID="createAerialTelemetryDataButton">
-            <Text style={styles.buttonText}>Create</Text>
-          </BaseButton>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      <LoadingOverlay loading={loading} />
+    </View>
   );
 };
 
