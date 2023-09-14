@@ -1,6 +1,7 @@
 const { sequelize } = require("../../../config/database");
 const { Animal } = require("../../../model/Animal");
 const { AtData } = require("../../../model/AtData");
+const { AtDataPhotos } = require("../../../model/AtDataPhotos");
 
 const observationToDtoProperties = {
   time: {
@@ -71,7 +72,24 @@ const syncAerialTelemetry = async (data) =>
       );
     }
     // Populate main table
-    await AtData.create(dtoToObservation(dto, { animalId: animal.id }));
+    const aerialTelemetry = await AtData.create(
+      dtoToObservation(dto, { animalId: animal.id }),
+      { transaction },
+    );
+    // Populate photos
+    const aerialTelemetryId = aerialTelemetry.id;
+    const photos = dto.photos || [];
+    await Promise.all(
+      photos.map((image) =>
+        AtDataPhotos.create(
+          {
+            aerialTelemetryId,
+            image,
+          },
+          { transaction },
+        ),
+      ),
+    );
   });
 
 module.exports = {

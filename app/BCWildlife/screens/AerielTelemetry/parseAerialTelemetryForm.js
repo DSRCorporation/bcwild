@@ -82,6 +82,9 @@ const dtoProperties = [
     property: 'comments',
   },
   {
+    property: 'photos',
+  },
+  {
     property: 'date',
     transform: datePropertyToTimestamp,
   },

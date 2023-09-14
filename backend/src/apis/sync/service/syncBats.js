@@ -9,6 +9,7 @@ const {
   BBDataBatSignCustomLocation,
 } = require("../../../model/BBDataBatSignCustomLocation");
 const { BBDataBatSign } = require("../../../model/BBDataBatSigns");
+const {BBDataPhotos} = require("../../../model/BBDataPhotos");
 
 // eslint-disable-next-line no-bitwise
 const arrayToBitmask = (masks) => masks.reduce((acc, val) => acc | val, 0);
@@ -58,6 +59,7 @@ const bridgeObservationToDtoProperties = {
   wouldRoostingBatsBeReachableWithoutLadder: {
     property: "wouldBatsBeReachable",
   },
+  photos: { property: "photos" },
   userDateTime: {
     property: "dateTime",
     transform: (timestamp) => new Date(timestamp),
@@ -118,6 +120,11 @@ const batDtoBatCustomSignLocationToTable =
     };
   };
 
+const batDtoPhotosToTable = (observationId) => (photo) => ({
+  bridgeObservationId: observationId,
+  image: photo,
+});
+
 const syncBats = async (data) =>
   sequelize.transaction(async (transaction) => {
     // Sync the tables
@@ -154,7 +161,7 @@ const syncBats = async (data) =>
       { transaction },
     );
     const observationId = bridgeObservation.id;
-    // Now that we have the observation ID, populate bat signs data.
+    // Now that we have the observation ID, populate bat signs data and photos.
     const batSigns = dto.batSigns.map(batDtoBatSignToTable(observationId));
     const signLocations = dto.batSignLocations.map(
       batDtoBatSignLocationToTable(observationId),
@@ -162,15 +169,19 @@ const syncBats = async (data) =>
     const customSignLocations = dto.batSignCustomLocations.map(
       batDtoBatCustomSignLocationToTable(observationId),
     );
-    const signCreation = signLocations
+    const photos = dto.photos.map(batDtoPhotosToTable(observationId));
+    const signAndPhotoCreation = signLocations
       .map((loc) => BBDataBatSignStandardLocation.create(loc, { transaction }))
       .concat(
         customSignLocations.map((loc) =>
           BBDataBatSignCustomLocation.create(loc, { transaction }),
         ),
         batSigns.map((sign) => BBDataBatSign.create(sign, { transaction })),
+      )
+      .concat(
+        photos.map((photo) => BBDataPhotos.create(photo, { transaction })),
       );
-    await Promise.all(signCreation);
+    await Promise.all(signAndPhotoCreation);
   });
 
 module.exports = {

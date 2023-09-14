@@ -26,6 +26,7 @@ const TelemetryTriangulationScreen = () => {
   const handleTriangulate = () => {
     console.log('Triangulate button pressed');
     console.log(entries);
+    setTelemetryStr(entries);
 
 
 // Define constants and variables

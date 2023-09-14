@@ -6,8 +6,9 @@ import LoadingOverlay from '../../utility/LoadingOverlay';
 import {useCardListStyles} from '../../shared/styles/card-list-styles';
 import {useAnimals} from './use-animals';
 import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
+import {useIsFocused} from '@react-navigation/native';
 
-const AnimalListScreen = ({navigation}) => {
+const AnimalListContainer = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const {
     animals,
@@ -68,6 +69,13 @@ const AnimalListScreen = ({navigation}) => {
       <LoadingOverlay loading={loading || loadingAnimals} />
     </View>
   );
+};
+
+// Destroy the container when unfocused in order to reinitialize the state
+// after an animal is added/edited.
+const AnimalListScreen = props => {
+  const isFocused = useIsFocused();
+  return isFocused && <AnimalListContainer {...props} />;
 };
 
 export default AnimalListScreen;
