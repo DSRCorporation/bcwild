@@ -406,18 +406,14 @@ const BridgeFormScreen = ({route}) => {
                 {bridgeIsForData.map(item => (
                   <BouncyCheckbox
                     key={item.id}
-                    onPress={value => {
-                      setForm(draft => {
-                        if (value) {
-                          if (draft.bridgeIfFor.includes(item.id)) {
-                            draft.bridgeIfFor = draft.bridgeIfFor.filter(
-                              id => id !== item.id,
-                            );
-                          }
+                    onPress={() => {
+                    setForm(draft => {
+                      if (draft.bridgeIfFor.includes(item.id)) {
+                        draft.bridgeIfFor = draft.bridgeIfFor.filter(
+                          id => id !== item.id,
+                          );
                         } else {
-                          if (!draft.bridgeIfFor.includes(item.id)) {
-                            draft.bridgeIfFor = [...draft.bridgeIfFor, item.id];
-                          }
+                          draft.bridgeIfFor = [...draft.bridgeIfFor, item.id];
                         }
                       });
                     }}
