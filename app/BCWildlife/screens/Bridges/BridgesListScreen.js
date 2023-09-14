@@ -21,7 +21,6 @@ const BridgeListContainer = ({navigation}) => {
     },
     ...cardListStyles,
   });
-  console.debug('bridges', bridges);
 
   useEffect(() => {
     const load = async () => {
