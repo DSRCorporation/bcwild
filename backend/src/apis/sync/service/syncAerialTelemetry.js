@@ -18,7 +18,7 @@ const observationToDtoProperties = {
   habitatType: { property: "habitatType" },
   locationTime: {
     property: "locationTimestamp",
-    transform: (timestamp) => new Date(timestamp),
+    transform: (timestamp) => timestamp && new Date(timestamp),
   },
   navigator: { property: "navigator" },
   observer: { property: "observer" },
@@ -29,6 +29,10 @@ const observationToDtoProperties = {
   macroPositionId: { property: "macroPosition" },
   createdBy: { property: "created_by" },
   comments: { property: "comments" },
+  userDateTime: {
+    property: "date",
+    transform: (timestamp) => new Date(timestamp),
+  },
 };
 
 const dtoToObservation = (dto, { animalId }) => {

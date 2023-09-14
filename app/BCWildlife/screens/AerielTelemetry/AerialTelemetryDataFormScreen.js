@@ -53,6 +53,7 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
   const {animals} = useAnimals();
   const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
     useLocation();
+  const currentDateTime = form.date;
 
   const submit = useCallback(async () => {
     const timestamp = Date.now();
@@ -138,101 +139,129 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                   style={styles.textInput}
                 />
               </View>
-              {/* Automatic?
-            <View style={styles.inputContainer}>
-              <InputLabel>{aerielTelemetryFormLabels.date}</InputLabel>
-              <DateTimePicker
-                value={form.date}
-                onChange={date =>
-                  setForm(draft => {
-                    draft.date = date;
-                  })
-                }
-              />
-            </View>
-            */}
+              <View
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 8,
+              }}>
               <View style={styles.inputContainer}>
-                <InputLabel>{aerielTelemetryFormLabels.observer}</InputLabel>
-                <TextInput
-                  value={form.observer}
-                  onChangeText={value =>
+                <InputLabel>Date</InputLabel>
+                <DateTimePicker
+                  value={currentDateTime}
+                  mode="date"
+                  onChange={date =>
                     setForm(draft => {
-                      draft.observer = value;
+                      const newDate = new Date(currentDateTime);
+                      newDate.setFullYear(date.getFullYear());
+                      newDate.setMonth(date.getMonth());
+                      newDate.setDate(date.getDate());
+                      newDate.setSeconds(0, 0);
+                      draft.date = newDate;
                     })
                   }
-                  placeholder="Enter observer"
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>Time</InputLabel>
+                <DateTimePicker
+                  value={currentDateTime}
+                  mode="time"
+                  onChange={date =>
+                    setForm(draft => {
+                      const newDate = new Date(currentDateTime);
+                      newDate.setHours(date.getHours());
+                      newDate.setMinutes(date.getMinutes());
+                      newDate.setSeconds(0, 0);
+                      draft.date = newDate;
+                    })
+                  }
+                />
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{aerielTelemetryFormLabels.observer}</InputLabel>
+              <TextInput
+                value={form.observer}
+                onChangeText={value =>
+                  setForm(draft => {
+                    draft.observer = value;
+                  })
+                }
+                placeholder="Enter observer"
+                style={styles.textInput}
+              />
+            </View>
+            <View style={cardStyles.card}>
+              <Text style={cardStyles.cardName}>
+                Aerial GPS Coordinates (NAD83 only)
+              </Text>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.gpsID}</InputLabel>
+                <TextInput
+                  value={form.gpsID}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.gpsID = value;
+                    })
+                  }
+                  placeholder="Enter GPS ID"
                   style={styles.textInput}
                 />
               </View>
-              <View style={cardStyles.card}>
-                <Text style={cardStyles.cardName}>
-                  Aerial GPS Coordinates (NAD83 only)
-                </Text>
-                <View style={styles.inputContainer}>
-                  <InputLabel>{aerielTelemetryFormLabels.gpsID}</InputLabel>
-                  <TextInput
-                    value={form.gpsID}
-                    onChangeText={value =>
-                      setForm(draft => {
-                        draft.gpsID = value;
-                      })
-                    }
-                    placeholder="Enter GPS ID"
-                    style={styles.textInput}
-                  />
-                </View>
-                <View style={styles.inputContainer}>
-                  <InputLabel>
-                    {aerielTelemetryFormLabels.waypoint} (optional){' '}
-                  </InputLabel>
-                  <TextInput
-                    value={form.waypoint}
-                    onChangeText={value =>
-                      setForm(draft => {
-                        draft.waypoint = value;
-                      })
-                    }
-                    placeholder="Enter waypoint"
-                    style={styles.textInput}
-                  />
-                </View>
-                <View style={styles.inputContainer}>
-                  <InputLabel>
-                    {aerielTelemetryFormLabels.gpsCoordinates}
-                  </InputLabel>
-                  <View style={{flexDirection: 'row', gap: 8}}>
-                    <View style={{flex: 1}}>
-                      <TextInput
-                        keyboardType="numeric"
-                        placeholder="Enter longitude"
-                        onChangeText={value =>
-                          setForm(draft => {
-                            draft.longitude = value;
-                          })
-                        }
-                        value={form.longitude}
-                        style={styles.textInput}
-                      />
-                    </View>
-                    <View style={{flex: 1}}>
-                      <TextInput
-                        keyboardType="numeric"
-                        placeholder="Enter latitude"
-                        onChangeText={value =>
-                          setForm(draft => {
-                            draft.latitude = value;
-                          })
-                        }
-                        value={form.latitude}
-                        style={[styles.textInput, {flex: 2}]}
-                      />
-                    </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>
+                  {aerielTelemetryFormLabels.waypoint} (optional){' '}
+                </InputLabel>
+                <TextInput
+                  value={form.waypoint}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.waypoint = value;
+                    })
+                  }
+                  placeholder="Enter waypoint"
+                  style={styles.textInput}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>
+                  {aerielTelemetryFormLabels.gpsCoordinates}
+                </InputLabel>
+                <View style={{flexDirection: 'row', gap: 8}}>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Enter longitude"
+                      onChangeText={value =>
+                        setForm(draft => {
+                          draft.longitude = value;
+                        })
+                      }
+                      value={form.longitude}
+                      style={styles.textInput}
+                    />
+                  </View>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Enter latitude"
+                      onChangeText={value =>
+                        setForm(draft => {
+                          draft.latitude = value;
+                        })
+                      }
+                      value={form.latitude}
+                      style={[styles.textInput, {flex: 2}]}
+                    />
                   </View>
                 </View>
-                <View style={styles.inputContainer}>
-                  <InputLabel>{aerielTelemetryFormLabels.easting}</InputLabel>
-                  <TextInput
-                    value={form.easting.toString()}
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.easting}</InputLabel>
+                <TextInput
+                  value={form.easting.toString()}
                     keyboardType="numeric"
                     onChangeText={value =>
                       setForm(draft => {
@@ -265,51 +294,37 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                   <Text style={styles.buttonText}>Get current location</Text>
                 </BaseButton>
               </View>
-              <View style={styles.inputContainer}>
-                <InputLabel>{aerielTelemetryFormLabels.animal}</InputLabel>
-                <Picker
-                  selectedValue={form.animal}
-                  onValueChange={value =>
-                    setForm(draft => {
-                      draft.animal = value;
-                    })
-                  }>
-                  <Picker.Item label="Select" value={null} />
-                  {animals.map(item => (
-                    <Picker.Item
-                      key={item.id}
-                      label={item.name}
-                      value={item.id}
-                    />
-                  ))}
-                </Picker>
-              </View>
-              <View style={styles.inputContainer}>
-                <InputLabel>{aerielTelemetryFormLabels.frequency}</InputLabel>
-                <TextInput
-                  keyboardType="numeric"
-                  value={form.frequency}
-                  onChangeText={value =>
-                    setForm(draft => {
-                      draft.frequency = value;
-                    })
-                  }
-                  placeholder="Enter frequency"
-                  style={styles.textInput}
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <InputLabel>
-                  {aerielTelemetryFormLabels.timeOfLocation}
-                </InputLabel>
-                <DateTimePicker
-                  value={form.timeOfLocation}
-                  mode="time"
-                  onChange={date =>
-                    setForm(draft => {
-                      draft.timeOfLocation = date;
-                    })
-                  }
+            <View style={styles.inputContainer}>
+              <InputLabel>{aerielTelemetryFormLabels.animal}</InputLabel>
+              <Picker
+                selectedValue={form.animal}
+                onValueChange={value =>
+                  setForm(draft => {
+                    draft.animal = value;
+                  })
+                }>
+                <Picker.Item label="Select" value={null} />
+                {animals.map(item => (
+                  <Picker.Item
+                    key={item.id}
+                    label={item.name}
+                    value={item.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>{aerielTelemetryFormLabels.frequency}</InputLabel>
+              <TextInput
+                keyboardType="numeric"
+                value={form.frequency}
+                onChangeText={value =>
+                  setForm(draft => {
+                    draft.frequency = value;
+                  })
+                }
+                placeholder="Enter frequency"
+                style={styles.textInput}
                 />
               </View>
               <View style={styles.inputContainer}>

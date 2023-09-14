@@ -60,6 +60,11 @@ const bridgeObservationToDtoProperties = {
     property: "wouldBatsBeReachable",
   },
   photos: { property: "photos" },
+  userDateTime: {
+    property: "dateTime",
+    transform: (timestamp) => new Date(timestamp),
+    transformToDto: (time) => time.getTime(),
+  },
 };
 
 const batDtoToObservation = (bridgeId, dto) => {
