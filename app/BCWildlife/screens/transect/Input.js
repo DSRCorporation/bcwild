@@ -50,8 +50,9 @@ const InputChoice = ({inputConfig}) => {
   );
 };
 
-const InputDate = ({inputConfig}) => {
-  const {name, displayName, hint} = inputConfig;
+// Single input either for date or for time
+const InputDateOrTime = ({inputConfig}) => {
+  const {name, displayName, hint, textFormat, mode} = inputConfig;
   const {styles, form, setForm} = useSimpleFormContext();
   return (
     <View style={styles.inputContainer}>
@@ -59,7 +60,8 @@ const InputDate = ({inputConfig}) => {
       {hint && <Text>{hint}</Text>}
       <DateTimePicker
         value={new Date(form[name])}
-        mode="date"
+        mode={mode || 'date'}
+        textFormat={textFormat}
         onChange={date =>
           setForm(draft => {
             draft[name] = date.getTime();
@@ -68,6 +70,74 @@ const InputDate = ({inputConfig}) => {
       />
     </View>
   );
+};
+
+// Two inputs, one for date, another for time
+const InputDateTime = ({inputConfig}) => {
+  const {
+    name,
+    displayNameDate,
+    displayNameTime,
+    hint,
+    dateTextFormat,
+    timeTextFormat,
+  } = inputConfig;
+  const {styles, form, setForm} = useSimpleFormContext();
+  const value = new Date(form[name]);
+  return (
+    <View style={styles.inputContainer}>
+      {hint && <Text>{hint}</Text>}
+      <View
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 8,
+        }}>
+        <View style={styles.inputContainer}>
+          <InputLabel>{displayNameDate}</InputLabel>
+          <DateTimePicker
+            value={value}
+            mode="date"
+            onChange={date =>
+              setForm(draft => {
+                const newDate = new Date(value);
+                newDate.setFullYear(date.getFullYear());
+                newDate.setMonth(date.getMonth());
+                newDate.setDate(date.getDate());
+                newDate.setSeconds(0, 0);
+                draft[name] = newDate.getTime();
+              })
+            }
+            textFormat={dateTextFormat}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <InputLabel>{displayNameTime}</InputLabel>
+          <DateTimePicker
+            value={value}
+            mode="time"
+            onChange={date =>
+              setForm(draft => {
+                const newDate = new Date(value);
+                newDate.setHours(date.getHours());
+                newDate.setMinutes(date.getMinutes());
+                newDate.setSeconds(0, 0);
+                draft[name] = newDate.getTime();
+              })
+            }
+            textFormat={timeTextFormat}
+          />
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const InputTimestamp = ({inputConfig}) => {
+  const mode = inputConfig.mode || 'date';
+  const I = mode === 'datetime' ? InputDateTime : InputDateOrTime;
+  return <I inputConfig={inputConfig} />;
 };
 
 const CoordinatesButton = ({inputConfig}) => {
@@ -103,7 +173,7 @@ const CoordinatesButton = ({inputConfig}) => {
 const InputTypes = {
   text: InputText,
   choice: InputChoice,
-  date: InputDate,
+  timestamp: InputTimestamp,
   coordinates_button: CoordinatesButton,
 };
 

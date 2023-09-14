@@ -16,6 +16,7 @@ export const DateTimePicker = ({
   value,
   mode = 'date',
   containerStyle,
+  textFormat,
   textStyle,
   onChange,
 }) => {
@@ -34,6 +35,9 @@ export const DateTimePicker = ({
   );
 
   const formattedValueText = useMemo(() => {
+    if (textFormat != null) {
+      return textFormat(value);
+    }
     switch (mode) {
       case 'date':
         return value.toLocaleDateString();
@@ -42,7 +46,7 @@ export const DateTimePicker = ({
       default:
         return value.toLocaleString();
     }
-  }, [value, mode]);
+  }, [value, mode, textFormat]);
 
   return (
     <>
