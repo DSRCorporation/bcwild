@@ -3,13 +3,11 @@ import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useCardListStyles} from '../../shared/styles/card-list-styles';
-import {GoBackArrowButton} from '../../shared/components/GoBackArrowButton';
-import {BCWildLogo} from '../../shared/components/BCWildLogo';
-import {TitleText} from '../../shared/components/TitleText';
 import {useBridges} from '../../shared/hooks/use-bridges/useBridges';
 import {SimpleScreenHeader} from '../../shared/components/SimpleScreenHeader';
+import {useIsFocused} from '@react-navigation/native';
 
-const BridgeListScreen = ({navigation}) => {
+const BridgeListContainer = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [bridges, setBridges] = useState([]);
   const {bridgeList, bridgeByMotId} = useBridges();
@@ -94,5 +92,10 @@ const BridgeListScreen = ({navigation}) => {
     </View>
   );
 };
+
+const BridgeListScreen = (props) => {
+  const isFocused = useIsFocused();
+  return isFocused && <BridgeListContainer {...props} />;
+}
 
 export default BridgeListScreen;
