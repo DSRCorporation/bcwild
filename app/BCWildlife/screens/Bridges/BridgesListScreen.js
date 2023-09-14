@@ -21,6 +21,7 @@ const BridgeListContainer = ({navigation}) => {
     },
     ...cardListStyles,
   });
+  console.debug('bridges', bridges);
 
   useEffect(() => {
     const load = async () => {
@@ -93,9 +94,11 @@ const BridgeListContainer = ({navigation}) => {
   );
 };
 
-const BridgeListScreen = (props) => {
+// Destroy the container when unfocused in order to reinitialize the state
+// after a bridge is added/edited.
+const BridgeListScreen = props => {
   const isFocused = useIsFocused();
   return isFocused && <BridgeListContainer {...props} />;
-}
+};
 
 export default BridgeListScreen;
