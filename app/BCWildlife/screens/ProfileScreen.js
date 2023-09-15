@@ -15,9 +15,34 @@ import {RecordType} from '../utility/RecordType';
 import {uploadImages} from '../shared/utils/uploadImages';
 
 // Uploading images
+//
+// Images are uploaded before the records. If you implement records supporting
+// images, you typically represent them using local URIs.  The response to an
+// upload request includes the random name the image is saved with on the
+// server.  Most likely, you want to update your record to contain the
+// server-side name instead of the local URI.  To do this, you register a
+// "pusher" in the `imagePushers` object below.  The pusher is a function async
+// (record: Record) => Record that performs the upload and updates the record.
+// The pushers are dispatched over RecordType's extracted from records' names.
+//
+// When the data are synced, the first pass includes running the image pushers
+// over the records, which upload images and update the records.  Then updated
+// records are sent to the server.  Thus, the server never sees local URIs.
+//
+// For typical usecases, you can construct a pusher using `singleImagePusher`
+// or `multipleImagePusher`.  They take a property name and assume that the
+// value of the property is a single image or an array thereof, respectively.
+// The updated record is the copy of the record where server-side names are
+// used for the property value.
+//
+// When this file is refactored, it makes sense to factor out general image
+// uploading utils to one file and the imagePushers object to another.
 
 const singleImagePusher = property => async record => {
   const imageFile = record.data[property];
+  if (imageFile == null) {
+    return record;
+  }
   const response = await uploadImages([imageFile]);
   const fixedData = {...record.data};
   fixedData[property] = response.files[0].filename;
@@ -30,6 +55,12 @@ const uriBasename = uri => uri.split('/').pop();
 
 const multipleImagePusher = property => async record => {
   const imageFiles = record.data[property];
+  if (
+    imageFiles == null ||
+    (Array.isArray(imageFiles) && imageFiles.length === 0)
+  ) {
+    return record;
+  }
   const response = await uploadImages(imageFiles);
   const resultFiles = response.data.files;
   const findResultFilename = ({fileName}) => {
@@ -50,9 +81,12 @@ const multipleImagePusher = property => async record => {
 
 const noOpImagePusher = async record => record;
 
+// Pusher registry
+// REGISTER YOUR PUSHER HERE
 const imagePushers = {
-  BAT: multipleImagePusher('photos'),
-  AERIALTELEMETRY: multipleImagePusher('photos'),
+  [RecordType.Bat]: multipleImagePusher('photos'),
+  [RecordType.AerialTelemetry]: multipleImagePusher('photos'),
+  [RecordType.Cam]: multipleImagePusher('photos'),
 };
 
 const pushRecordImages = async record => {
@@ -65,7 +99,6 @@ const pushRecordsImages = async records =>
   Promise.all(records.map(pushRecordImages));
 
 // End uploading images
-
 
 const ProfileScreen = ({navigation}) => {
   const [fname, setFname] = useState('');

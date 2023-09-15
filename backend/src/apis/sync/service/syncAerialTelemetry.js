@@ -1,4 +1,3 @@
-const { sequelize } = require("../../../config/database");
 const { Animal } = require("../../../model/Animal");
 const { AtData } = require("../../../model/AtData");
 const { AtDataPhotos } = require("../../../model/AtDataPhotos");
@@ -53,44 +52,43 @@ const dtoToObservation = (dto, { animalId }) => {
   return observation;
 };
 
-const syncAerialTelemetry = async (data) =>
-  sequelize.transaction(async (transaction) => {
-    const dto = data.data;
-    // DTO is supposed to have string animal ID, not the internal animal ID.
-    // Find the internal animal ID.
-    const stringAnimalId = dto.animal;
-    if (!stringAnimalId) {
-      throw Error("Empty animal ID");
-    }
-    const animal = await Animal.findOne(
-      { where: { stringId: stringAnimalId } },
-      { transaction },
+const syncAerialTelemetry = async (data, { transaction }) => {
+  const dto = data.data;
+  // DTO is supposed to have string animal ID, not the internal animal ID.
+  // Find the internal animal ID.
+  const stringAnimalId = dto.animal;
+  if (!stringAnimalId) {
+    throw Error("Empty animal ID");
+  }
+  const animal = await Animal.findOne(
+    { where: { stringId: stringAnimalId } },
+    { transaction },
+  );
+  if (!animal) {
+    throw Error(
+      `Animal with ID ${stringAnimalId} does not exist in the database`,
     );
-    if (!animal) {
-      throw Error(
-        `Animal with ID ${stringAnimalId} does not exist in the database`,
-      );
-    }
-    // Populate main table
-    const aerialTelemetry = await AtData.create(
-      dtoToObservation(dto, { animalId: animal.id }),
-      { transaction },
-    );
-    // Populate photos
-    const aerialTelemetryId = aerialTelemetry.id;
-    const photos = dto.photos || [];
-    await Promise.all(
-      photos.map((image) =>
-        AtDataPhotos.create(
-          {
-            aerialTelemetryId,
-            image,
-          },
-          { transaction },
-        ),
+  }
+  // Populate main table
+  const aerialTelemetry = await AtData.create(
+    dtoToObservation(dto, { animalId: animal.id }),
+    { transaction },
+  );
+  // Populate photos
+  const aerialTelemetryId = aerialTelemetry.id;
+  const photos = dto.photos || [];
+  await Promise.all(
+    photos.map((image) =>
+      AtDataPhotos.create(
+        {
+          aerialTelemetryId,
+          image,
+        },
+        { transaction },
       ),
-    );
-  });
+    ),
+  );
+};
 
 module.exports = {
   syncAerialTelemetry,

@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../../../config/database");
+const {setMandatoryProperty} = require("../../../helpers/commonSequelizeQueries");
 
 const CameraTrapData = db.sequelize.define(
   "camera_trap_data",
@@ -121,9 +122,6 @@ const CameraTrapData = db.sequelize.define(
     sd_card_replaced: {
       type: Sequelize.STRING(50),
     },
-    photos: {
-      type: Sequelize.TEXT,
-    },
     created_by: {
       type: Sequelize.STRING(50),
     },
@@ -134,22 +132,22 @@ const CameraTrapData = db.sequelize.define(
   { timestamps: true, underscored: true },
 );
 
-// CameraTrapData.belongsTo(Project,{
-//     foreignKey:"project_id",
-//     targetKey:"project_id",
-//     as:"project"
-// })
+const CameraTrapDataPhotos = db.sequelize.define("camera_trap_data_photos", {
+  id: {
+    allowNull: false,
+    primaryKey: true,
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+  },
+  image: {
+    allowNull: false,
+    type: Sequelize.STRING,
+  },
+});
 
-// CameraTrapData.belongsTo(User,{
-//     foreignKey:"created_by",
-//     targetKey:"username",
-//     as:"user"
-// })
-// CameraTrapData.belongsTo(User,{
-//     foreignKey:"updated_by",
-//     targetKey:"username",
-//     as:"user"
-// })
+setMandatoryProperty(CameraTrapDataPhotos, CameraTrapData, "cameraTrapDataId");
 
-// CameraTrapData.sync({alter:true}).then()
-module.exports = CameraTrapData;
+module.exports = {
+  CameraTrapData,
+  CameraTrapDataPhotos,
+};

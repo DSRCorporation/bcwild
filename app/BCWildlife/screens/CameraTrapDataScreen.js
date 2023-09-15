@@ -18,6 +18,8 @@ import {RecordType} from '../utility/RecordType';
 import {useLocation} from './Location';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {BaseButton} from '../shared/components/BaseButton';
+import {InputLabel} from '../shared/components/InputLabel';
+import {GalleryPicker} from '../shared/components/GalleryPicker';
 
 const CameraTrapDataScreen = () => {
   const [projects, setProjects] = React.useState([]);
@@ -72,6 +74,7 @@ const CameraTrapDataScreen = () => {
   const [cameraReplaced, setCameraReplaced] = React.useState();
   const [batteriesReplaced, setBatteriesReplaced] = React.useState('');
   const [sdCardReplaced, setSdCardReplaced] = React.useState('');
+  const [attachedImages, setAttachedImages] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
@@ -321,6 +324,7 @@ const CameraTrapDataScreen = () => {
       }
     }
 
+    data.photos = attachedImages;
     var strvalue = JSON.stringify(data);
     console.log(strvalue);
     var timeNowEpoch = Math.round(new Date().getTime() / 1000);
@@ -704,10 +708,10 @@ const CameraTrapDataScreen = () => {
                 onChangeText={text => setKeyId(text)}
               />
 
-              <Text style={styles.inputLabel}>Visiblity </Text>
+              <Text style={styles.inputLabel}>Visibility </Text>
               <TextInput
                 style={styles.input}
-                placeholder="Visiblity n meters"
+                placeholder="Visibility in meters"
                 value={visibility}
                 keyboardType="numeric"
                 onChangeText={text => setVisiblity(text)}
@@ -822,13 +826,13 @@ const CameraTrapDataScreen = () => {
                 value={comments}
                 placeholder="Comments"
               />
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  handleImageUpload();
-                }}>
-                <Text style={styles.inputLabel}> Click to Add Photos </Text>
-              </TouchableOpacity>
+              <View style={styles.inputContainer}>
+                <InputLabel>Click to Add Photos</InputLabel>
+                <GalleryPicker
+                  onChange={setAttachedImages}
+                  images={attachedImages}
+                />
+              </View>
             </View>
           ) : (
             <View style={styles.inputContainer}>

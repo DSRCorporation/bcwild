@@ -32,14 +32,6 @@ const dtoToEncounterData = dtoToModelData();
 
 const dtoToStandData = dtoToModelData();
 
-const syncModels = async (transaction) => {
-  await Promise.all(
-    [TrDataStand, TrDataTransect, TrDataEncounter].map((model) =>
-      model.sync({ transaction }),
-    ),
-  );
-};
-
 const createTransectRecord = async (dto, transaction) =>
   TrDataTransect.create(dtoToTransectData(dto), { transaction });
 
@@ -70,27 +62,25 @@ const createStandRecord = async (standDto, transectId, transaction) => {
   }));
 };
 
-const syncTransect = async (data) =>
-  sequelize.transaction(async (transaction) => {
-    syncModels();
-    const dto = data.data;
-    // Populate main observation table
-    const transect = await createTransectRecord(dto, transaction);
-    const transectId = transect.id;
-    // Populate stand table collecting encounter data
-    const encountersPerStand = await Promise.all(
-      dto.stands.map((standDto) =>
-        createStandRecord(standDto, transectId, transaction),
-      ),
-    );
-    const encounters = encountersPerStand.flat();
-    // Populate encounter table
-    await Promise.all(
-      encounters.map(({ encounterDto, extraProperties }) =>
-        createEncounterRecord(encounterDto, extraProperties, transaction),
-      ),
-    );
-  });
+const syncTransect = async (data, { transaction }) => {
+  const dto = data.data;
+  // Populate main observation table
+  const transect = await createTransectRecord(dto, transaction);
+  const transectId = transect.id;
+  // Populate stand table collecting encounter data
+  const encountersPerStand = await Promise.all(
+    dto.stands.map((standDto) =>
+      createStandRecord(standDto, transectId, transaction),
+    ),
+  );
+  const encounters = encountersPerStand.flat();
+  // Populate encounter table
+  await Promise.all(
+    encounters.map(({ encounterDto, extraProperties }) =>
+      createEncounterRecord(encounterDto, extraProperties, transaction),
+    ),
+  );
+};
 
 module.exports = {
   syncTransect,

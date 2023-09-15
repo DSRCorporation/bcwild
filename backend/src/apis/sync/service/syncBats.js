@@ -1,5 +1,4 @@
 const { Bridge } = require("../../../model/Bridge");
-const { sequelize } = require("../../../config/database");
 const { BridgeConfiguration } = require("../../../model/BridgeConfiguration");
 const { BridgeObservation } = require("../../../model/BridgeObservation");
 const {
@@ -9,7 +8,7 @@ const {
   BBDataBatSignCustomLocation,
 } = require("../../../model/BBDataBatSignCustomLocation");
 const { BBDataBatSign } = require("../../../model/BBDataBatSigns");
-const {BBDataPhotos} = require("../../../model/BBDataPhotos");
+const { BBDataPhotos } = require("../../../model/BBDataPhotos");
 
 // eslint-disable-next-line no-bitwise
 const arrayToBitmask = (masks) => masks.reduce((acc, val) => acc | val, 0);
@@ -125,64 +124,61 @@ const batDtoPhotosToTable = (observationId) => (photo) => ({
   image: photo,
 });
 
-const syncBats = async (data) =>
-  sequelize.transaction(async (transaction) => {
-    // Sync the tables
-    await Promise.all(
-      [
-        Bridge,
-        BridgeConfiguration,
-        BridgeObservation,
-        BBDataBatSign,
-        BBDataBatSignStandardLocation,
-        BBDataBatSignCustomLocation,
-      ].map((model) => model.sync({ transaction })),
+const syncBats = async (data, { transaction }) => {
+  // Sync the tables
+  await Promise.all(
+    [
+      Bridge,
+      BridgeConfiguration,
+      BridgeObservation,
+      BBDataBatSign,
+      BBDataBatSignStandardLocation,
+      BBDataBatSignCustomLocation,
+    ].map((model) => model.sync({ transaction })),
+  );
+  const dto = data.data;
+  // DTO is supposed to have MOT ID, not the internal bridge ID.
+  // Find the internal bridge ID.
+  const { bridgeMotId } = dto;
+  if (!bridgeMotId) {
+    throw Error("Empty bridge MOT ID");
+  }
+  const bridgeConfiguration = await BridgeConfiguration.findOne(
+    { where: { motBridgeID: bridgeMotId } },
+    { transaction },
+  );
+  if (!bridgeConfiguration) {
+    throw Error(
+      `Bridge with MOT ID ${bridgeMotId} does not exist in the database`,
     );
-    const dto = data.data;
-    // DTO is supposed to have MOT ID, not the internal bridge ID.
-    // Find the internal bridge ID.
-    const { bridgeMotId } = dto;
-    if (!bridgeMotId) {
-      throw Error("Empty bridge MOT ID");
-    }
-    const bridgeConfiguration = await BridgeConfiguration.findOne(
-      { where: { motBridgeID: bridgeMotId } },
-      { transaction },
-    );
-    if (!bridgeConfiguration) {
-      throw Error(
-        `Bridge with MOT ID ${bridgeMotId} does not exist in the database`,
-      );
-    }
-    const { bridgeId } = bridgeConfiguration;
-    // Populate main observation table
-    const bridgeObservation = await BridgeObservation.create(
-      batDtoToObservation(bridgeId, dto),
-      { transaction },
-    );
-    const observationId = bridgeObservation.id;
-    // Now that we have the observation ID, populate bat signs data and photos.
-    const batSigns = dto.batSigns.map(batDtoBatSignToTable(observationId));
-    const signLocations = dto.batSignLocations.map(
-      batDtoBatSignLocationToTable(observationId),
-    );
-    const customSignLocations = dto.batSignCustomLocations.map(
-      batDtoBatCustomSignLocationToTable(observationId),
-    );
-    const photos = dto.photos.map(batDtoPhotosToTable(observationId));
-    const signAndPhotoCreation = signLocations
-      .map((loc) => BBDataBatSignStandardLocation.create(loc, { transaction }))
-      .concat(
-        customSignLocations.map((loc) =>
-          BBDataBatSignCustomLocation.create(loc, { transaction }),
-        ),
-        batSigns.map((sign) => BBDataBatSign.create(sign, { transaction })),
-      )
-      .concat(
-        photos.map((photo) => BBDataPhotos.create(photo, { transaction })),
-      );
-    await Promise.all(signAndPhotoCreation);
-  });
+  }
+  const { bridgeId } = bridgeConfiguration;
+  // Populate main observation table
+  const bridgeObservation = await BridgeObservation.create(
+    batDtoToObservation(bridgeId, dto),
+    { transaction },
+  );
+  const observationId = bridgeObservation.id;
+  // Now that we have the observation ID, populate bat signs data and photos.
+  const batSigns = dto.batSigns.map(batDtoBatSignToTable(observationId));
+  const signLocations = dto.batSignLocations.map(
+    batDtoBatSignLocationToTable(observationId),
+  );
+  const customSignLocations = dto.batSignCustomLocations.map(
+    batDtoBatCustomSignLocationToTable(observationId),
+  );
+  const photos = dto.photos.map(batDtoPhotosToTable(observationId));
+  const signAndPhotoCreation = signLocations
+    .map((loc) => BBDataBatSignStandardLocation.create(loc, { transaction }))
+    .concat(
+      customSignLocations.map((loc) =>
+        BBDataBatSignCustomLocation.create(loc, { transaction }),
+      ),
+      batSigns.map((sign) => BBDataBatSign.create(sign, { transaction })),
+    )
+    .concat(photos.map((photo) => BBDataPhotos.create(photo, { transaction })));
+  await Promise.all(signAndPhotoCreation);
+};
 
 module.exports = {
   syncBats,
