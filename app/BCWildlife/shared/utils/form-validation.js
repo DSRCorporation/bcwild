@@ -66,6 +66,17 @@ export const parseNonnegativeFloatProperty = transformProperty(value => {
   return {ok: true, value: float};
 });
 
+export const parseFloatPropertyInRange = ({min, max}) =>
+  transformProperty(value => {
+    const float = tryParseFloat(value);
+    const numMin = min != null ? min : Number.NEGATIVE_INFINITY;
+    const numMax = max != null ? max : Number.POSITIVE_INFINITY;
+    if (float == null || float < numMin || float > numMax) {
+      return {ok: false};
+    }
+    return {ok: true, value: float};
+  });
+
 /*
 transforms: Array<
   | { fromProperty: string, toProperty: string, transform?: (object, string) => any }

@@ -18,4 +18,5 @@ export const aerielTelemetryFormLabels = {
   aspect: 'Aspect',
   mesoSlope: 'Meso Slope',
   macroPosition: 'Macro Position',
+  canopyCover: 'Canopy cover',
 };

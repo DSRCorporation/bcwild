@@ -33,6 +33,7 @@ const observationToDtoProperties = {
     property: "date",
     transform: (timestamp) => new Date(timestamp),
   },
+  canopyCover: { property: "canopyCover" },
 };
 
 const dtoToObservation = (dto, { animalId }) => {

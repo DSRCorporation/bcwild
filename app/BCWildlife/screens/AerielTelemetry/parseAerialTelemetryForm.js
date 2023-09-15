@@ -4,6 +4,7 @@ import {
   ensureNonemptyStringProperty,
   ensureNonnegativeNumberProperty,
   parseFloatProperty,
+  parseFloatPropertyInRange,
   parseNonnegativeFloatProperty,
 } from '../../shared/utils/form-validation';
 import {getFormValidationErrorMessage} from '../../shared/utils/get-form-validation-error-message';
@@ -56,6 +57,10 @@ const dtoProperties = [
   {
     property: 'frequency',
     transform: parseNonnegativeFloatProperty,
+  },
+  {
+    property: 'canopyCover',
+    transform: parseFloatPropertyInRange({min: 0, max: 100}),
   },
   {
     property: 'aspect',

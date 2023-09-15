@@ -69,6 +69,9 @@ const AtData = db.sequelize.define("at_data", {
   comments: {
     type: DataTypes.STRING,
   },
+  canopyCover: {
+    type: DataTypes.REAL,
+  },
 });
 
 setOptionalProperty(AtData, Animal, "animalId");

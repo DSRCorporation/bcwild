@@ -30,6 +30,12 @@ const uriBasename = uri => uri.split('/').pop();
 
 const multipleImagePusher = property => async record => {
   const imageFiles = record.data[property];
+  if (
+    imageFiles == null ||
+    (Array.isArray(imageFiles) && imageFiles.length === 0)
+  ) {
+    return record;
+  }
   const response = await uploadImages(imageFiles);
   const resultFiles = response.data.files;
   const findResultFilename = ({fileName}) => {
