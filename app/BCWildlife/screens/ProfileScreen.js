@@ -559,8 +559,6 @@ const ProfileScreen = ({navigation}) => {
             <Image
               style={styles.photo}
               source={userPhoto || require('../assets/placeholder_profile.png')}
-              width={100}
-              height={100}
             />
           </ImagePicker>
           <Text style={styles.title}>{fullname}</Text>
@@ -674,6 +672,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     resizeMode: 'contain',
+    borderRadius: 9999,
   },
   name: {
     fontSize: 20,
