@@ -13,6 +13,8 @@ import {useBridges} from '../shared/hooks/use-bridges/useBridges';
 import {localAnimalToRecord, useAnimals} from './Animals/use-animals';
 import {RecordType} from '../utility/RecordType';
 import {uploadImages} from '../shared/utils/uploadImages';
+import {ImagePicker} from '../shared/components/ImagePicker';
+import {fetchProfileImage, uploadProfileImage} from '../shared/utils/uploadProfilePicture';
 
 // Uploading images
 //
@@ -211,11 +213,22 @@ const ProfileScreen = ({navigation}) => {
     }
   };
 
+  const loadPicture = useCallback(async () => {
+    const picture = await fetchProfileImage();
+    setUserPhoto({uri: `data:image/png;base64,${picture}`});
+  }, []);
+
   useEffect(() => {
     if (renderProfile) {
       renderProfile();
     }
   }, [renderProfile]);
+
+  useEffect(() => {
+    loadPicture().catch(error => {
+      console.error('profileimage error', error);
+    });
+  }, [loadPicture]);
 
   const configAuth = () => {
     let token = getAccessToken();
@@ -265,7 +278,6 @@ const ProfileScreen = ({navigation}) => {
       }
 
       recordsObj = await pushRecordsImages(recordsObj); // "fixed" records"
-      console.debug('ro', recordsObj);
 
       const animalRecords = []; // syncing animals before aerial telemetry
       const bridgeRecords = []; //syncing bridges before bats
@@ -424,11 +436,21 @@ const ProfileScreen = ({navigation}) => {
     }
   };
 
-  const handleUpdatePhoto = () => {
-    // handle user photo update logic
-    console.log('Update Photo');
-    showAlert('Update Photo', 'Are you sure you want to Replace your photo?');
-  };
+  const handleUpdatePhoto = useCallback(
+    async picture => {
+      try {
+        await uploadProfileImage(picture);
+      } catch (error) {
+        console.error(
+          'Could not upload profile picture',
+          JSON.stringify(error, null, 2),
+        );
+        Alert.alert('Error', 'Could not upload profile picture');
+      }
+      await loadPicture();
+    },
+    [loadPicture],
+  );
 
   const renderProfile = useCallback(async () => {
     try {
@@ -533,16 +555,14 @@ const ProfileScreen = ({navigation}) => {
         </View>
 
         <View style={styles.photoContainer}>
-          <TouchableOpacity onPress={handleUpdatePhoto}>
+          <ImagePicker onChange={handleUpdatePhoto}>
             <Image
               style={styles.photo}
-              source={
-                userPhoto
-                  ? {uri: userPhoto}
-                  : require('../assets/placeholder_profile.png')
-              }
+              source={userPhoto || require('../assets/placeholder_profile.png')}
+              width={100}
+              height={100}
             />
-          </TouchableOpacity>
+          </ImagePicker>
           <Text style={styles.title}>{fullname}</Text>
         </View>
 
