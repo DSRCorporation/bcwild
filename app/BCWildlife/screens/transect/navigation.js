@@ -19,7 +19,13 @@ export const saveState = async state => {
 };
 
 export const clearState = async () =>
-  EncryptedStorage.removeItem(stateStorageKey);
+  EncryptedStorage.removeItem(stateStorageKey).catch(e => {
+    console.warn(
+      `Could not remove state, probably it does not exist. Error: ${JSON.stringify(
+        e,
+      )}`,
+    );
+  });
 
 // Transect has three screens.  These are the routes associated with the screens.
 const routeNames = {
