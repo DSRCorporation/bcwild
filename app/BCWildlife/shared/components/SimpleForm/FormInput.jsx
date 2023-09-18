@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {View, TextInput, Text} from 'react-native';
+import { View, TextInput, Text, Platform } from "react-native";
 import {InputLabel} from '../InputLabel';
 import {useSimpleFormContext} from './SimpleFormContextProvider';
 
@@ -32,7 +32,7 @@ export const FormInput = ({ name, label, placeholder, multiline, numeric, suffix
       onChangeText={onChangeText}
       multiline={multiline}
       placeholder={placeholder}
-      keyboardType={numeric ? 'numeric' : undefined}
+      keyboardType={numeric ? Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric' : undefined}
       style={styles.textInput}
       {...textInputProps}
     />
