@@ -44,6 +44,7 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
     frequency: '',
     timeOfLocation: now,
     habitatType: '',
+    canopyCover: '',
     aspect: null,
     mesoSlope: null,
     macroPosition: null,
@@ -338,6 +339,20 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                   }
                   placeholder="Enter habitat type"
                   style={styles.textInput}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>{aerielTelemetryFormLabels.canopyCover}</InputLabel>
+                <TextInput
+                  value={form.canopyCover}
+                  onChangeText={value =>
+                    setForm(draft => {
+                      draft.canopyCover = value;
+                    })
+                  }
+                  placeholder="Enter canopy cover (%)"
+                  style={styles.textInput}
+                  keyboardType="numeric"
                 />
               </View>
               <View style={styles.inputContainer}>
