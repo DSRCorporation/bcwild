@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/ArialTelemetry.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const AtDefMesoSlope = db.sequelize.define(
   "at_def_meso_slope",
@@ -22,9 +22,8 @@ const AtDefMesoSlope = db.sequelize.define(
   },
 );
 
-const init = createDefInit(AtDefMesoSlope, datasheetTypes, "MesoSlope");
+addAutoPopulateHook(AtDefMesoSlope, datasheetTypes, "MesoSlope");
 
 module.exports = {
   AtDefMesoSlope,
-  init,
 };

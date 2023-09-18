@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const Region = db.sequelize.define(
   "region",
@@ -21,16 +22,11 @@ const Region = db.sequelize.define(
   },
 );
 
-async function init(transaction) {
-  await Region.bulkCreate(
-    datasheetTypes.types
-      .find(({ name }) => name === "Region")
-      .values.map(({ id, value }) => ({ id, name: value })),
-    { transaction, updateOnDuplicate: ["id"] },
-  );
-}
+addAutoPopulateHook(Region, datasheetTypes, "Region", {
+  valuesTransform: (values) =>
+    values.map(({ id, value }) => ({ id, name: value })),
+});
 
 module.exports = {
   Region,
-  init,
 };

@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BridgeWater = db.sequelize.define(
   "bb_def_water",
@@ -22,9 +22,8 @@ const BridgeWater = db.sequelize.define(
   },
 );
 
-const init = createDefInit(BridgeWater, datasheetTypes, "Water");
+addAutoPopulateHook(BridgeWater, datasheetTypes, "Water");
 
 module.exports = {
   BridgeWater,
-  init,
 };

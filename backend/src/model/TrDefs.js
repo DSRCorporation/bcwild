@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/Transect.json");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 function pascalCaseToCamelCase(string) {
   return Array.from(string.matchAll("[A-Z]([a-z]*)"))
@@ -46,23 +47,16 @@ function defineModel(typeName) {
       timestamps: false,
     },
   );
-  const initModel = async (transaction) => {
-    await model.bulkCreate(typeDescription.values, {
-      transaction,
-      updateOnDuplicate: ["id"],
-    });
-  };
-  return [model, initModel];
+  addAutoPopulateHook(model, datasheetTypes, typeName);
+  return model;
 }
 
 function defineModels() {
   const typeNames = datasheetTypes.types.map(({ name }) => name);
   const models = {};
-  const initFunctions = [];
   typeNames.forEach((typeName) => {
-    const [model, initModel] = defineModel(typeName);
+    const model = defineModel(typeName);
     models[typeName] = model;
-    initFunctions.push(initModel);
   });
   const modelFor = (typeName) => {
     const model = models[typeName];
@@ -71,10 +65,10 @@ function defineModels() {
     }
     return model;
   };
-  return { modelFor, initFunctions };
+  return modelFor;
 }
 
-const { modelFor, initFunctions } = defineModels();
+const modelFor = defineModels();
 
 const TrDefSurveyType = modelFor("SurveyType");
 const TrDefPrecipitation = modelFor("Precipitation");
@@ -83,10 +77,6 @@ const TrDefWind = modelFor("Wind");
 // const TrDefTemperature = modelFor("Temperature");
 const TrDefReliability = modelFor("Reliability");
 
-async function init(transaction) {
-  await Promise.all(initFunctions.map((fn) => fn(transaction)));
-}
-
 module.exports = {
   TrDefSurveyType,
   TrDefPrecipitation,
@@ -94,5 +84,4 @@ module.exports = {
   TrDefWind,
   // TrDefTemperature,
   TrDefReliability,
-  init,
 };

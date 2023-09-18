@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/BatsAndBridges.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const BatRecording = db.sequelize.define(
   "bb_def_bat_recording",
@@ -22,9 +22,8 @@ const BatRecording = db.sequelize.define(
   },
 );
 
-const init = createDefInit(BatRecording, datasheetTypes, "BatRecording");
+addAutoPopulateHook(BatRecording, datasheetTypes, "BatRecording");
 
 module.exports = {
   BatRecording,
-  init,
 };

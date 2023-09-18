@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/ArialTelemetry.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const AtDefMacroPosition = db.sequelize.define(
   "at_def_macro_position",
@@ -22,9 +22,8 @@ const AtDefMacroPosition = db.sequelize.define(
   },
 );
 
-const init = createDefInit(AtDefMacroPosition, datasheetTypes, "MacroPosition");
+addAutoPopulateHook(AtDefMacroPosition, datasheetTypes, "MacroPosition");
 
 module.exports = {
   AtDefMacroPosition,
-  init,
 };

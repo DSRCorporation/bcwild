@@ -96,76 +96,8 @@ async function startServer() {
   }
 }
 
-const assessment = require("./src/model/Assessment");
-const batGuanoAmount = require("./src/model/BatGuanoAmount");
-const batGuanoCollected = require("./src/model/BatGuanoCollected");
-const batGuanoDistribution = require("./src/model/BatGuanoDistribution");
-const batRecording = require("./src/model/BatRecording");
-const batSign = require("./src/model/BatSign");
-const batSignLocation = require("./src/model/BatSignLocation");
-const bbDataBatSignCustomLocation = require("./src/model/BBDataBatSignCustomLocation");
-const bbDataBatSignStandardLocation = require("./src/model/BBDataBatSignStandardLocation");
-const bridge = require("./src/model/Bridge");
-const bridgeAbutment = require("./src/model/BridgeAbutment");
-const bridgeBeams = require("./src/model/BridgeBeams");
-const bridgeColumns = require("./src/model/BridgeColumns");
-const bridgeConfiguration = require("./src/model/BridgeConfiguration");
-const bridgeCrossingType = require("./src/model/BridgeCrossingType");
+// BridgeFor is an orphan module ATM, so I import it here to make sure the DB
+// table is properly initialized.
 const bridgeFor = require("./src/model/BridgeFor");
-const bridgeHabitat = require("./src/model/BridgeHabitat");
-const bridgeObservation = require("./src/model/BridgeObservation");
-const bridgeSpanMaterial = require("./src/model/BridgeSpanMaterial");
-const bridgeType = require("./src/model/BridgeType");
-const bridgeUnderdeck = require("./src/model/BridgeUnderdeck");
-const bridgeWater = require("./src/model/BridgeWater");
-const region = require("./src/model/Region");
-const atDefMacroPosition = require("./src/model/AtDefMacroPosition");
-const atDefMesoSlope = require("./src/model/AtDefMesoSlope");
-const atDefAspect = require("./src/model/AtDefAspect");
-const swallowNestType = require("./src/model/BBDefSwallowNestType");
-const trDefs = require("./src/model/TrDefs");
-
-const tables = [
-  assessment,
-  batRecording,
-  batSign,
-  batSignLocation,
-  bridgeAbutment,
-  bridgeBeams,
-  bridgeColumns,
-  bridgeCrossingType,
-  bridgeFor,
-  batGuanoAmount,
-  batGuanoCollected,
-  batGuanoDistribution,
-  bridgeHabitat,
-  bridgeObservation,
-  bridgeSpanMaterial,
-  bridgeType,
-  bridgeUnderdeck,
-  bridgeWater,
-  region,
-  swallowNestType,
-  atDefMacroPosition,
-  atDefMesoSlope,
-  atDefAspect,
-  trDefs,
-];
-
-const db = require("./src/config/database");
-
-async function initDB() {
-  db.sequelize.transaction(async (transaction) => {
-    await db.sequelize.sync({ transaction });
-    await Promise.all(tables.map(async ({ init }) => {
-      if (init != null) {
-        await init(transaction);
-      }
-    }));
-  });
-}
-
-initDB().then(() =>  console.log("Database initialized"));
-
 
 startServer();

@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
 const datasheetTypes = require("../datasheettypes/ArialTelemetry.json");
-const { createDefInit } = require("./createDefInit");
+const { addAutoPopulateHook } = require("./addAutoPopulateHook");
 
 const AtDefAspect = db.sequelize.define(
   "at_def_aspect",
@@ -22,9 +22,8 @@ const AtDefAspect = db.sequelize.define(
   },
 );
 
-const init = createDefInit(AtDefAspect, datasheetTypes, "Aspect");
+addAutoPopulateHook(AtDefAspect, datasheetTypes, "Aspect");
 
 module.exports = {
   AtDefAspect,
-  init,
 };
