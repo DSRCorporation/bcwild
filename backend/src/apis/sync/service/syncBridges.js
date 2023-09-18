@@ -1,5 +1,4 @@
 const { Bridge } = require("../../../model/Bridge");
-const { sequelize } = require("../../../config/database");
 const { BridgeConfiguration } = require("../../../model/BridgeConfiguration");
 
 const toPowersOfTwo = (int) => {
@@ -65,28 +64,23 @@ const bridgeDtoToConfiguration = (bridgeId, dto) => {
   return configuration;
 };
 
-const syncBridges = async (data) =>
-  sequelize.transaction(async (transaction) => {
-    // Sync the tables
-    await Promise.all(
-      [Bridge, BridgeConfiguration].map((model) => model.sync({ transaction })),
-    );
-    const dto = data.data;
-    const { bridgeMotId } = dto;
-    let bridgeId;
-    const bridgeConfiguration = await BridgeConfiguration.findOne(
-      { where: { motBridgeID: bridgeMotId } },
-      { transaction },
-    );
-    if (bridgeConfiguration != null) {
-      bridgeId = bridgeConfiguration.bridgeId;
-    } else {
-      const bridge = await Bridge.create({}, { transaction });
-      bridgeId = bridge.id;
-    }
-    const cfg = bridgeDtoToConfiguration(bridgeId, dto);
-    await BridgeConfiguration.create(cfg, { transaction });
-  });
+const syncBridges = async (data, { transaction }) => {
+  const dto = data.data;
+  const { bridgeMotId } = dto;
+  let bridgeId;
+  const bridgeConfiguration = await BridgeConfiguration.findOne(
+    { where: { motBridgeID: bridgeMotId } },
+    { transaction },
+  );
+  if (bridgeConfiguration != null) {
+    bridgeId = bridgeConfiguration.bridgeId;
+  } else {
+    const bridge = await Bridge.create({}, { transaction });
+    bridgeId = bridge.id;
+  }
+  const cfg = bridgeDtoToConfiguration(bridgeId, dto);
+  await BridgeConfiguration.create(cfg, { transaction });
+};
 
 module.exports = {
   syncBridges,

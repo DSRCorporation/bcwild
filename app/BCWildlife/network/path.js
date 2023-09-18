@@ -17,3 +17,4 @@ export const datasyncpush_url = base_url + "/pushChanges";
 export const listbridges_url = base_url + "/bridge/list";
 export const listanimals_url = base_url + "/animal/list";
 export const uploadimage_url = base_url + "/image/upload";
+export const profileimage_url = base_url + "/profileimage";

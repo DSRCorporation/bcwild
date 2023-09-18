@@ -33,6 +33,11 @@ const multerFileToFileResult = (file) => {
   return fileResult;
 };
 
+const singleImageUploadResult = (req) => {
+  const { file } = req;
+  return { file: multerFileToFileResult(file) };
+};
+
 const imageUploadResult = (req) => {
   const { files } = req;
   return { files: files.map(multerFileToFileResult) };
@@ -60,4 +65,5 @@ const uploadImages = multerUpload.array(formDataKey);
 module.exports = {
   imageUploadResult,
   uploadImages,
+  singleImageUploadResult,
 };
