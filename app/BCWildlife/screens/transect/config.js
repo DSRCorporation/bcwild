@@ -114,6 +114,7 @@ export const transectConfig = {
       inputType: 'coordinates_button',
       firstCoordinateName: 'coordinateNorthingStart',
       secondCoordinateName: 'coordinateEastingStart',
+      optional: true,
     },
     {
       name: 'bearingStart',
@@ -262,6 +263,7 @@ export const transectConfig = {
       inputType: 'coordinates_button',
       firstCoordinateName: 'coordinateNorthingEnd',
       secondCoordinateName: 'coordinateEastingEnd',
+      optional: true,
     },
   ],
   getDefaultValues: state => state.defaultValues,
@@ -313,6 +315,7 @@ export const standConfig = {
       inputType: 'coordinates_button',
       firstCoordinateName: 'coordinateNorthing',
       secondCoordinateName: 'coordinateEasting',
+      optional: true,
     },
     {
       name: 'beu',
@@ -396,6 +399,7 @@ export const encounterConfig = {
       inputType: 'coordinates_button',
       firstCoordinateName: 'coordinateNorthingObservation',
       secondCoordinateName: 'coordinateEastingObservation',
+      optional: true,
     },
     {
       name: 'waypoint',
