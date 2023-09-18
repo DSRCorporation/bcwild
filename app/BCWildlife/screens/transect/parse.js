@@ -86,7 +86,11 @@ export const parseForm = (form, formConfig) => {
   const dto = {};
   formConfig.inputs.forEach(inputConfig => {
     const {databaseFieldName} = inputConfig;
-    dto[databaseFieldName] = parseInputValue(form, inputConfig);
+    // type === undefined means the element does not provide a form field
+    const {type} = inputConfig;
+    if (type !== undefined) {
+      dto[databaseFieldName] = parseInputValue(form, inputConfig);
+    }
   });
   return dto;
 };
