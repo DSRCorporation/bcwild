@@ -10,11 +10,20 @@ import {
   FormInput,
   useSimpleFormContext,
 } from '../../shared/components/SimpleForm';
-import { BaseButton } from "../../shared/components/BaseButton";
-import { useLocation } from "../Location";
+import {BaseButton} from '../../shared/components/BaseButton';
+import {useLocation} from '../Location';
+import {latLonToUtm10} from '../../shared/utils/convertCoords';
 
 const InputText = ({inputConfig}) => {
-  const {name, displayName, type, placeholder, editable, hint} = inputConfig;
+  const {
+    name,
+    displayName,
+    type,
+    placeholder,
+    editable,
+    hint,
+    onChangeTextCustom,
+  } = inputConfig;
   return (
     <FormInput
       name={name}
@@ -23,6 +32,7 @@ const InputText = ({inputConfig}) => {
       editable={editable}
       text={hint}
       placeholder={placeholder}
+      onChangeTextCustom={onChangeTextCustom}
     />
   );
 };
@@ -141,7 +151,13 @@ const InputTimestamp = ({inputConfig}) => {
 };
 
 const CoordinatesButton = ({inputConfig}) => {
-  const {firstCoordinateName, secondCoordinateName, displayName} = inputConfig;
+  const {
+    coordinateNorthing,
+    coordinateEasting,
+    coordinateLongitude,
+    coordinateLatitude,
+    displayName,
+  } = inputConfig;
   const {styles, setLoading, form, setForm} = useSimpleFormContext();
   const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
     useLocation();
@@ -152,10 +168,13 @@ const CoordinatesButton = ({inputConfig}) => {
         const permissionGranted = await requestLocationPermission();
         if (permissionGranted) {
           setLoading(true);
-          const {northing, easting} = await getLocation();
+          const {lat, lon} = await getLocation();
+          const {easting, northing} = latLonToUtm10(lat, lon);
           setForm(draft => {
-            draft[firstCoordinateName] = northing.toString();
-            draft[secondCoordinateName] = easting.toString();
+            draft[coordinateNorthing] = northing.toString();
+            draft[coordinateEasting] = easting.toString();
+            draft[coordinateLongitude] = lon.toString();
+            draft[coordinateLatitude] = lat.toString();
           });
           setLoading(false);
         } else {

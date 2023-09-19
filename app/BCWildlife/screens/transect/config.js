@@ -21,6 +21,7 @@ import {
   transectDefaults,
 } from '../../constants/transect/transect';
 import {nextEncounterId} from './navigation';
+import { utm10ToLatLon } from "../../shared/utils/convertCoords";
 
 export const transectConfig = {
   title: 'Transect survey',
@@ -87,33 +88,69 @@ export const transectConfig = {
       placeholder: 'Enter GPS ID',
     },
     {
-      name: 'coordinateNorthingStart',
-      databaseFieldName: 'Coordinate_Northing_start',
-      displayName: 'Start coordinate (Northing)',
+      name: 'coordinateLongitudeStart',
+      displayName: 'Start coordinate (Longitude)',
       type: 'float',
       optional: false,
       inputType: 'text',
-      editable: true,
+      editable: false,
       defaultValue: undefined,
-      placeholder: 'Enter northing',
+      placeholder: 'Longitude',
+    },
+    {
+      name: 'coordinateLatitudeStart',
+      displayName: 'Start coordinate (Latitude)',
+      type: 'float',
+      optional: false,
+      inputType: 'text',
+      editable: false,
+      defaultValue: undefined,
+      placeholder: 'Latitude',
     },
     {
       name: 'coordinateEastingStart',
       databaseFieldName: 'Coordinate_Easting_start',
-      displayName: 'Start coordinate (Easting)',
+      displayName: 'Start coordinate (Easting, UTM10)',
       type: 'float',
       optional: false,
       inputType: 'text',
       editable: true,
       defaultValue: undefined,
       placeholder: 'Enter easting',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(text, form.coordinateNorthingStart);
+        setForm(draft => {
+          draft.coordinateLatitudeStart = (lat ?? '').toString();
+          draft.coordinateLongitudeStart = (lon ?? '').toString();
+        });
+      },
+    },
+    {
+      name: 'coordinateNorthingStart',
+      databaseFieldName: 'Coordinate_Northing_start',
+      displayName: 'Start coordinate (Northing, UTM10)',
+      type: 'float',
+      optional: false,
+      inputType: 'text',
+      editable: true,
+      defaultValue: undefined,
+      placeholder: 'Enter northing',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(form.coordinateEastingStart, text);
+        setForm(draft => {
+          draft.coordinateLatitudeStart = (lat ?? '').toString();
+          draft.coordinateLongitudeStart = (lon ?? '').toString();
+        });
+      },
     },
     {
       name: 'getCurrentCoordinatesButton',
       displayName: 'Get current location',
       inputType: 'coordinates_button',
-      firstCoordinateName: 'coordinateNorthingStart',
-      secondCoordinateName: 'coordinateEastingStart',
+      coordinateNorthing: 'coordinateNorthingStart',
+      coordinateEasting: 'coordinateEastingStart',
+      coordinateLongitude: 'coordinateLongitudeStart',
+      coordinateLatitude: 'coordinateLatitudeStart',
       optional: true,
     },
     {
@@ -254,33 +291,69 @@ export const transectConfig = {
       hint: 'Total distance (m) survyed at the end of the transect.',
     },
     {
-      name: 'coordinateNorthingEnd',
-      databaseFieldName: 'Coordinate_Northing_end',
-      displayName: 'End coordinate (Northing)',
+      name: 'coordinateLongitudeEnd',
+      displayName: 'End coordinate (Longitude)',
       type: 'float',
       optional: false,
       inputType: 'text',
-      editable: true,
+      editable: false,
       defaultValue: undefined,
-      placeholder: 'Enter northing',
+      placeholder: 'Longitude',
+    },
+    {
+      name: 'coordinateLatitudeEnd',
+      displayName: 'End coordinate (Latitude)',
+      type: 'float',
+      optional: false,
+      inputType: 'text',
+      editable: false,
+      defaultValue: undefined,
+      placeholder: 'Latitude',
     },
     {
       name: 'coordinateEastingEnd',
       databaseFieldName: 'Coordinate_Easting_end',
-      displayName: 'End coordinate (Easting)',
+      displayName: 'End coordinate (Easting, UTM10)',
       type: 'float',
       optional: false,
       inputType: 'text',
       editable: true,
       defaultValue: undefined,
       placeholder: 'Enter easting',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(text, form.coordinateNorthingEnd);
+        setForm(draft => {
+          draft.coordinateLatitudeEnd = (lat ?? '').toString();
+          draft.coordinateLongitudeEnd = (lon ?? '').toString();
+        });
+      },
+    },
+    {
+      name: 'coordinateNorthingEnd',
+      databaseFieldName: 'Coordinate_Northing_end',
+      displayName: 'End coordinate (Northing, UTM10)',
+      type: 'float',
+      optional: false,
+      inputType: 'text',
+      editable: true,
+      defaultValue: undefined,
+      placeholder: 'Enter northing',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(form.coordinateEastingEnd, text);
+        setForm(draft => {
+          draft.coordinateLatitudeEnd = (lat ?? '').toString();
+          draft.coordinateLongitudeEnd = (lon ?? '').toString();
+        });
+      },
     },
     {
       name: 'getCurrentEndCoordinatesButton',
       displayName: 'Get current location',
       inputType: 'coordinates_button',
-      firstCoordinateName: 'coordinateNorthingEnd',
-      secondCoordinateName: 'coordinateEastingEnd',
+      coordinateNorthing: 'coordinateNorthingEnd',
+      coordinateEasting: 'coordinateEastingEnd',
+      coordinateLongitude: 'coordinateLongitudeEnd',
+      coordinateLatitude: 'coordinateLatitudeEnd',
       optional: true,
     },
   ],
@@ -310,29 +383,65 @@ export const standConfig = {
       hint: 'Distance along transect in metres that the edge between stands is observed.',
     },
     {
-      name: 'coordinateNorthing',
-      databaseFieldName: 'Coordinate_Northing',
-      displayName: 'Coordinate (Northing)',
+      name: 'coordinateLongitude',
+      displayName: 'Coordinate (Longitude)',
       type: 'float',
       optional: false,
+      inputType: 'text',
+      editable: false,
       defaultValue: undefined,
-      placeholder: 'Enter northing',
+      placeholder: 'Longitude',
+    },
+    {
+      name: 'coordinateLatitude',
+      displayName: 'Coordinate (Latitude)',
+      type: 'float',
+      optional: false,
+      inputType: 'text',
+      editable: false,
+      defaultValue: undefined,
+      placeholder: 'Latitude',
     },
     {
       name: 'coordinateEasting',
       databaseFieldName: 'Coordinate_Easting',
-      displayName: 'Coordinate (Easting)',
+      displayName: 'Coordinate (Easting, UTM10)',
       type: 'float',
       optional: false,
       defaultValue: undefined,
       placeholder: 'Enter easting',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(text, form.coordinateNorthing);
+        setForm(draft => {
+          draft.coordinateLatitude = (lat ?? '').toString();
+          draft.coordinateLongitude = (lon ?? '').toString();
+        });
+      },
+    },
+    {
+      name: 'coordinateNorthing',
+      databaseFieldName: 'Coordinate_Northing',
+      displayName: 'Coordinate (Northing, UTM10)',
+      type: 'float',
+      optional: false,
+      defaultValue: undefined,
+      placeholder: 'Enter northing',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(form.coordinateEasting, text);
+        setForm(draft => {
+          draft.coordinateLatitude = (lat ?? '').toString();
+          draft.coordinateLongitude = (lon ?? '').toString();
+        });
+      },
     },
     {
       name: 'getCurrentCoordinatesButton',
       displayName: 'Get current location',
       inputType: 'coordinates_button',
-      firstCoordinateName: 'coordinateNorthing',
-      secondCoordinateName: 'coordinateEasting',
+      coordinateNorthing: 'coordinateNorthing',
+      coordinateEasting: 'coordinateEasting',
+      coordinateLongitude: 'coordinateLongitude',
+      coordinateLatitude: 'coordinateLatitude',
       optional: true,
     },
     {
@@ -394,29 +503,71 @@ export const encounterConfig = {
       defaultValue: undefined,
     },
     {
-      name: 'coordinateNorthingObservation',
-      databaseFieldName: 'Coordinate_Northing_observation',
-      displayName: 'Coordinate (Northing)',
+      name: 'coordinateLongitudeObservation',
+      displayName: 'Coordinate (Longitude)',
       type: 'float',
       optional: false,
+      inputType: 'text',
+      editable: false,
       defaultValue: undefined,
-      placeholder: 'Enter northing',
+      placeholder: 'Longitude',
+    },
+    {
+      name: 'coordinateLatitudeObservation',
+      displayName: 'Coordinate (Latitude)',
+      type: 'float',
+      optional: false,
+      inputType: 'text',
+      editable: false,
+      defaultValue: undefined,
+      placeholder: 'Latitude',
     },
     {
       name: 'coordinateEastingObservation',
       databaseFieldName: 'Coordinate_Easting_observation',
-      displayName: 'Coordinate (Easting)',
+      displayName: 'Coordinate (Easting, UTM10)',
       type: 'float',
       optional: false,
       defaultValue: undefined,
       placeholder: 'Enter easting',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(
+          text,
+          form.coordinateNorthingObservation,
+        );
+        setForm(draft => {
+          draft.coordinateLatitudeObservation = (lat ?? '').toString();
+          draft.coordinateLongitudeObservation = (lon ?? '').toString();
+        });
+      },
+    },
+    {
+      name: 'coordinateNorthingObservation',
+      databaseFieldName: 'Coordinate_Northing_observation',
+      displayName: 'Coordinate (Northing, UTM10)',
+      type: 'float',
+      optional: false,
+      defaultValue: undefined,
+      placeholder: 'Enter northing',
+      onChangeTextCustom: (name, text, form, setForm) => {
+        const {lat, lon} = utm10ToLatLon(
+          form.coordinateEastingObservation,
+          text,
+        );
+        setForm(draft => {
+          draft.coordinateLatitudeObservation = (lat ?? '').toString();
+          draft.coordinateLongitudeObservation = (lon ?? '').toString();
+        });
+      },
     },
     {
       name: 'getCurrentCoordinatesButton',
       displayName: 'Get current location',
       inputType: 'coordinates_button',
-      firstCoordinateName: 'coordinateNorthingObservation',
-      secondCoordinateName: 'coordinateEastingObservation',
+      coordinateNorthing: 'coordinateNorthingObservation',
+      coordinateEasting: 'coordinateEastingObservation',
+      coordinateLongitude: 'coordinateLongitudeObservation',
+      coordinateLatitude: 'coordinateLatitudeObservation',
       optional: true,
     },
     {
