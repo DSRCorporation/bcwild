@@ -83,10 +83,6 @@ const DashboardScreen = ({route, navigation}) => {
     navigation.navigate('Transect');
   };
 
-  const handleTelemetryTriangulation = () => {
-    navigation.navigate('TelemetryTriangulation');
-  };
-
   const handleCameraTrapData = () => {
     navigation.navigate('CameraTrapData');
   };
@@ -206,13 +202,6 @@ const DashboardScreen = ({route, navigation}) => {
               <Image
                 style={{height: 95, width: 95, resizeMode: 'contain'}}
                 source={require('../assets/telemetry.png')}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => handleTelemetryTriangulation()}>
-              <Image
-                style={{height: 100, width: 100, resizeMode: 'contain'}}
-                source={require('../assets/gtele.png')}
               />
             </TouchableOpacity>
           </View>
