@@ -40,12 +40,8 @@ export const useLocation = () => {
       Geolocation.getCurrentPosition(
         position => {
           const {latitude, longitude} = position.coords;
-          const utmCoordinates = [latitude, longitude];
-          const coords = getUTMCoordinates(utmCoordinates);
-          console.log(
-            `Northing: ${coords.northing}, Easting: ${coords.easting}`,
-          );
-          resolve(coords);
+          console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+          resolve({lat: latitude, lon: longitude});
         },
         error => {
           console.warn(`Error getting current location ${error.message}`);

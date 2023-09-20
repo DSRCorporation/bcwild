@@ -82,8 +82,6 @@ const Stands = ({stands, onEdit, onAddStand}) => {
 const TransectFormBody = ({callback, params, state, onSave, onCancel}) => {
   const {styles, form, setLoading, loading} = useSimpleFormContext();
   const [defaultValues, setDefaultValues] = useState(null);
-  const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
-    useLocation();
 
   const onAddStand = async () => {
     setLoading(true);
@@ -108,23 +106,6 @@ const TransectFormBody = ({callback, params, state, onSave, onCancel}) => {
       }
     }
   }, [form, onSave]);
-
-  const getCurrentLocation = useCallback(async () => {
-    const permissionGranted = await requestLocationPermission();
-    if (permissionGranted) {
-      setLoading(true);
-      const coords = await getLocation();
-      setLoading(false);
-      return coords;
-    } else {
-      showPermissionRequiredAlert();
-    }
-  }, [
-    requestLocationPermission,
-    getLocation,
-    setLoading,
-    showPermissionRequiredAlert,
-  ]);
 
   useEffect(() => {
     const loadDefaultValues = async () => {

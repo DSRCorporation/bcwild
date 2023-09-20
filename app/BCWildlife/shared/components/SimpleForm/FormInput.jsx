@@ -16,24 +16,27 @@ const WithSuffix = ({ children, suffix }) => {
   );
 }
 
-export const FormInput = ({ name, label, placeholder, multiline, numeric, suffix, textInputProps, editable, text }) => {
-  const {styles, config, form, nameUpdater} = useSimpleFormContext();
+export const FormInput = ({ name, label, placeholder, multiline, numeric, suffix, textInputProps, editable, text, onChangeTextCustom }) => {
+  const {styles, config, form, setForm, nameUpdater} = useSimpleFormContext();
   const labels = config.labels || {}; // name-defined labels if available
   const onChangeText = useMemo(() => nameUpdater(name), [nameUpdater, name]);
   let value = form[name];
-  if (typeof value !== 'string') {
-    value = '';
+  if ((typeof value).toString() !== 'string') {
     console.warn(`FormInput '${name}': invalid value type '${typeof value}'`);
+    value = '';
   }
   const textInput = (
     <TextInput
       editable={editable}
       value={value}
-      onChangeText={onChangeText}
+      onChangeText={text => {
+        onChangeText(text);
+        onChangeTextCustom && onChangeTextCustom(name, text, form, setForm);
+      }}
       multiline={multiline}
       placeholder={placeholder}
       keyboardType={numeric ? Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric' : undefined}
-      style={styles.textInput}
+      style={{...styles.textInput, opacity: editable ?? true ? 1 : 0.5}}
       {...textInputProps}
     />
   );

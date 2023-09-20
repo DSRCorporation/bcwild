@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import { View, TextInput, Alert, Text } from "react-native";
+import {View, TextInput, Alert, Text} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import {InputLabel} from '../../shared/components/InputLabel';
@@ -32,6 +32,7 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {RecordType} from '../../utility/RecordType';
 import {useLocation} from '../Location';
 import LoadingOverlay from '../../utility/LoadingOverlay';
+import {latLonToUtm10, utm10ToLatLon} from '../../shared/utils/convertCoords';
 
 const BridgeFormScreen = ({route}) => {
   const styles = useFormScreenStyles();
@@ -46,6 +47,8 @@ const BridgeFormScreen = ({route}) => {
     bridgeName: '',
     longitude: '',
     latitude: '',
+    easting: '',
+    northing: '',
     roadOrHighway: '',
     motBridgeId: '',
     bridgeType: '',
@@ -101,10 +104,13 @@ const BridgeFormScreen = ({route}) => {
     const permissionGranted = await requestLocationPermission();
     if (permissionGranted) {
       setLoading(true);
-      const {northing, easting} = await getLocation();
+      const {lat, lon} = await getLocation();
+      const {easting, northing} = latLonToUtm10(lat, lon);
       setForm(draft => {
-        draft.latitude = northing;
-        draft.longitude = easting;
+        draft.latitude = lat;
+        draft.longitude = lon;
+        draft.easting = easting ?? '';
+        draft.northing = northing ?? '';
       });
       setLoading(false);
     } else {
@@ -194,16 +200,12 @@ const BridgeFormScreen = ({route}) => {
               </View>
               <View style={styles.inputContainer}>
                 <InputLabel>Coordinates long/lat</InputLabel>
-                <View style={{flexDirection: 'row', gap: 8}}>
+                <View style={{flexDirection: 'row', gap: 8, opacity: 0.5}}>
                   <View style={{flex: 1}}>
                     <TextInput
                       keyboardType="numeric"
-                      placeholder="Enter longitude"
-                      onChangeText={value =>
-                        setForm(draft => {
-                          draft.longitude = value;
-                        })
-                      }
+                      placeholder="Longitude"
+                      editable={false}
                       value={form.longitude.toString()}
                       style={styles.textInput}
                     />
@@ -211,25 +213,58 @@ const BridgeFormScreen = ({route}) => {
                   <View style={{flex: 1}}>
                     <TextInput
                       keyboardType="numeric"
-                      placeholder="Enter latitude"
-                      onChangeText={value =>
-                        setForm(draft => {
-                          draft.latitude = value;
-                        })
-                      }
+                      placeholder="Latitude"
+                      editable={false}
                       value={form.latitude.toString()}
                       style={[styles.textInput, {flex: 2}]}
                     />
                   </View>
                 </View>
-                <BaseButton
-                  onPress={getCurrentLocation}
-                  style={styles.button}
-                  accessibilityLabel="get current location"
-                  testID="getCurrentLocation">
-                  <Text style={styles.buttonText}>Get current location</Text>
-                </BaseButton>
               </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>Coordinates Easting/Northing (UTM10)</InputLabel>
+                <View style={{flexDirection: 'row', gap: 8}}>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Enter easting"
+                      onChangeText={value => {
+                        const {lat, lon} = utm10ToLatLon(value, form.northing);
+                        setForm(draft => {
+                          draft.easting = value;
+                          draft.latitude = lat ?? '';
+                          draft.longitude = lon ?? '';
+                        });
+                      }}
+                      value={form.easting.toString()}
+                      style={styles.textInput}
+                    />
+                  </View>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Enter northing"
+                      onChangeText={value => {
+                        const {lat, lon} = utm10ToLatLon(form.easting, value);
+                        setForm(draft => {
+                          draft.northing = value;
+                          draft.latitude = lat ?? '';
+                          draft.longitude = lon ?? '';
+                        });
+                      }}
+                      value={form.northing.toString()}
+                      style={[styles.textInput, {flex: 2}]}
+                    />
+                  </View>
+                </View>
+              </View>
+              <BaseButton
+                onPress={getCurrentLocation}
+                style={styles.button}
+                accessibilityLabel="get current location"
+                testID="getCurrentLocation">
+                <Text style={styles.buttonText}>Get current location</Text>
+              </BaseButton>
               <View style={styles.inputContainer}>
                 <InputLabel>Road/Highway</InputLabel>
                 <TextInput
@@ -407,10 +442,10 @@ const BridgeFormScreen = ({route}) => {
                   <BouncyCheckbox
                     key={item.id}
                     onPress={() => {
-                    setForm(draft => {
-                      if (draft.bridgeIfFor.includes(item.id)) {
-                        draft.bridgeIfFor = draft.bridgeIfFor.filter(
-                          id => id !== item.id,
+                      setForm(draft => {
+                        if (draft.bridgeIfFor.includes(item.id)) {
+                          draft.bridgeIfFor = draft.bridgeIfFor.filter(
+                            id => id !== item.id,
                           );
                         } else {
                           draft.bridgeIfFor = [...draft.bridgeIfFor, item.id];

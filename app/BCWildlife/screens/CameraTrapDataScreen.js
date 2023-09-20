@@ -20,6 +20,7 @@ import LoadingOverlay from '../utility/LoadingOverlay';
 import {BaseButton} from '../shared/components/BaseButton';
 import {InputLabel} from '../shared/components/InputLabel';
 import {GalleryPicker} from '../shared/components/GalleryPicker';
+import { latLonToUtm10, utm10ToLatLon } from "../shared/utils/convertCoords";
 
 const CameraTrapDataScreen = () => {
   const [projects, setProjects] = React.useState([]);
@@ -39,6 +40,8 @@ const CameraTrapDataScreen = () => {
   const [dateTime, setDateTime] = React.useState('');
   const [stationId, setStationId] = React.useState('');
   const [stationNorthing, setStationNorthing] = React.useState('');
+  const [stationLat, setStationLat] = React.useState('');
+  const [stationLon, setStationLon] = React.useState('');
   const [stationEasting, setStationEasting] = React.useState('');
   const [securityBox, setSecurityBox] = React.useState('');
   const [cameraHeight, setCameraHeight] = React.useState('');
@@ -92,7 +95,10 @@ const CameraTrapDataScreen = () => {
     const permissionGranted = await requestLocationPermission();
     if (permissionGranted) {
       setLoading(true);
-      const {northing, easting} = await getLocation();
+      const {lat, lon} = await getLocation();
+      const {easting, northing} = latLonToUtm10(lat, lon);
+      setStationLat(lat);
+      setStationLon(lon);
       setStationNorthing(northing);
       setStationEasting(easting);
       setLoading(false);
@@ -346,6 +352,8 @@ const CameraTrapDataScreen = () => {
     setStationId('');
     setStationNorthing('');
     setStationEasting('');
+    setStationLat('');
+    setStationLon('');
     setSecurityBox('');
     setCameraHeight('');
     setCameraDirection('');
@@ -597,29 +605,73 @@ const CameraTrapDataScreen = () => {
           </View>
           {isDeployView ? (
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}> Station northing </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Station northing"
-                keyboardType="default"
-                value={stationNorthing.toString()}
-                onChangeText={text => setStationNorthing(text)}
-              />
-              <Text style={styles.inputLabel}> Station easting </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Station easting"
-                keyboardType="default"
-                value={stationEasting.toString()}
-                onChangeText={text => setStationEasting(text)}
-              />
-              <BaseButton
-                onPress={getCurrentLocation}
-                style={styles.button}
-                accessibilityLabel="get current location"
-                testID="getCurrentLocation">
-                <Text style={styles.buttonText}>Get current location</Text>
-              </BaseButton>
+              <View style={styles.inputContainer}>
+                <InputLabel>Coordinates long/lat</InputLabel>
+                <View style={{flexDirection: 'row', gap: 8, opacity: 0.5}}>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Longitude"
+                      editable={false}
+                      value={stationLon.toString()}
+                      style={styles.input}
+                    />
+                  </View>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Latitude"
+                      editable={false}
+                      value={stationLat.toString()}
+                      style={[styles.input, {flex: 2}]}
+                    />
+                  </View>
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <InputLabel>Station Easting/Northing (UTM10)</InputLabel>
+                <View style={{flexDirection: 'row', gap: 8}}>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Enter easting"
+                      onChangeText={value => {
+                        const {lat, lon} = utm10ToLatLon(
+                          value,
+                          stationNorthing,
+                        );
+                        setStationEasting(value);
+                        setStationLat(lat ?? '');
+                        setStationLon(lon ?? '');
+                      }}
+                      value={stationEasting.toString()}
+                      style={styles.input}
+                    />
+                  </View>
+                  <View style={{flex: 1}}>
+                    <TextInput
+                      keyboardType="numeric"
+                      placeholder="Enter northing"
+                      onChangeText={value => {
+                        const {lat, lon} = utm10ToLatLon(stationEasting, value);
+                        setStationNorthing(value);
+                        setStationLat(lat ?? '');
+                        setStationLon(lon ?? '');
+                      }}
+                      value={stationNorthing.toString()}
+                      style={[styles.input, {flex: 2}]}
+                    />
+                  </View>
+                </View>
+                <BaseButton
+                  onPress={getCurrentLocation}
+                  style={styles.button}
+                  accessibilityLabel="get current location"
+                  testID="getCurrentLocation">
+                  <Text style={styles.buttonText}>Get current location</Text>
+                </BaseButton>
+              </View>
+
               <Text style={styles.inputLabel}> Camera Attached </Text>
               <View style={styles.dropdownContainer}>
                 <Picker
