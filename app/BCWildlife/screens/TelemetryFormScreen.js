@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,17 @@ import {
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import {getUsernameG} from '../global';
+import {getTriangulationResults, getUsernameG} from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
 import {getTelemetryStr, setTelemetryStr} from '../global';
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 import {RecordType} from '../utility/RecordType';
+import {InputLabel} from '../shared/components/InputLabel';
+import {latLonToUtm10, utm10ToLatLon} from '../shared/utils/convertCoords';
+import {BaseButton} from '../shared/components/BaseButton';
+import {useLocation} from './Location';
+import LoadingOverlay from '../utility/LoadingOverlay';
+import {useIsFocused} from '@react-navigation/native';
 
 const TelemetryFormScreen = ({navigation}) => {
   const [projects, setProjects] = React.useState([]);
@@ -30,13 +36,87 @@ const TelemetryFormScreen = ({navigation}) => {
   const [precipitation, setPrecipitation] = useState('');
   const [windSpeed, setWindSpeed] = useState('');
   const [elementIdentified, setElementIdentify] = useState('');
-  const [useTriangulation, setUseTriangulation] = useState('');
   const [comments, setComments] = React.useState('');
   const [recordIdentifier, setRecordIdentifier] = React.useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [easting, setEasting] = React.useState('');
+  const [northing, setNorthing] = React.useState('');
+  const [eastingError, setEastingError] = React.useState('');
+  const [northingError, setNorthingError] = React.useState('');
+  const [longitudeCustom, setLongitudeCustom] = React.useState('');
+  const [latitudeCustom, setLatitudeCustom] = React.useState('');
+  const [eastingCustom, setEastingCustom] = React.useState('');
+  const [northingCustom, setNorthingCustom] = React.useState('');
+  const [loading, setLoading] = useState(false);
+  const [triangulationResults, setTriangulationResults] = useState(
+    getTriangulationResults(),
+  );
+  const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
+    useLocation();
+
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     handleLocalValues();
   }, []);
+
+  useEffect(() => {
+    setTriangulationResults(getTriangulationResults());
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (elementIdentified === 'yes') {
+      setLongitude(longitudeCustom);
+      setLatitude(latitudeCustom);
+      setEasting(eastingCustom);
+      setNorthing(northingCustom);
+      setEastingError('0');
+      setNorthingError('0');
+    } else if (elementIdentified === 'no') {
+      const {lat, lon} = utm10ToLatLon(
+        triangulationResults.easting,
+        triangulationResults.northing,
+      );
+      setLongitude(lon ?? '');
+      setLatitude(lat ?? '');
+      setEasting(triangulationResults.easting ?? '');
+      setNorthing(triangulationResults.northing ?? '');
+      setEastingError(triangulationResults.eastingError ?? '');
+      setNorthingError(triangulationResults.northingError ?? '');
+    }
+  }, [
+    eastingCustom,
+    elementIdentified,
+    latitudeCustom,
+    longitudeCustom,
+    northingCustom,
+    triangulationResults.easting,
+    triangulationResults.eastingError,
+    triangulationResults.northing,
+    triangulationResults.northingError,
+  ]);
+
+  const getCurrentLocation = useCallback(async () => {
+    const permissionGranted = await requestLocationPermission();
+    if (permissionGranted) {
+      setLoading(true);
+      const {lat, lon} = await getLocation();
+      const {easting, northing} = latLonToUtm10(lat, lon);
+      setLatitudeCustom(lat);
+      setLongitudeCustom(lon);
+      setNorthingCustom(northing);
+      setEastingCustom(easting);
+      setLoading(false);
+    } else {
+      showPermissionRequiredAlert();
+    }
+  }, [
+    requestLocationPermission,
+    getLocation,
+    setLoading,
+    showPermissionRequiredAlert,
+  ]);
 
   const handleSave = () => {
     console.log('save');
@@ -218,7 +298,6 @@ const TelemetryFormScreen = ({navigation}) => {
     setWindSpeed(defaultWindSpeed);
     setElementIdentify(defaultElementIdentified);
     setComments(defaultComments);
-    setUseTriangulation('');
     setRecordIdentifier('');
   }
 
@@ -278,12 +357,8 @@ const TelemetryFormScreen = ({navigation}) => {
       return;
     }
     const location_comments = comments || '';
-    if (!useTriangulation) {
-      Alert.alert('Please select use triangulation');
-      return;
-    }
 
-    const triangulation = useTriangulation === 'yes' ? getTelemetryStr() : null;
+    const triangulation = elementIdentified === 'no' ? getTelemetryStr() : null;
 
     const data = {
       date: dateTime,
@@ -501,6 +576,99 @@ const TelemetryFormScreen = ({navigation}) => {
             </Picker>
           </View>
 
+          <View style={styles.inputContainer}>
+            <View style={styles.inputContainer}>
+              <InputLabel>Coordinates long/lat</InputLabel>
+              <View style={{flexDirection: 'row', gap: 8, opacity: 0.5}}>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Longitude"
+                    editable={false}
+                    value={longitude.toString()}
+                    style={styles.input}
+                  />
+                </View>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Latitude"
+                    editable={false}
+                    value={latitude.toString()}
+                    style={[styles.input, {flex: 2}]}
+                  />
+                </View>
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Station Easting/Northing (UTM10)</InputLabel>
+              <View style={{flexDirection: 'row', gap: 8}}>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Enter easting"
+                    onChangeText={value => {
+                      const {lat, lon} = utm10ToLatLon(value, northing);
+                      setEastingCustom(value);
+                      setLatitudeCustom(lat ?? '');
+                      setLongitudeCustom(lon ?? '');
+                    }}
+                    editable={elementIdentified === 'yes'}
+                    value={easting.toString()}
+                    style={styles.input}
+                  />
+                </View>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Enter northing"
+                    onChangeText={value => {
+                      const {lat, lon} = utm10ToLatLon(easting, value);
+                      setNorthingCustom(value);
+                      setLatitudeCustom(lat ?? '');
+                      setLongitudeCustom(lon ?? '');
+                    }}
+                    editable={elementIdentified === 'yes'}
+                    value={northing.toString()}
+                    style={[styles.input, {flex: 2}]}
+                  />
+                </View>
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Error Easting/Northing (UTM10)</InputLabel>
+              <View style={{flexDirection: 'row', gap: 8}}>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Error easting"
+                    editable={false}
+                    value={eastingError.toString()}
+                    style={styles.input}
+                  />
+                </View>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Error northing"
+                    editable={false}
+                    value={northingError.toString()}
+                    style={[styles.input, {flex: 2}]}
+                  />
+                </View>
+              </View>
+              {elementIdentified && elementIdentified === 'yes' && (
+                <BaseButton
+                  onPress={getCurrentLocation}
+                  style={styles.button}
+                  accessibilityLabel="get current location"
+                  testID="getCurrentLocation">
+                  <Text style={styles.buttonText}>Get current location</Text>
+                </BaseButton>
+              )}
+            </View>
+          </View>
+
           <Text style={styles.inputLabel}> Comments </Text>
           <TextInput
             multiline
@@ -511,39 +679,30 @@ const TelemetryFormScreen = ({navigation}) => {
             placeholder="Comments"
           />
 
-          <Text style={styles.inputLabel}> Use Triangulation ? </Text>
-          <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={useTriangulation}
-              onValueChange={itemValue => setUseTriangulation(itemValue)}>
-              <Picker.Item label="Select" value={null} />
-              <Picker.Item label="Yes" value="yes" />
-              <Picker.Item label="No" value="no" />
-            </Picker>
-          </View>
-
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#234075',
-              borderRadius: 10,
-              marginTop: 20,
-              marginBottom: 20,
-              padding: 10,
-              justifyContent: 'center',
-            }}
-            onPress={handleTriangulation}
-            accessibilityLabel="next button"
-            testID="nextButton">
-            <Text
+          {elementIdentified && elementIdentified === 'no' && (
+            <TouchableOpacity
               style={{
-                color: '#fff',
-                fontWeight: 'bold',
-                fontSize: 18,
-                textAlign: 'center',
-              }}>
-              Triangulate
-            </Text>
-          </TouchableOpacity>
+                backgroundColor: '#234075',
+                borderRadius: 10,
+                marginTop: 20,
+                marginBottom: 20,
+                padding: 10,
+                justifyContent: 'center',
+              }}
+              onPress={handleTriangulation}
+              accessibilityLabel="next button"
+              testID="nextButton">
+              <Text
+                style={{
+                  color: '#fff',
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                  textAlign: 'center',
+                }}>
+                Triangulate
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={{
@@ -569,6 +728,7 @@ const TelemetryFormScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <LoadingOverlay loading={loading} />
     </View>
   );
 };
