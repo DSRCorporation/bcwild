@@ -548,9 +548,9 @@ const ProfileScreen = ({navigation}) => {
             onPress={() =>
               showAlert('Logout', 'Are you sure you want to Logout?')
             }>
-            <Image
+            <VectorImage
               style={styles.l_image}
-              source={require('../assets/logout.png')}
+              source={require('../assets/logout.svg')}
             />
           </TouchableOpacity>
         </View>
@@ -724,9 +724,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   l_image: {
-    width: 60,
-    height: 60,
+    width: 32,
+    height: 32,
     resizeMode: 'contain',
+    marginTop: 24,
   },
 
   text: {

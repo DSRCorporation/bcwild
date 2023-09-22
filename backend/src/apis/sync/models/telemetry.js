@@ -58,6 +58,9 @@ const Telemetry = db.sequelize.define(
     northing_error: {
       type: Sequelize.REAL,
     },
+    error_area: {
+      type: Sequelize.REAL,
+    },
     location_comments: {
       type: Sequelize.TEXT,
     },

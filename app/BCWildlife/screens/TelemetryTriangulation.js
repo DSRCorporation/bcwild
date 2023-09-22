@@ -78,9 +78,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
       biases.push(
         entry.bias === '--' ? signalStrength : parseFloat(entry.bias),
       );
-      signalStrengths.push(
-        entry.signal === 'constant' ? 0.001 : 0
-      );
+      signalStrengths.push(0.001);
     }
 
     // Calculate weights based on signal strengths
@@ -152,7 +150,13 @@ const TelemetryTriangulationScreen = ({navigation}) => {
     const triangCorr = 0.619693624719674; // default correlation coefficient
     const numBearingsUsed = bearings.length;
 
-    setTriangulationResults(triangEasting, triangNorthing, sEx, sEy);
+    setTriangulationResults(
+      triangEasting,
+      triangNorthing,
+      sEx,
+      sEy,
+      triangErrorArea,
+    );
 
     // Log the triangulation results to console
     console.log(`Triang_easting: ${triangEasting.toFixed(4)}`);
@@ -166,13 +170,12 @@ const TelemetryTriangulationScreen = ({navigation}) => {
 
     Alert.alert(
       'Result',
-      `Triang_easting: ${triangEasting.toFixed(
-        4,
-      )}\nTriang_northing: ${triangNorthing.toFixed(
-        4,
-      )}\nErrror_area: ${triangErrorArea.toFixed(
-        4,
-      )}\nTriang_SD: ${triangSD}\n\nTriang_corr: ${triangCorr}\nNumber_bearings_used: ${numBearingsUsed}`,
+      `Easting: ${triangEasting.toFixed(4)}
+      \nNorthing: ${triangNorthing.toFixed(4)}
+      \nError Easting: ${sEx.toFixed(4)}
+      \nError Northing: ${sEy.toFixed(4)}
+      \nError area: ${triangErrorArea}
+      \nNumber of bearings used: ${numBearingsUsed}`,
       [
         {text: 'Cancel', onPress: () => {}},
         {text: 'Save', onPress: () => navigation.goBack()},
