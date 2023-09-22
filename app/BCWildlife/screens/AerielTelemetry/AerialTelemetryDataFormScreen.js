@@ -260,7 +260,7 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                   <View style={{flexDirection: 'row', gap: 8}}>
                     <View style={{flex: 1}}>
                       <TextInput
-                        value={form.easting.toString()}
+                        value={form.easting?.toString() ?? ''}
                         keyboardType="numeric"
                         onChangeText={value => {
                           const {lat, lon} = utm10ToLatLon(
@@ -279,7 +279,7 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                     </View>
                     <View style={{flex: 1}}>
                       <TextInput
-                        value={form.northing.toString()}
+                        value={form.northing?.toString() ?? ''}
                         keyboardType="numeric"
                         onChangeText={value => {
                           const {lat, lon} = utm10ToLatLon(form.easting, value);

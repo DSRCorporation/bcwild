@@ -236,7 +236,7 @@ const BridgeFormScreen = ({route}) => {
                           draft.longitude = lon ?? '';
                         });
                       }}
-                      value={form.easting.toString()}
+                      value={form.easting?.toString() ?? ''}
                       style={styles.textInput}
                     />
                   </View>
@@ -252,7 +252,7 @@ const BridgeFormScreen = ({route}) => {
                           draft.longitude = lon ?? '';
                         });
                       }}
-                      value={form.northing.toString()}
+                      value={form.northing?.toString() ?? ''}
                       style={[styles.textInput, {flex: 2}]}
                     />
                   </View>
