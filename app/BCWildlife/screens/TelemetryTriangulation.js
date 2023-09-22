@@ -10,18 +10,36 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {ScrollView} from 'react-native-gesture-handler';
-import { getTelemetryStr, setTelemetryStr, setTriangulationResults } from "../global";
+import {
+  getTelemetryStr,
+  setTelemetryStr,
+  setTriangulationResults,
+} from '../global';
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 
 const TelemetryTriangulationScreen = () => {
   const [entries, setEntries] = useState([
-    {time: '', northing: '', easting: '', bearing: '', signal: '', bias: ''},
+    {
+      time: '',
+      northing: '',
+      easting: '',
+      bearing: '',
+      signal: 'constant',
+      bias: '',
+    },
   ]);
 
   const handleAddEntry = () => {
     setEntries([
       ...entries,
-      {time: '', northing: '', easting: '', bearing: '', signal: '', bias: ''},
+      {
+        time: '',
+        northing: '',
+        easting: '',
+        bearing: '',
+        signal: 'constant',
+        bias: '',
+      },
     ]);
     setTelemetryStr(entries);
   };
@@ -49,6 +67,7 @@ const TelemetryTriangulationScreen = () => {
     let eastings = [];
     let northings = [];
     let signalStrengths = [];
+    let biases = [];
 
     // Extract bearings, eastings, northings, and signal strengths from entries
     for (let i = 0; i < entries.length; i++) {
@@ -56,8 +75,11 @@ const TelemetryTriangulationScreen = () => {
       bearings.push((parseFloat(entry.bearing) * Math.PI) / 180); // convert bearings to radians
       eastings.push(parseFloat(entry.easting));
       northings.push(parseFloat(entry.northing));
+      biases.push(
+        entry.bias === '--' ? signalStrength : parseFloat(entry.bias),
+      );
       signalStrengths.push(
-        entry.signal === '--' ? signalStrength : parseFloat(entry.signal),
+        entry.signal === 'constant' ? 0.001 : 0
       );
     }
 
