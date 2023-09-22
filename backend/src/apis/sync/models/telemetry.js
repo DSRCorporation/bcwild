@@ -46,35 +46,20 @@ const Telemetry = db.sequelize.define(
     element_identified: {
       type: Sequelize.STRING(50),
     },
+    easting: {
+      type: Sequelize.REAL,
+    },
+    northing: {
+      type: Sequelize.REAL,
+    },
+    easting_error: {
+      type: Sequelize.REAL,
+    },
+    northing_error: {
+      type: Sequelize.REAL,
+    },
     location_comments: {
       type: Sequelize.TEXT,
-    },
-    bearing_id: {
-      type: Sequelize.STRING(50),
-    },
-    bearing_easting: {
-      type: Sequelize.STRING(50),
-    },
-    bearing_northing: {
-      type: Sequelize.STRING(50),
-    },
-    time_bearing_collected: {
-      type: Sequelize.STRING(50),
-    },
-    azimuth: {
-      type: Sequelize.STRING(50),
-    },
-    signal_assessment: {
-      type: Sequelize.STRING(50),
-    },
-    bias_assessment: {
-      type: Sequelize.STRING(50),
-    },
-    bearing_notes: {
-      type: Sequelize.TEXT,
-    },
-    triangulation_use: {
-      type: Sequelize.STRING(50),
     },
     triangulation: {
       type: Sequelize.ARRAY(Sequelize.JSON),

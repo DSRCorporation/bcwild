@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {ScrollView} from 'react-native-gesture-handler';
-import {getTelemetryStr, setTelemetryStr} from '../global';
+import { getTelemetryStr, setTelemetryStr, setTriangulationResults } from "../global";
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 
 const TelemetryTriangulationScreen = () => {
@@ -129,6 +129,8 @@ const TelemetryTriangulationScreen = () => {
     const triangNorthing = ymean;
     const triangCorr = 0.619693624719674; // default correlation coefficient
     const numBearingsUsed = bearings.length;
+
+    setTriangulationResults(triangEasting, triangNorthing, sEx, sEy);
 
     // Log the triangulation results to console
     console.log(`Triang_easting: ${triangEasting.toFixed(4)}`);

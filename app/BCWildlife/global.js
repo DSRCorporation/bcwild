@@ -1,41 +1,60 @@
 let accessToken = '';
 let refreshToken = '';
-let usernameG='';
-let telemetryStr='';
+let usernameG = '';
+let telemetryStr = '';
+let triangulationResults = {
+  easting: undefined,
+  northing: undefined,
+  eastingError: undefined,
+  northingError: undefined,
+};
 
-
-export const setTelemetryStr = (str) => {
+export const setTelemetryStr = str => {
   telemetryStr = str;
-}
+};
 
 export const getTelemetryStr = () => {
   return telemetryStr;
-}
+};
 
+export const setTriangulationResults = (
+  easting,
+  northing,
+  eastingError,
+  northingError,
+) => {
+  triangulationResults = {
+    easting: easting,
+    northing: northing,
+    eastingError: eastingError,
+    northingError: northingError,
+  };
+};
 
+export const getTriangulationResults = () => {
+  return triangulationResults;
+};
 
-export const setUsernameG = (name) => {
+export const setUsernameG = name => {
   usernameG = name;
-}
+};
 
 export const getUsernameG = () => {
   return usernameG;
-}
+};
 
-
-export const setAccessToken = (token) => {
+export const setAccessToken = token => {
   accessToken = token;
-}
+};
 
-export const setRefreshToken = (token) => {
-    refreshToken = token;
-}
+export const setRefreshToken = token => {
+  refreshToken = token;
+};
 
 export const getRefreshToken = () => {
-    return refreshToken;
-}
-
+  return refreshToken;
+};
 
 export const getAccessToken = () => {
   return accessToken;
-}
+};
