@@ -7,6 +7,7 @@ let triangulationResults = {
   northing: undefined,
   eastingError: undefined,
   northingError: undefined,
+  errorArea: undefined,
 };
 
 export const setTelemetryStr = str => {
@@ -22,12 +23,14 @@ export const setTriangulationResults = (
   northing,
   eastingError,
   northingError,
+  errorArea,
 ) => {
   triangulationResults = {
     easting: easting,
     northing: northing,
     eastingError: eastingError,
     northingError: northingError,
+    errorArea: errorArea,
   };
 };
 

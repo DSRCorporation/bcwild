@@ -44,6 +44,7 @@ const TelemetryFormScreen = ({navigation}) => {
   const [northing, setNorthing] = React.useState('');
   const [eastingError, setEastingError] = React.useState('');
   const [northingError, setNorthingError] = React.useState('');
+  const [errorArea, setErrorArea] = React.useState('');
   const [longitudeCustom, setLongitudeCustom] = React.useState('');
   const [latitudeCustom, setLatitudeCustom] = React.useState('');
   const [eastingCustom, setEastingCustom] = React.useState('');
@@ -73,6 +74,7 @@ const TelemetryFormScreen = ({navigation}) => {
       setNorthing(northingCustom);
       setEastingError('0');
       setNorthingError('0');
+      setErrorArea('0');
     } else if (elementIdentified === 'no') {
       const {lat, lon} = utm10ToLatLon(
         triangulationResults.easting,
@@ -84,6 +86,7 @@ const TelemetryFormScreen = ({navigation}) => {
       setNorthing(triangulationResults.northing ?? '');
       setEastingError(triangulationResults.eastingError ?? '');
       setNorthingError(triangulationResults.northingError ?? '');
+      setErrorArea(triangulationResults.errorArea ?? '');
     }
   }, [
     eastingCustom,
@@ -93,6 +96,7 @@ const TelemetryFormScreen = ({navigation}) => {
     northingCustom,
     triangulationResults.easting,
     triangulationResults.eastingError,
+    triangulationResults.errorArea,
     triangulationResults.northing,
     triangulationResults.northingError,
   ]);
@@ -388,6 +392,7 @@ const TelemetryFormScreen = ({navigation}) => {
       northing: northing,
       easting_error: eastingError,
       northing_error: northingError,
+      error_area: errorArea,
       location_comments,
       triangulation,
     };
@@ -676,6 +681,18 @@ const TelemetryFormScreen = ({navigation}) => {
                     style={[styles.input, {flex: 2}]}
                   />
                 </View>
+              </View>
+            </View>
+            <View style={styles.inputContainer}>
+              <InputLabel>Error area</InputLabel>
+              <View style={{flex: 1}}>
+                <TextInput
+                  keyboardType="numeric"
+                  placeholder="Error area"
+                  editable={false}
+                  value={errorArea.toString()}
+                  style={styles.input}
+                />
               </View>
               {elementIdentified && elementIdentified === 'yes' && (
                 <BaseButton
