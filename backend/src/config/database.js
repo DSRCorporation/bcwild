@@ -1,5 +1,6 @@
 // 'use strict';
 const Sequelize = require("sequelize");
+const logger = require("../logger");
 
 const env = process.env.NODE_ENV || "local";
 const config = require("./config.json")[env];
@@ -26,11 +27,11 @@ sequelize
   .sync()
   .then(() => {
     // eslint-disable-next-line no-console
-    console.log("Sync Complete");
+    logger.debug("Sync Complete");
   })
   .catch((err) => {
     // eslint-disable-next-line no-console
-    console.error("Error in syncing", err);
+    logger.error("Error in syncing", err);
   });
 
 // db.sequelize = sequelize;
