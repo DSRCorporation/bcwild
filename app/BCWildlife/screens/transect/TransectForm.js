@@ -96,6 +96,10 @@ const TransectFormBody = ({callback, params, state, onSave, onCancel}) => {
   };
   const onSaveValidating = useCallback(() => {
     try {
+      if (!form.stands || form.stands.length === 0) {
+        Alert.alert('Error', 'You need to add at least one stand');
+        return;
+      }
       const dto = parseTransect(form);
       onSave(dto);
     } catch (error) {
