@@ -17,7 +17,7 @@ import {
 } from '../global';
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 
-const TelemetryTriangulationScreen = () => {
+const TelemetryTriangulationScreen = ({navigation}) => {
   const [entries, setEntries] = useState([
     {
       time: '',
@@ -173,6 +173,10 @@ const TelemetryTriangulationScreen = () => {
       )}\nErrror_area: ${triangErrorArea.toFixed(
         4,
       )}\nTriang_SD: ${triangSD}\n\nTriang_corr: ${triangCorr}\nNumber_bearings_used: ${numBearingsUsed}`,
+      [
+        {text: 'Cancel', onPress: () => {}},
+        {text: 'Save', onPress: () => navigation.goBack()},
+      ],
     );
   };
 

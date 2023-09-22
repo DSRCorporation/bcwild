@@ -359,10 +359,12 @@ const TelemetryFormScreen = ({navigation}) => {
 
     if (!easting || easting.toString().length === 0) {
       Alert.alert('Please enter easting or perform triangulation');
+      return;
     }
 
     if (!northing || northing.toString().length === 0) {
       Alert.alert('Please enter northing or perform triangulation');
+      return;
     }
 
     const location_comments = comments || '';
@@ -399,7 +401,12 @@ const TelemetryFormScreen = ({navigation}) => {
     RecordsRepo.addRecord(recordIdentifier, recordsValue);
     setDefaultValues();
     setTelemetryStr('');
-    Alert.alert('Record saved successfully');
+    Alert.alert('Success', 'Record saved successfully', [
+      {
+        text: 'OK',
+        onPress: () => navigation.goBack(),
+      },
+    ]);
   }
 
   const handleTriangulation = () => {
