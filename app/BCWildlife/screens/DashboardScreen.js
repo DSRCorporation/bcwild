@@ -15,6 +15,7 @@ import {useState} from 'react';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {getAccessToken} from '../global';
 import AxiosUtility from '../network/AxiosUtility';
+import VectorImage from "react-native-vector-image";
 
 const DashboardScreen = ({route, navigation}) => {
   const {admin} = route.params;
@@ -134,7 +135,7 @@ const DashboardScreen = ({route, navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, flexDirection: 'column', backgroundColor: 'white'}}>
+    <View style={{flex: 1, backgroundColor: 'white'}}>
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.imageContainer}>
@@ -154,167 +155,145 @@ const DashboardScreen = ({route, navigation}) => {
               onPress={() =>
                 showAlert('Logout', 'Are you sure you want to Logout?')
               }>
-              <Image
-                style={styles.l_image}
-                source={require('../assets/logout.png')}
+              <VectorImage
+                style={{ width: 32, height: 32, marginTop: 24 }}
+                source={require('../assets/logout.svg')}
               />
             </TouchableOpacity>
           </View>
         </View>
 
-        <View
-          style={{
-            flex: 1,
-            marginTop: 90,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Image
-            style={{height: 15, width: 15, marginLeft: 20}}
-            source={require('../assets/plus_sign.png')}
-          />
-          <TouchableOpacity onPress={() => handleAddProject()}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: 'black',
-                fontWeight: 'bold',
-                marginLeft: 10,
-              }}>
-              Project Setup
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View
-          style={{
-            backgroundColor: '#E8F0FF',
-          }}>
-          <View style={styles.row}>
-            <TouchableOpacity onPress={() => handleCameraTrapData()}>
-              <Image
-                style={{height: 80, width: 80, resizeMode: 'contain'}}
-                source={require('../assets/cam_trap.png')}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => hanldeTelemetryForm()}>
-              <Image
-                style={{height: 95, width: 95, resizeMode: 'contain'}}
-                source={require('../assets/telemetry.png')}
-              />
-            </TouchableOpacity>
+        <View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Projects</Text>
+            <View style={styles.sectionContent}>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleAddProject()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/add_project.svg')}
+                />
+                <Text style={styles.listItemText}>Project Setup</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => navigation.navigate('ProjectAccess')}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/project_access.svg')}
+                />
+                <Text style={styles.listItemText}>Project Request</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.row}>
-            <TouchableOpacity
-              style={styles.listItemWithoutImage}
-              onPress={() => handleBatSurvey()}>
-              <Text style={styles.listItemText}>Bat Survey</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.listItemWithoutImage}
-              onPress={() => handleBridgesClick()}>
-              <Text style={styles.listItemText}>Bridges</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.listItemWithoutImage}
-              onPress={() => handleAnimalsClick()}>
-              <Text style={styles.listItemText}>Animals</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.listItemWithoutImage}
-              onPress={() => handleAerialTelemetryDataClick()}>
-              <Text style={styles.listItemText}>Aerial Telemetry Data</Text>
-            </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Bats</Text>
+            <View style={styles.sectionContent}>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleBatSurvey()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/bat.svg')}
+                />
+                <Text style={styles.listItemText}>Bat Survey</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleBridgesClick()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/bridge.svg')}
+                />
+                <Text style={styles.listItemText}>Bridges</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.row}>
-            <TouchableOpacity
-              style={styles.listItemWithoutImage}
-              onPress={handleTransectSurvey}>
-              <Text style={styles.listItemText}>Transect Survey</Text>
-            </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Fisher</Text>
+            <View style={styles.sectionContent}>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => hanldeTelemetryForm()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/ground_telemetry.svg')}
+                />
+                <Text style={styles.listItemText}>Ground Telemetry Data</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleAnimalsClick()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/animals.svg')}
+                />
+                <Text style={styles.listItemText}>Animals</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleAerialTelemetryDataClick()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/aerial_telemetry.svg')}
+                />
+                <Text style={styles.listItemText}>Aerial Telemetry Data</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View
-          style={{
-            flex: 1,
-            marginTop: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Image
-            style={{
-              height: 15,
-              width: 15,
-              marginLeft: 20,
-              resizeMode: 'contain',
-            }}
-            source={require('../assets/proj_req_ico.png')}
-          />
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ProjectAccess')}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: 'black',
-                fontWeight: 'bold',
-                marginLeft: 10,
-              }}>
-              Project Request
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Multi-species</Text>
+            <View style={styles.sectionContent}>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleCameraTrapData()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/camera.svg')}
+                />
+                <Text style={styles.listItemText}>Camera Trap Metadata</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={handleTransectSurvey}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/transect.svg')}
+                />
+                <Text style={styles.listItemText}>Transect Survey</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
         {admin ? (
-          <View style={styles.row}>
-            <TouchableOpacity onPress={() => handleApproveProjectAccess()}>
-              <Image
-                style={{height: 90, width: 90, resizeMode: 'contain'}}
-                source={require('../assets/approve_req_access.png')}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleApproveSignupReqs()}>
-              <Image
-                style={{height: 85, width: 85, resizeMode: 'contain'}}
-                source={require('../assets/approve_signup_access.png')}
-              />
-            </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Admin</Text>
+            <View style={styles.sectionContent}>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleApproveProjectAccess()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/project_approve.svg')}
+                />
+                <Text style={styles.listItemText}>Approve Access Request</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleApproveSignupReqs()}>
+                <VectorImage
+                  style={styles.menuItemImage}
+                  source={require('../assets/account_approve.svg')}
+                />
+                <Text style={styles.listItemText}>Approve Account</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ) : null}
-        {/*
-        <View
-          style={{
-            flex: 1,
-            marginTop: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Image
-            style={{
-              height: 25,
-              width: 25,
-              marginLeft: 20,
-              resizeMode: 'contain',
-            }}
-            source={require('../assets/ack_ico.png')}
-          />
-          <Text
-            style={{
-              fontSize: 20,
-              color: 'black',
-              fontWeight: 'bold',
-              marginLeft: 10,
-            }}>
-            Acknowledgements / Glossary
-          </Text>
-        </View>
-        <View style={{flex: 2}}>
-          <></>
-        </View>
-        */}
       </ScrollView>
       <View
         style={{
-          flex: 0.4,
           backgroundColor: '#234075',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -340,17 +319,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  row: {
-    flex: 1,
-    marginTop: 15,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-    backgroundColor: '#E8F0FF',
-  },
-  listItemWithoutImage: {
+  listItem: {
     paddingVertical: 8,
+    alignItems: 'center',
   },
   listItemText: {
     color: '#000',
@@ -372,6 +343,29 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     resizeMode: 'contain',
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    color: 'black',
+    fontWeight: 'bold',
+    marginStart: 16,
+  },
+  sectionContent: {
+    flex: 1,
+    marginTop: 8,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    backgroundColor: '#E8F0FF',
+  },
+  menuItemImage: {
+    height: 32,
+    width: 32,
+    marginBottom: 4,
   },
 });
 
