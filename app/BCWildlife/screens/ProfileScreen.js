@@ -15,6 +15,7 @@ import {RecordType} from '../utility/RecordType';
 import {uploadImages} from '../shared/utils/uploadImages';
 import {ImagePicker} from '../shared/components/ImagePicker';
 import {fetchProfileImage, uploadProfileImage} from '../shared/utils/uploadProfilePicture';
+import VectorImage from "react-native-vector-image";
 
 // Uploading images
 //
@@ -529,8 +530,8 @@ const ProfileScreen = ({navigation}) => {
             justifyContent: 'space-between',
           }}>
           <TouchableOpacity onPress={() => navigateToDashboard()}>
-            <Image
-              source={require('../assets/arrow_back_ios.png')}
+            <VectorImage
+              source={require('../assets/arrow_back.svg')}
               style={{height: 25, width: 25, marginTop: 30}}
             />
           </TouchableOpacity>

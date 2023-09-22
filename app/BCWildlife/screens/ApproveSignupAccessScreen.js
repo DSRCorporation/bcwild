@@ -7,6 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { statuschange_url } from '../network/path';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { getAccessToken } from '../global';
+import VectorImage from "react-native-vector-image";
 
 const ApproveSignupAccessScreen = ({navigation}) => {
 
@@ -264,7 +265,7 @@ const ApproveSignupAccessScreen = ({navigation}) => {
   return (
       <View style={styles.container}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Image style={{height:30,width:30,margin:25}} source={require('../assets/arrow_back_ios.png')} />
+          <VectorImage style={{height:30,width:30,margin:25}} source={require('../assets/arrow_back.svg')} />
         </TouchableOpacity>
         <View style={styles.logoContainer}>
           <Image style={styles.logo} source={require('../assets/bc_abbreviated.png')} />

@@ -1,7 +1,8 @@
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {Image, TouchableOpacity, StyleSheet} from 'react-native';
-import arrowImage from '../../assets/arrow_back_ios.png';
+import arrowImage from '../../assets/arrow_back.svg';
+import VectorImage from 'react-native-vector-image';
 
 const arrowSize = 30;
 
@@ -19,7 +20,7 @@ export const GoBackArrowButton = ({onGoBack}) => {
 
   return (
     <TouchableOpacity onPress={onPress}>
-      <Image style={styles.arrow} source={arrowImage} />
+      <VectorImage style={styles.arrow} source={arrowImage} />
     </TouchableOpacity>
   );
 };
