@@ -356,6 +356,15 @@ const TelemetryFormScreen = ({navigation}) => {
       Alert.alert('Please enter element identified');
       return;
     }
+
+    if (!easting || easting.toString().length === 0) {
+      Alert.alert('Please enter easting or perform triangulation');
+    }
+
+    if (!northing || northing.toString().length === 0) {
+      Alert.alert('Please enter northing or perform triangulation');
+    }
+
     const location_comments = comments || '';
 
     const triangulation = elementIdentified === 'no' ? getTelemetryStr() : null;
@@ -373,6 +382,10 @@ const TelemetryFormScreen = ({navigation}) => {
       precip: precipitation,
       wind: windSpeed,
       element_identified: elementIdentified,
+      easting: easting,
+      northing: northing,
+      easting_error: eastingError,
+      northing_error: northingError,
       location_comments,
       triangulation,
     };
