@@ -22,7 +22,7 @@ import RecordsRepo from '../../utility/RecordsRepo';
 import {RecordType} from '../../utility/RecordType';
 import {useLocation} from '../Location';
 import LoadingOverlay from '../../utility/LoadingOverlay';
-import { latLonToUtm10, utm10ToLatLon } from "../../shared/utils/convertCoords";
+import {latLonToUtm10, utm10ToLatLon} from '../../shared/utils/convertCoords';
 
 const ArielTelemetryDataFormScreen = ({navigation}) => {
   const styles = useFormScreenStyles();

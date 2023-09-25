@@ -1,5 +1,5 @@
 import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {BaseButton} from './BaseButton';
 
@@ -32,7 +32,10 @@ export const GalleryPicker = ({onChange}) => {
     const newList = attachedImages.concat(result.assets);
 
     setAttachedImages(newList);
-    onChange && onChange(newList);
+  }, [attachedImages]);
+
+  useEffect(() => {
+    onChange && onChange(attachedImages);
   }, [attachedImages, onChange]);
 
   return (
