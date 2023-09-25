@@ -12,6 +12,7 @@
     "prestart": "react-native-vector-image generate"
   },
   "dependencies": {
+    "@bam.tech/react-native-image-resizer": "^3.0.7",
     "@bam.tech/react-native-make": "^3.0.3",
     "@klarna/react-native-vector-drawable": "^0.4.0",
     "@react-native-community/datetimepicker": "^7.0.1",

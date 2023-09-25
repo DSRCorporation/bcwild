@@ -1060,6 +1060,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     "to-fast-properties" "^2.0.0"
 
+"@bam.tech/react-native-image-resizer@^3.0.7":
+  "integrity" "sha512-TRYfjuaEOQjrGkj9736kW5A3xgyuVD5B2HlhPHvgVn0nM4zjPDLbjTqjId15hQCBNK6Udapcgvfb8lWlwcr7Gw=="
+  "resolved" "https://registry.npmjs.org/@bam.tech/react-native-image-resizer/-/react-native-image-resizer-3.0.7.tgz"
+  "version" "3.0.7"
+
 "@bam.tech/react-native-make@^3.0.3":
   "integrity" "sha512-5Ouk7j6zFLZnlGiZT5CpYQTqaUrBbfOgckvObqJfTul2Z2DABEEmX55D3OPNlKUp9Z1202AcE7ZqobZ8n0Umbg=="
   "resolved" "https://registry.npmjs.org/@bam.tech/react-native-make/-/react-native-make-3.0.3.tgz"
