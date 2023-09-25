@@ -23,7 +23,6 @@ const saveRecord = async dto => {
   const recordIdentifier = `${RecordType.Transect}_${username}_${timeNowEpoch}`;
   await RecordsRepo.addRecord(recordIdentifier, strvalue);
   await clearState();
-  Alert.alert('Success', 'Transect survey saved locally');
 };
 
 const submit = async (dto, navigation) => {
