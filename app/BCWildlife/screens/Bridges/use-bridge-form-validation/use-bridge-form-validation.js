@@ -84,8 +84,8 @@ const simpleParsing = [
     fieldDictionary: {
       heightFromBeamsOrDeckToSurfaceBelow: 'height',
       length: 'length',
-      longitude: 'longitude',
-      latitude: 'latitude',
+      easting: 'easting',
+      northing: 'northing',
     },
   },
 ];

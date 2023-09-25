@@ -35,14 +35,6 @@ const dtoProperties = [
     property: 'waypoint',
   },
   {
-    property: 'latitude',
-    transform: parseFloatProperty,
-  },
-  {
-    property: 'longitude',
-    transform: parseFloatProperty,
-  },
-  {
     property: 'easting',
     transform: parseFloatProperty,
   },
