@@ -14,8 +14,12 @@ import {localAnimalToRecord, useAnimals} from './Animals/use-animals';
 import {RecordType} from '../utility/RecordType';
 import {uploadImages} from '../shared/utils/uploadImages';
 import {ImagePicker} from '../shared/components/ImagePicker';
-import {fetchProfileImage, uploadProfileImage} from '../shared/utils/uploadProfilePicture';
-import VectorImage from "react-native-vector-image";
+import {
+  fetchProfileImage,
+  uploadProfileImage,
+} from '../shared/utils/uploadProfilePicture';
+import VectorImage from 'react-native-vector-image';
+import ImageResizer from '@bam.tech/react-native-image-resizer';
 
 // Uploading images
 //
@@ -64,7 +68,31 @@ const multipleImagePusher = property => async record => {
   ) {
     return record;
   }
-  const response = await uploadImages(imageFiles);
+  const compressedImages = [];
+  for (const image of imageFiles) {
+    try {
+      const compressedImage = await ImageResizer.createResizedImage(
+        image.uri,
+        1000,
+        1000,
+        'JPEG',
+        50,
+        0,
+        null,
+        true,
+      );
+      compressedImages.push({
+        uri: compressedImage.uri,
+        size: compressedImage.size,
+        fileName: compressedImage.name,
+      });
+    } catch (e) {
+      console.warn(
+        `Error compressing image ${image?.uri}. Error: ${JSON.stringify(e)}`,
+      );
+    }
+  }
+  const response = await uploadImages(compressedImages);
   const resultFiles = response.data.files;
   const findResultFilename = ({fileName}) => {
     const basename = uriBasename(fileName);
@@ -73,7 +101,7 @@ const multipleImagePusher = property => async record => {
     );
     return resultFile && resultFile.filename;
   };
-  const fixedFiles = imageFiles
+  const fixedFiles = compressedImages
     .map(findResultFilename)
     .filter(file => file != null);
   const fixedData = {...record.data};
@@ -149,7 +177,7 @@ const ProfileScreen = ({navigation}) => {
           //setLoading(false);
           if (error.response) {
             let errorMessage = error.response.data.message;
-            if (errorMessage.indexOf('token') > -1) {
+            if (errorMessage?.indexOf('token') > -1) {
               console.log('token expired');
               if (refreshTokenCount > 0) {
                 return;
@@ -192,7 +220,7 @@ const ProfileScreen = ({navigation}) => {
               setDialogVisible(false);
               console.log(
                 'error message:',
-                errorMessage + ' with index ' + errorMessage.indexOf('token'),
+                errorMessage + ' with index ' + errorMessage?.indexOf('token'),
               );
             }
             Alert.alert('Error', errorMessage);
@@ -329,7 +357,7 @@ const ProfileScreen = ({navigation}) => {
           .catch(error => {
             if (error.response) {
               let errorMessage = error.response.data.message;
-              if (errorMessage.indexOf('token') > -1) {
+              if (errorMessage?.indexOf('token') > -1) {
                 console.log('token expired');
                 if (refreshTokenCount > 0) {
                   return;
@@ -379,7 +407,9 @@ const ProfileScreen = ({navigation}) => {
               } else {
                 console.log(
                   'error message:',
-                  errorMessage + ' with index ' + errorMessage.indexOf('token'),
+                  errorMessage +
+                    ' with index ' +
+                    errorMessage?.indexOf('token'),
                 );
               }
               Alert.alert('Error', errorMessage);

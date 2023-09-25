@@ -13,7 +13,7 @@ const isTokenExpiredError = error => {
     return false;
   }
   const errorMessage = error.response.data.message;
-  return errorMessage.indexOf('token') > -1;
+  return errorMessage?.indexOf('token') > -1;
 };
 
 const requestWithAuth = async asyncAction => {
