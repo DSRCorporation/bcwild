@@ -149,7 +149,7 @@ const ProfileScreen = ({navigation}) => {
           //setLoading(false);
           if (error.response) {
             let errorMessage = error.response.data.message;
-            if (errorMessage.indexOf('token') > -1) {
+            if (errorMessage?.indexOf('token') > -1) {
               console.log('token expired');
               if (refreshTokenCount > 0) {
                 return;
@@ -192,7 +192,7 @@ const ProfileScreen = ({navigation}) => {
               setDialogVisible(false);
               console.log(
                 'error message:',
-                errorMessage + ' with index ' + errorMessage.indexOf('token'),
+                errorMessage + ' with index ' + errorMessage?.indexOf('token'),
               );
             }
             Alert.alert('Error', errorMessage);
@@ -329,7 +329,7 @@ const ProfileScreen = ({navigation}) => {
           .catch(error => {
             if (error.response) {
               let errorMessage = error.response.data.message;
-              if (errorMessage.indexOf('token') > -1) {
+              if (errorMessage?.indexOf('token') > -1) {
                 console.log('token expired');
                 if (refreshTokenCount > 0) {
                   return;
@@ -379,7 +379,7 @@ const ProfileScreen = ({navigation}) => {
               } else {
                 console.log(
                   'error message:',
-                  errorMessage + ' with index ' + errorMessage.indexOf('token'),
+                  errorMessage + ' with index ' + errorMessage?.indexOf('token'),
                 );
               }
               Alert.alert('Error', errorMessage);
