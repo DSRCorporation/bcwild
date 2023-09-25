@@ -13,7 +13,7 @@ export const latLonToUtm10 = (lat, lon) => {
     const utm = proj4(
       'EPSG:4326',
       epsg26910Def, // epsg:26910
-      [latParsed, lonParsed],
+      [lonParsed, latParsed],
     );
 
     return {
