@@ -28,8 +28,12 @@ const saveRecord = async dto => {
 
 const submit = async (dto, navigation) => {
   await saveRecord(dto);
-  Alert.alert('Success', 'Transect survey saved locally');
-  navigation.goBack();
+  Alert.alert('Success', 'Transect survey saved locally', [
+    {
+      title: 'OK',
+      onPress: () => navigation.goBack(),
+    },
+  ]);
 };
 
 const setup = async ({

@@ -22,7 +22,7 @@ import {InputLabel} from '../shared/components/InputLabel';
 import {GalleryPicker} from '../shared/components/GalleryPicker';
 import { latLonToUtm10, utm10ToLatLon } from "../shared/utils/convertCoords";
 
-const CameraTrapDataScreen = () => {
+const CameraTrapDataScreen = ({navigation}) => {
   const [projects, setProjects] = React.useState([]);
   const [isDeployView, setIsDeployView] = React.useState(true);
 
@@ -342,7 +342,12 @@ const CameraTrapDataScreen = () => {
     var recordIdentifier = RecordType.Cam + '_' + username + '_' + timeNowEpoch;
 
     RecordsRepo.addRecord(recordIdentifier, strvalue);
-    Alert.alert('Record Saved');
+    Alert.alert('Success', 'Record Saved', [
+      {
+        title: 'OK',
+        onPress: () => navigation.goBack(),
+      },
+    ]);
     setDefaultValues();
   }
 

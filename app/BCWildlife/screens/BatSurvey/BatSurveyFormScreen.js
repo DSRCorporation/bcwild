@@ -68,7 +68,7 @@ const CustomLocation = ({value, onDelete, onChange}) => {
 
 const createCustomLocation = key => ({key, description: '', comments: ''});
 
-const BatSurveyFormScreen = () => {
+const BatSurveyFormScreen = ({navigation}) => {
   const styles = useFormScreenStyles();
   const [needBridges, setNeedBridges] = useState(true);
   const [bridges, setBridges] = useState([]);
@@ -144,8 +144,14 @@ const BatSurveyFormScreen = () => {
       const recordIdentifier = `${RecordType.Bat}_${username}_${timeNowEpoch}`;
       await RecordsRepo.addRecord(recordIdentifier, strvalue);
       setCreateDisabled(true);
+      Alert.alert('Success', 'Bat survey saved locally', [
+        {
+          title: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
     }
-  }, [form, attachedImages]);
+  }, [form, attachedImages, navigation]);
 
   const setDefaultValues = useCallback(() => {
     setForm(draft => {

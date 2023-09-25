@@ -24,10 +24,10 @@ const TrDataEncounter = db.sequelize.define("tr_data_encounter", {
     type: DataTypes.INTEGER,
   },
   Coordinate_Northing_observation: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   Coordinate_Easting_observation: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   Waypoint: {
     type: DataTypes.STRING,
