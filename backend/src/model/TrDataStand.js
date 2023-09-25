@@ -19,10 +19,10 @@ const TrDataStand = db.sequelize.define("tr_data_stand", {
     type: DataTypes.REAL,
   },
   Coordinate_Northing: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   Coordinate_Easting: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   BEU: {
     type: DataTypes.STRING,

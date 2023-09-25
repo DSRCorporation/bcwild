@@ -47,19 +47,19 @@ const Telemetry = db.sequelize.define(
       type: Sequelize.STRING(50),
     },
     easting: {
-      type: Sequelize.REAL,
+      type: Sequelize.DOUBLE,
     },
     northing: {
-      type: Sequelize.REAL,
+      type: Sequelize.DOUBLE,
     },
     easting_error: {
-      type: Sequelize.REAL,
+      type: Sequelize.DOUBLE,
     },
     northing_error: {
-      type: Sequelize.REAL,
+      type: Sequelize.DOUBLE,
     },
     error_area: {
-      type: Sequelize.REAL,
+      type: Sequelize.DOUBLE,
     },
     location_comments: {
       type: Sequelize.TEXT,

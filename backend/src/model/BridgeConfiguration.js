@@ -41,19 +41,11 @@ const BridgeConfiguration = db.sequelize.define(
       allowNull: false,
       unique: "id-mot",
     },
-    longitude: {
-      type: DataTypes.REAL,
-      validate: {
-        min: -180,
-        max: 180,
-      },
+    easting: {
+      type: DataTypes.DOUBLE,
     },
-    latitude: {
-      type: DataTypes.REAL,
-      validate: {
-        min: -180,
-        max: 180,
-      },
+    northing: {
+      type: DataTypes.DOUBLE,
     },
     height: {
       type: DataTypes.REAL,

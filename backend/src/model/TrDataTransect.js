@@ -40,10 +40,10 @@ const TrDataTransect = db.sequelize.define("tr_data_transect", {
     type: DataTypes.STRING,
   },
   Coordinate_Northing_start: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   Coordinate_Easting_start: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   Bearing_start: {
     type: DataTypes.REAL,
@@ -61,10 +61,10 @@ const TrDataTransect = db.sequelize.define("tr_data_transect", {
     type: DataTypes.REAL,
   },
   Coordinate_Northing_end: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   Coordinate_Easting_end: {
-    type: DataTypes.REAL,
+    type: DataTypes.DOUBLE,
   },
   Temperature: {
     type: DataTypes.REAL,
