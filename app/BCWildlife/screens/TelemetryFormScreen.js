@@ -31,7 +31,7 @@ const TelemetryFormScreen = ({navigation}) => {
   const [reuse, setReuse] = useState('');
   const [firstLocation, setFirstLocation] = useState('');
   const [animalId, setAnimalId] = useState('');
-  const [ambientTemprature, setAmbientTemprature] = useState('');
+  const [ambientTemperature, setAmbientTemperature] = useState('');
   const [cloudCover, setCloudCover] = useState('');
   const [precipitation, setPrecipitation] = useState('');
   const [windSpeed, setWindSpeed] = useState('');
@@ -282,7 +282,7 @@ const TelemetryFormScreen = ({navigation}) => {
     const defaultReuse = '';
     const defaultFirstLocation = '';
     const defaultAnimalId = '';
-    const defaultAmbientTemprature = '';
+    const defaultAmbientTemperature = '';
     const defaultCloudCover = '';
     const defaultPrecipitation = '';
     const defaultWindSpeed = '';
@@ -296,7 +296,7 @@ const TelemetryFormScreen = ({navigation}) => {
     setReuse(defaultReuse);
     setFirstLocation(defaultFirstLocation);
     setAnimalId(defaultAnimalId);
-    setAmbientTemprature(defaultAmbientTemprature);
+    setAmbientTemperature(defaultAmbientTemperature);
     setCloudCover(defaultCloudCover);
     setPrecipitation(defaultPrecipitation);
     setWindSpeed(defaultWindSpeed);
@@ -340,7 +340,7 @@ const TelemetryFormScreen = ({navigation}) => {
 
       return;
     }
-    if (!ambientTemprature) {
+    if (!ambientTemperature) {
       Alert.alert('Please enter ambient temperature');
       return;
     }
@@ -383,7 +383,7 @@ const TelemetryFormScreen = ({navigation}) => {
       reuse: reuse,
       first_location_id: firstLocation,
       animal_id: animalId,
-      ambient_temperature: ambientTemprature,
+      ambient_temperature: ambientTemperature,
       cloud_cover: cloudCover,
       precip: precipitation,
       wind: windSpeed,
@@ -524,13 +524,13 @@ const TelemetryFormScreen = ({navigation}) => {
             onChangeText={text => setAnimalId(text)}
           />
 
-          <Text style={styles.inputLabel}>Ambient Temprature</Text>
+          <Text style={styles.inputLabel}>Ambient Temperature</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter Ambient Temprature"
+            placeholder="Enter Ambient Temperature"
             keyboardType="default"
-            value={ambientTemprature}
-            onChangeText={text => setAmbientTemprature(text)}
+            value={ambientTemperature}
+            onChangeText={text => setAmbientTemperature(text)}
           />
 
           <Text style={styles.inputLabel}>Date</Text>
