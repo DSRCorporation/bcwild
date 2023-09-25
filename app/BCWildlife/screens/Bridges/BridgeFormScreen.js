@@ -34,7 +34,7 @@ import {useLocation} from '../Location';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {latLonToUtm10, utm10ToLatLon} from '../../shared/utils/convertCoords';
 
-const BridgeFormScreen = ({route}) => {
+const BridgeFormScreen = ({route, navigation}) => {
   const styles = useFormScreenStyles();
   const currentBridge = (route.params && route.params.bridge) || null;
   const {validate} = useBridgeFormValidation();
@@ -93,7 +93,9 @@ const BridgeFormScreen = ({route}) => {
       }
       await RecordsRepo.addRecord(recordIdentifier, strvalue);
       await updateBridgeLocally(dto);
-      Alert.alert('Bridge data saved');
+      Alert.alert('Success', 'Bridge data saved', [
+        {title: 'OK', onPress: () => navigation.goBack()},
+      ]);
     }
     if (dto instanceof BridgeValidationError) {
       Alert.alert(dto.message);

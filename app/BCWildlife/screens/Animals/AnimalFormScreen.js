@@ -63,8 +63,12 @@ const AnimalFormScreen = ({route, navigation}) => {
     try {
       if (validated.isValid) {
         await saveAnimalLocally(validated.animal);
-        Alert.alert('Success', 'Animal saved locally');
-        navigation.goBack();
+        Alert.alert('Success', 'Animal saved locally', [
+          {
+            title: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]);
       } else {
         Alert.alert('Error', validated.errorMessage);
       }

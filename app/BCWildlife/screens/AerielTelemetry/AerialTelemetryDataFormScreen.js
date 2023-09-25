@@ -67,8 +67,12 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
       const username = getUsernameG();
       const recordIdentifier = `${RecordType.AerialTelemetry}_${username}_${timeNowEpoch}`;
       await RecordsRepo.addRecord(recordIdentifier, strvalue);
-      Alert.alert('Success', 'Aerial telemetry saved locally');
-      navigation.goBack();
+      Alert.alert('Success', 'Aerial telemetry saved locally', [
+        {
+          title: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
     } else {
       Alert.alert('Error', parsed.errorMessage);
     }
