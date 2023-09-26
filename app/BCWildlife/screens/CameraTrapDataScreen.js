@@ -277,9 +277,6 @@ const CameraTrapDataScreen = ({navigation}) => {
 
       if (comments) {
         data.comments = comments;
-      } else {
-        Alert.alert('Comments is required');
-        return;
       }
     } else {
       if (isCamActiveArrival != null) {
