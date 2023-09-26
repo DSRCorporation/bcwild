@@ -1,26 +1,31 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   TextInput,
   Alert,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {ScrollView} from 'react-native-gesture-handler';
-import {
-  getTelemetryStr,
-  setTelemetryStr,
-  setTriangulationResults,
-} from '../global';
+import {setTelemetryStr, setTriangulationResults} from '../global';
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
+import {latLonToUtm10, utm10ToLatLon} from '../shared/utils/convertCoords';
+import {BaseButton} from '../shared/components/BaseButton';
+import {useLocation} from './Location';
+import LoadingOverlay from '../utility/LoadingOverlay';
 
 const TelemetryTriangulationScreen = ({navigation}) => {
+  const [loading, setLoading] = useState(false);
+  const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
+    useLocation();
+
   const [entries, setEntries] = useState([
     {
       time: '',
+      longitude: '',
+      latitude: '',
       northing: '',
       easting: '',
       bearing: '',
@@ -29,11 +34,13 @@ const TelemetryTriangulationScreen = ({navigation}) => {
     },
   ]);
 
-  const handleAddEntry = () => {
+  const handleAddEntry = useCallback(() => {
     setEntries([
       ...entries,
       {
         time: '',
+        longitude: '',
+        latitude: '',
         northing: '',
         easting: '',
         bearing: '',
@@ -42,17 +49,47 @@ const TelemetryTriangulationScreen = ({navigation}) => {
       },
     ]);
     setTelemetryStr(entries);
-  };
+  }, [entries]);
 
-  const handleRemoveEntry = index => {
-    setEntries(entries.filter((_, i) => i !== index));
-  };
+  const handleRemoveEntry = useCallback(
+    index => {
+      setEntries(entries.filter((_, i) => i !== index));
+    },
+    [entries],
+  );
 
-  const handleInputChange = (index, field, value) => {
-    const newEntries = [...entries];
-    newEntries[index][field] = value;
-    setEntries(newEntries);
-  };
+  const handleInputChange = useCallback(
+    (index, field, value) => {
+      const newEntries = [...entries];
+      newEntries[index][field] = value;
+      setEntries(newEntries);
+    },
+    [entries],
+  );
+
+  const getCurrentLocation = useCallback(
+    async index => {
+      const permissionGranted = await requestLocationPermission();
+      if (permissionGranted) {
+        setLoading(true);
+        const {lat, lon} = await getLocation();
+        const {easting, northing} = latLonToUtm10(lat, lon);
+        handleInputChange(index, 'longitude', lon);
+        handleInputChange(index, 'latitude', lat);
+        handleInputChange(index, 'easting', easting);
+        handleInputChange(index, 'northing', northing);
+        setLoading(false);
+      } else {
+        showPermissionRequiredAlert();
+      }
+    },
+    [
+      requestLocationPermission,
+      getLocation,
+      handleInputChange,
+      showPermissionRequiredAlert,
+    ],
+  );
 
   const handleTriangulate = () => {
     console.log('Triangulate button pressed');
@@ -221,13 +258,34 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 />
               </View>
               <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Station Longitude:</Text>
+                <TextInput
+                  style={{...styles.inputField, opacity: 0.5}}
+                  value={entry.longitude?.toString() ?? ''}
+                  editable={false}
+                  placeholder="Station longitude"
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Station Latitude:</Text>
+                <TextInput
+                  style={{...styles.inputField, opacity: 0.5}}
+                  value={entry.latitude?.toString() ?? ''}
+                  editable={false}
+                  placeholder="Station latitude"
+                />
+              </View>
+              <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Station UTM Northing:</Text>
                 <TextInput
                   style={styles.inputField}
-                  value={entry.northing}
-                  onChangeText={value =>
-                    handleInputChange(index, 'northing', value)
-                  }
+                  value={entry.northing?.toString() ?? ''}
+                  onChangeText={value => {
+                    const {lat, lon} = utm10ToLatLon(entry.easting, value);
+                    handleInputChange(index, 'northing', value);
+                    handleInputChange(index, 'longitude', lon);
+                    handleInputChange(index, 'latitude', lat);
+                  }}
                   placeholder="Enter station UTM northing"
                 />
               </View>
@@ -235,13 +293,23 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 <Text style={styles.inputLabel}>Station UTM Easting:</Text>
                 <TextInput
                   style={styles.inputField}
-                  value={entry.easting}
-                  onChangeText={value =>
-                    handleInputChange(index, 'easting', value)
-                  }
+                  value={entry.easting?.toString() ?? ''}
+                  onChangeText={value => {
+                    const {lat, lon} = utm10ToLatLon(value, entry.northing);
+                    handleInputChange(index, 'easting', value);
+                    handleInputChange(index, 'longitude', lon);
+                    handleInputChange(index, 'latitude', lat);
+                  }}
                   placeholder="Enter station UTM easting"
                 />
               </View>
+              <BaseButton
+                onPress={() => getCurrentLocation(index)}
+                style={styles.button}
+                accessibilityLabel="get current location"
+                testID="getCurrentLocation">
+                <Text style={styles.buttonText}>Get current location</Text>
+              </BaseButton>
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Bearing:</Text>
                 <TextInput
@@ -290,6 +358,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
         onPress={handleTriangulate}>
         <Text style={styles.buttonText}>Triangulate</Text>
       </TouchableOpacity>
+      <LoadingOverlay loading={loading} />
     </View>
   );
 };
