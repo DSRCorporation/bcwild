@@ -128,6 +128,27 @@ class RecordsRepo {
     // Delete the list of unsynced records from local storage
     await EncryptedStorage.removeItem('unsynced_records');
   }
+
+  static async saveTriangulationState(telemetryStr) {
+    console.log(`saving state ${telemetryStr}`);
+    await EncryptedStorage.setItem('TRIANG_STATE', telemetryStr.toString());
+  }
+
+  static async getTriangulationState() {
+    try {
+      return await EncryptedStorage.getItem('TRIANG_STATE');
+    } catch (e) {
+      return '';
+    }
+  }
+
+  static async clearTriangulationState() {
+    try {
+      await EncryptedStorage.removeItem('TRIANG_STATE');
+    } catch (e) {
+      console.warn('Tried to delete non-existing item');
+    }
+  }
 }
 
 export default RecordsRepo;
