@@ -23,6 +23,7 @@ import {RecordType} from '../../utility/RecordType';
 import {useLocation} from '../Location';
 import LoadingOverlay from '../../utility/LoadingOverlay';
 import {latLonToUtm10, utm10ToLatLon} from '../../shared/utils/convertCoords';
+import uuid from 'react-native-uuid';
 
 const ArielTelemetryDataFormScreen = ({navigation}) => {
   const styles = useFormScreenStyles();
@@ -30,7 +31,7 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
   const now = new Date();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useImmer({
-    locationId: '',
+    locationId: uuid.v4(),
     pilot: '',
     navigator: '',
     date: now,
@@ -113,13 +114,9 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                 <InputLabel>{aerielTelemetryFormLabels.locationId}</InputLabel>
                 <TextInput
                   value={form.locationId}
-                  onChangeText={value =>
-                    setForm(draft => {
-                      draft.locationId = value;
-                    })
-                  }
+                  editable={false}
                   placeholder="Enter location ID"
-                  style={styles.textInput}
+                  style={{...styles.textInput, opacity: 0.5}}
                 />
               </View>
               <View style={styles.inputContainer}>

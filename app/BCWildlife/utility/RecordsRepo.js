@@ -136,7 +136,7 @@ class RecordsRepo {
 
   static async getTriangulationState() {
     try {
-      return await EncryptedStorage.getItem('TRIANG_STATE');
+      return (await EncryptedStorage.getItem('TRIANG_STATE')) ?? '';
     } catch (e) {
       return '';
     }
