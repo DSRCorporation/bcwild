@@ -89,6 +89,7 @@ export const transectConfig = {
     },
     {
       name: 'coordinateLongitudeStart',
+      databaseFieldName: 'Coordinate_Longitude_start',
       displayName: 'Start coordinate (Longitude)',
       type: 'float',
       optional: true,
@@ -99,6 +100,7 @@ export const transectConfig = {
     },
     {
       name: 'coordinateLatitudeStart',
+      databaseFieldName: 'Coordinate_Latitude_start',
       displayName: 'Start coordinate (Latitude)',
       type: 'float',
       optional: true,
@@ -292,6 +294,7 @@ export const transectConfig = {
     },
     {
       name: 'coordinateLongitudeEnd',
+      databaseFieldName: 'Coordinate_Longitude_end',
       displayName: 'End coordinate (Longitude)',
       type: 'float',
       optional: true,
@@ -302,6 +305,7 @@ export const transectConfig = {
     },
     {
       name: 'coordinateLatitudeEnd',
+      databaseFieldName: 'Coordinate_Latitude_end',
       displayName: 'End coordinate (Latitude)',
       type: 'float',
       optional: true,
@@ -384,6 +388,7 @@ export const standConfig = {
     },
     {
       name: 'coordinateLongitude',
+      databaseFieldName: 'Coordinate_Longitude',
       displayName: 'Coordinate (Longitude)',
       type: 'float',
       optional: true,
@@ -394,6 +399,7 @@ export const standConfig = {
     },
     {
       name: 'coordinateLatitude',
+      databaseFieldName: 'Coordinate_Latitude',
       displayName: 'Coordinate (Latitude)',
       type: 'float',
       optional: true,
@@ -504,6 +510,7 @@ export const encounterConfig = {
     },
     {
       name: 'coordinateLongitudeObservation',
+      databaseFieldName: 'Coordinate_Longitude_observation',
       displayName: 'Coordinate (Longitude)',
       type: 'float',
       optional: true,
@@ -514,6 +521,7 @@ export const encounterConfig = {
     },
     {
       name: 'coordinateLatitudeObservation',
+      databaseFieldName: 'Coordinate_Latitude_observation',
       displayName: 'Coordinate (Latitude)',
       type: 'float',
       optional: true,

@@ -20,7 +20,7 @@ import LoadingOverlay from '../utility/LoadingOverlay';
 import {BaseButton} from '../shared/components/BaseButton';
 import {InputLabel} from '../shared/components/InputLabel';
 import {GalleryPicker} from '../shared/components/GalleryPicker';
-import { latLonToUtm10, utm10ToLatLon } from "../shared/utils/convertCoords";
+import {latLonToUtm10, utm10ToLatLon} from '../shared/utils/convertCoords';
 
 const CameraTrapDataScreen = ({navigation}) => {
   const [projects, setProjects] = React.useState([]);
@@ -232,6 +232,15 @@ const CameraTrapDataScreen = ({navigation}) => {
         Alert.alert('Station Easting is required');
         return;
       }
+
+      if (stationLon) {
+        data.station_longitude = stationLon;
+      }
+
+      if (stationLat) {
+        data.station_latitude = stationLat;
+      }
+
       if (cameraDirection) {
         data.camera_compass_direction = cameraDirection;
       } else {
