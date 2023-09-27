@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
+  Alert, Switch,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -80,6 +80,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
       bearing: '',
       signal: 'constant',
       bias: '',
+      useBearing: true,
     },
   ]);
 
@@ -101,6 +102,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
         bearing: '',
         signal: 'constant',
         bias: '',
+        useBearing: true,
       },
     ]);
   }, [entries]);
@@ -146,17 +148,19 @@ const TelemetryTriangulationScreen = ({navigation}) => {
   );
 
   const handleTriangulate = () => {
+    const entriesToUse = entries.filter(entry => entry.useBearing);
+
     try {
-      maybeThrowValidationError(entries);
+      maybeThrowValidationError(entriesToUse);
     } catch (error) {
       Alert.alert('Error', error.message);
       return;
     }
-    if (entries.length < 2) {
+    if (entriesToUse.length < 2) {
       Alert.alert('Error', 'Triangulation requires at least two entries');
       return;
     }
-    const data = entries.map(({northing, easting, bearing}) => ({
+    const data = entriesToUse.map(({northing, easting, bearing}) => ({
       northing: parseFloat(northing),
       easting: parseFloat(easting),
       bearing: parseFloat(bearing),
@@ -218,6 +222,15 @@ const TelemetryTriangulationScreen = ({navigation}) => {
           {entries.map((entry, index) => (
             <View key={index} style={styles.entryContainer}>
               <Text style={styles.entryHeader}>Entry {index + 1}</Text>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Use Bearing?</Text>
+                <Switch
+                  value={entry.useBearing}
+                  onValueChange={value =>
+                    handleInputChange(index, 'useBearing', value)
+                  }
+                />
+              </View>
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>{entryFieldLabel.time}:</Text>
                 <TextInput
