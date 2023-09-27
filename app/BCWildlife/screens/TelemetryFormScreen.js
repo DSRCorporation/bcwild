@@ -37,6 +37,7 @@ const markGlobalTriangulationAsStale = () => {
       setTriangulationResults(staleResults);
     } else {
       setTriangulationResults();
+      setTelemetryStr('');
     }
   }
 };

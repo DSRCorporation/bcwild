@@ -23,6 +23,38 @@ const solveTriangulation = createTriangulationSolver({
   angleError: 2.5, // as in test data
 });
 
+// Simple validation: check empty fields
+
+const entryFieldLabel = {
+  time: 'Time',
+  longitude: 'Station Longitude',
+  latitude: 'Station Latitude',
+  northing: 'Station UTM Northing',
+  easting: 'Station UTM Easting',
+  bearing: 'Bearing',
+  signal: 'Signal',
+  bias: 'Bias',
+};
+
+const optionalEntryFields = ['bias'];
+
+const emptyFieldMessage = (entryId, field) =>
+  `Entry ${entryId}: ${entryFieldLabel[field]} is required`;
+
+const maybeThrowEntryError = (entryId, entry) => {
+  Object.keys(entryFieldLabel).forEach(field => {
+    if (!optionalEntryFields.includes(field)) {
+      if (entry[field] === '') {
+        throw new Error(emptyFieldMessage(entryId, field));
+      }
+    }
+  });
+};
+
+const maybeThrowValidationError = entries => {
+  entries.forEach((entry, index) => maybeThrowEntryError(index + 1, entry));
+};
+
 const TelemetryTriangulationScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
@@ -114,8 +146,12 @@ const TelemetryTriangulationScreen = ({navigation}) => {
   );
 
   const handleTriangulate = () => {
-    console.log('Triangulate button pressed');
-    console.log(entries);
+    try {
+      maybeThrowValidationError(entries);
+    } catch (error) {
+      Alert.alert('Error', error.message);
+      return;
+    }
     if (entries.length < 2) {
       Alert.alert('Error', 'Triangulation requires at least two entries');
       return;
@@ -183,7 +219,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
             <View key={index} style={styles.entryContainer}>
               <Text style={styles.entryHeader}>Entry {index + 1}</Text>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Time:</Text>
+                <Text style={styles.inputLabel}>{entryFieldLabel.time}:</Text>
                 <TextInput
                   style={styles.inputField}
                   value={entry.time}
@@ -194,7 +230,9 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Station Longitude:</Text>
+                <Text style={styles.inputLabel}>
+                  {entryFieldLabel.longitude}:
+                </Text>
                 <TextInput
                   style={{...styles.inputField, opacity: 0.5}}
                   value={entry.longitude?.toString() ?? ''}
@@ -203,7 +241,9 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Station Latitude:</Text>
+                <Text style={styles.inputLabel}>
+                  {entryFieldLabel.latitude}:
+                </Text>
                 <TextInput
                   style={{...styles.inputField, opacity: 0.5}}
                   value={entry.latitude?.toString() ?? ''}
@@ -212,7 +252,9 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Station UTM Easting:</Text>
+                <Text style={styles.inputLabel}>
+                  {entryFieldLabel.easting}:
+                </Text>
                 <TextInput
                   style={styles.inputField}
                   value={entry.easting?.toString() ?? ''}
@@ -227,7 +269,9 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Station UTM Northing:</Text>
+                <Text style={styles.inputLabel}>
+                  {entryFieldLabel.northing}:
+                </Text>
                 <TextInput
                   style={styles.inputField}
                   value={entry.northing?.toString() ?? ''}
@@ -249,7 +293,9 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 <Text style={styles.buttonText}>Get current location</Text>
               </BaseButton>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Bearing:</Text>
+                <Text style={styles.inputLabel}>
+                  {entryFieldLabel.bearing}:
+                </Text>
                 <TextInput
                   style={styles.inputField}
                   value={entry.bearing}
@@ -261,7 +307,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Signal:</Text>
+                <Text style={styles.inputLabel}>{entryFieldLabel.signal}:</Text>
                 <View style={styles.inputField}>
                   <Picker
                     selectedValue={entry.signal}
@@ -276,7 +322,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 </View>
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Bias:</Text>
+                <Text style={styles.inputLabel}>{entryFieldLabel.bias}:</Text>
                 <TextInput
                   style={styles.inputField}
                   value={entry.bias}
