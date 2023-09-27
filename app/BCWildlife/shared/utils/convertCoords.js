@@ -1,7 +1,8 @@
 import proj4 from 'proj4';
 
-const epsg26910Def =
-  '+proj=utm +zone=10 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs';
+const epsg26910DefForZone = zone => {
+  return `+proj=utm +zone=${zone} +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs`;
+};
 
 export const latLonToUtm10 = (lat, lon) => {
   try {
@@ -10,9 +11,12 @@ export const latLonToUtm10 = (lat, lon) => {
 
     console.log(`converting lat: ${latParsed} and lon: ${lonParsed} to UTM10`);
 
+    let zone = Math.floor(lon / 6) + 31;
+    if (zone > 60) zone = 60;
+
     const utm = proj4(
       'EPSG:4326',
-      epsg26910Def, // epsg:26910
+      epsg26910DefForZone(zone), // epsg:26910
       [lonParsed, latParsed],
     );
 
@@ -38,7 +42,7 @@ export const utm10ToLatLon = (easting, northing) => {
 
     console.log(`converting easting: ${eastingParsed} and northing: ${northingParsed} to latlon`);
 
-    const latlon = proj4(epsg26910Def, 'EPSG:4326', [
+    const latlon = proj4(epsg26910DefForZone(10), 'EPSG:4326', [
       eastingParsed,
       northingParsed,
     ]);
