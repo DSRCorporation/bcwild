@@ -208,7 +208,7 @@ const BridgeFormScreen = ({route, navigation}) => {
                       keyboardType="numeric"
                       placeholder="Longitude"
                       editable={false}
-                      value={form.longitude.toString()}
+                      value={form.longitude?.toString() ?? ''}
                       style={styles.textInput}
                     />
                   </View>
@@ -217,7 +217,7 @@ const BridgeFormScreen = ({route, navigation}) => {
                       keyboardType="numeric"
                       placeholder="Latitude"
                       editable={false}
-                      value={form.latitude.toString()}
+                      value={form.latitude?.toString() ?? ''}
                       style={[styles.textInput, {flex: 2}]}
                     />
                   </View>
