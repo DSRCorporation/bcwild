@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {ScrollView} from 'react-native-gesture-handler';
-import {setTelemetryStr, setTriangulationResults} from '../global';
+import { getTelemetryStr, setTelemetryStr, setTriangulationResults } from "../global";
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
 import {latLonToUtm10, utm10ToLatLon} from '../shared/utils/convertCoords';
 import {BaseButton} from '../shared/components/BaseButton';
@@ -27,6 +27,16 @@ const TelemetryTriangulationScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const {requestLocationPermission, getLocation, showPermissionRequiredAlert} =
     useLocation();
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    getTelemetryStr().then(state => {
+      if (state && state.length > 0) {
+        setEntries(JSON.parse(state));
+      }
+      setIsInitialized(true);
+    });
+  }, [setIsInitialized]);
 
   const [entries, setEntries] = useState([
     {
@@ -40,6 +50,12 @@ const TelemetryTriangulationScreen = ({navigation}) => {
       bias: '',
     },
   ]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      setTelemetryStr(JSON.stringify(entries));
+    }
+  }, [entries, isInitialized]);
 
   const handleAddEntry = useCallback(() => {
     setEntries([
@@ -55,7 +71,6 @@ const TelemetryTriangulationScreen = ({navigation}) => {
         bias: '',
       },
     ]);
-    setTelemetryStr(entries);
   }, [entries]);
 
   const handleRemoveEntry = useCallback(
@@ -114,7 +129,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
     try {
       const triangulationResult = solveTriangulation(data);
       console.log(triangulationResult);
-      setTelemetryStr(entries);
+      setTelemetryStr(JSON.stringify(entries));
       setTriangulationResults(
         triangulationResult.easting,
         triangulationResult.northing,

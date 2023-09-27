@@ -1,7 +1,8 @@
+import RecordsRepo from './utility/RecordsRepo';
+
 let accessToken = '';
 let refreshToken = '';
 let usernameG = '';
-let telemetryStr = '';
 let triangulationResults = {
   easting: undefined,
   northing: undefined,
@@ -10,12 +11,16 @@ let triangulationResults = {
   errorArea: undefined,
 };
 
-export const setTelemetryStr = str => {
-  telemetryStr = str;
+export const setTelemetryStr = async str => {
+  if (str && str.length > 0) {
+    await RecordsRepo.saveTriangulationState(str);
+  } else {
+    await RecordsRepo.clearTriangulationState();
+  }
 };
 
-export const getTelemetryStr = () => {
-  return telemetryStr;
+export const getTelemetryStr = async () => {
+  return await RecordsRepo.getTriangulationState();
 };
 
 export const setTriangulationResults = (
