@@ -176,7 +176,6 @@ const TelemetryTriangulationScreen = ({navigation}) => {
         triangulationResult.eastingError,
         triangulationResult.northingError,
         triangulationResult.errorArea,
-        true,
       );
       Alert.alert(
         'Result',

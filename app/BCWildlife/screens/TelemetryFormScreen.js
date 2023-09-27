@@ -11,6 +11,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {
+  clearTriangulationResults,
   getTriangulationResults,
   getUsernameG,
   setTriangulationResults,
@@ -26,21 +27,6 @@ import {useLocation} from './Location';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {useIsFocused} from '@react-navigation/native';
 import uuid from 'react-native-uuid';
-
-const markGlobalTriangulationAsStale = () => {
-  const triangulationResults = getTriangulationResults();
-  if (triangulationResults) {
-    const {isNew} = triangulationResults;
-    if (isNew) {
-      // eslint-disable-next-line no-shadow
-      const {isNew, ...staleResults} = triangulationResults;
-      setTriangulationResults(...staleResults);
-    } else {
-      setTriangulationResults();
-      setTelemetryStr('');
-    }
-  }
-};
 
 const TelemetryFormScreen = ({navigation}) => {
   const [projects, setProjects] = React.useState([]);
@@ -81,11 +67,6 @@ const TelemetryFormScreen = ({navigation}) => {
 
   useEffect(() => {
     handleLocalValues();
-  }, []);
-
-  useEffect(() => {
-    markGlobalTriangulationAsStale();
-    setTriangulationResults(getTriangulationResults());
   }, []);
 
   useEffect(() => {
@@ -331,7 +312,7 @@ const TelemetryFormScreen = ({navigation}) => {
     setRecordIdentifier('');
   }
 
-  function convertToJson() {
+  async function convertToJson() {
     if (!selectedValueProject) {
       Alert.alert('Please select a project');
       return;
@@ -399,7 +380,13 @@ const TelemetryFormScreen = ({navigation}) => {
 
     const location_comments = comments || '';
 
-    const triangulation = elementIdentified === 'no' ? getTelemetryStr() : null;
+    let triangulation =
+      elementIdentified === 'no' ? await getTelemetryStr() : null;
+    try {
+      triangulation = JSON.parse(triangulation);
+    } catch (e) {
+      triangulation = null;
+    }
 
     const data = {
       date: dateTime,
@@ -434,6 +421,7 @@ const TelemetryFormScreen = ({navigation}) => {
     RecordsRepo.addRecord(recordIdentifier, recordsValue);
     setDefaultValues();
     setTelemetryStr('');
+    clearTriangulationResults();
     Alert.alert('Success', 'Record saved successfully', [
       {
         text: 'OK',
