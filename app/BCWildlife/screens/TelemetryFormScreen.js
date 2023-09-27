@@ -388,6 +388,8 @@ const TelemetryFormScreen = ({navigation}) => {
       precip: precipitation,
       wind: windSpeed,
       element_identified: elementIdentified,
+      longitude: longitude,
+      latitude: latitude,
       easting: easting,
       northing: northing,
       easting_error: eastingError,
