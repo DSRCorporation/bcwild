@@ -34,7 +34,7 @@ const markGlobalTriangulationAsStale = () => {
     if (isNew) {
       // eslint-disable-next-line no-shadow
       const {isNew, ...staleResults} = triangulationResults;
-      setTriangulationResults(staleResults);
+      setTriangulationResults(...staleResults);
     } else {
       setTriangulationResults();
       setTelemetryStr('');
