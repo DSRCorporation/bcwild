@@ -10,7 +10,11 @@ import {
 import {ScrollView} from 'react-native-gesture-handler';
 import {Picker} from '@react-native-picker/picker';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import {getTriangulationResults, getUsernameG} from '../global';
+import {
+  getTriangulationResults,
+  getUsernameG,
+  setTriangulationResults,
+} from '../global';
 import RecordsRepo from '../utility/RecordsRepo';
 import {getTelemetryStr, setTelemetryStr} from '../global';
 import {SimpleScreenHeader} from '../shared/components/SimpleScreenHeader';
@@ -21,6 +25,20 @@ import {BaseButton} from '../shared/components/BaseButton';
 import {useLocation} from './Location';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {useIsFocused} from '@react-navigation/native';
+
+const markGlobalTriangulationAsStale = () => {
+  const triangulationResults = getTriangulationResults();
+  if (triangulationResults) {
+    const {isNew} = triangulationResults;
+    if (isNew) {
+      // eslint-disable-next-line no-shadow
+      const {isNew, ...staleResults} = triangulationResults;
+      setTriangulationResults(staleResults);
+    } else {
+      setTriangulationResults();
+    }
+  }
+};
 
 const TelemetryFormScreen = ({navigation}) => {
   const [projects, setProjects] = React.useState([]);
@@ -50,6 +68,7 @@ const TelemetryFormScreen = ({navigation}) => {
   const [eastingCustom, setEastingCustom] = React.useState('');
   const [northingCustom, setNorthingCustom] = React.useState('');
   const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line no-shadow
   const [triangulationResults, setTriangulationResults] = useState(
     getTriangulationResults(),
   );
@@ -60,6 +79,11 @@ const TelemetryFormScreen = ({navigation}) => {
 
   useEffect(() => {
     handleLocalValues();
+  }, []);
+
+  useEffect(() => {
+    markGlobalTriangulationAsStale();
+    setTriangulationResults(getTriangulationResults());
   }, []);
 
   useEffect(() => {
