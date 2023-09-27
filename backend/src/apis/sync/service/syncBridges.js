@@ -25,6 +25,8 @@ const bridgeConfigurationToDtoProperties = {
   motBridgeID: { property: "bridgeMotId" },
   easting: { property: "easting" },
   northing: { property: "northing" },
+  longitude: { property: "longitude" },
+  latitude: { property: "latitude" },
   height: { property: "height" },
   length: { property: "length" },
   habitatComments: { property: "habitatComments" },

@@ -23,6 +23,12 @@ const TrDataEncounter = db.sequelize.define("tr_data_encounter", {
   Observation_ID: {
     type: DataTypes.INTEGER,
   },
+  Coordinate_Longitude_observation: {
+    type: DataTypes.DOUBLE,
+  },
+  Coordinate_Latitude_observation: {
+    type: DataTypes.DOUBLE,
+  },
   Coordinate_Northing_observation: {
     type: DataTypes.DOUBLE,
   },

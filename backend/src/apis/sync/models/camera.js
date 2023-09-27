@@ -32,6 +32,12 @@ const CameraTrapData = db.sequelize.define(
     deploy_check: {
       type: Sequelize.STRING(50),
     },
+    station_longitude: {
+      type: Sequelize.STRING(50),
+    },
+    station_latitude: {
+      type: Sequelize.STRING(50),
+    },
     station_northing: {
       type: Sequelize.STRING(50),
     },

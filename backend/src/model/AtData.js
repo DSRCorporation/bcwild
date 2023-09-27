@@ -26,6 +26,12 @@ const AtData = db.sequelize.define("at_data", {
     allowNull: false,
     unique: "location-timestamp",
   },
+  longitude: {
+    type: DataTypes.DOUBLE,
+  },
+  latitude: {
+    type: DataTypes.DOUBLE,
+  },
   easting: {
     type: DataTypes.DOUBLE,
   },
