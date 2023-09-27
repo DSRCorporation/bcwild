@@ -21,12 +21,13 @@ import {BaseButton} from '../shared/components/BaseButton';
 import {useLocation} from './Location';
 import LoadingOverlay from '../utility/LoadingOverlay';
 import {useIsFocused} from '@react-navigation/native';
+import uuid from 'react-native-uuid';
 
 const TelemetryFormScreen = ({navigation}) => {
   const [projects, setProjects] = React.useState([]);
   const [dateTime, setDateTime] = React.useState('');
   const [surveyId, setSurveyId] = React.useState('');
-  const [locationId, setLocationId] = React.useState('');
+  const [locationId, setLocationId] = React.useState(uuid.v4());
   const [selectedValueProject, setSelectedValueProject] = useState('');
   const [reuse, setReuse] = useState('');
   const [firstLocation, setFirstLocation] = useState('');
@@ -493,11 +494,11 @@ const TelemetryFormScreen = ({navigation}) => {
           />
           <Text style={styles.inputLabel}> Location ID </Text>
           <TextInput
-            style={styles.input}
+            style={{...styles.input, opacity: 0.5}}
             placeholder="Enter Location ID"
             keyboardType="default"
             value={locationId}
-            onChangeText={text => setLocationId(text)}
+            editable={false}
           />
           <Text style={styles.inputLabel}> Re-Use ? </Text>
           <View style={styles.dropdownContainer}>
