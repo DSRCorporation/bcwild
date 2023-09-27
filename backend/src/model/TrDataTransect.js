@@ -39,6 +39,12 @@ const TrDataTransect = db.sequelize.define("tr_data_transect", {
   GPS_ID: {
     type: DataTypes.STRING,
   },
+  Coordinate_Longitude_start: {
+    type: DataTypes.DOUBLE,
+  },
+  Coordinate_Latitude_start: {
+    type: DataTypes.DOUBLE,
+  },
   Coordinate_Northing_start: {
     type: DataTypes.DOUBLE,
   },
@@ -59,6 +65,12 @@ const TrDataTransect = db.sequelize.define("tr_data_transect", {
   },
   Transect_length: {
     type: DataTypes.REAL,
+  },
+  Coordinate_Longitude_end: {
+    type: DataTypes.DOUBLE,
+  },
+  Coordinate_Latitude_end: {
+    type: DataTypes.DOUBLE,
   },
   Coordinate_Northing_end: {
     type: DataTypes.DOUBLE,

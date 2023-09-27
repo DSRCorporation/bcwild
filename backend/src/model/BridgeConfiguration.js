@@ -41,6 +41,12 @@ const BridgeConfiguration = db.sequelize.define(
       allowNull: false,
       unique: "id-mot",
     },
+    longitude: {
+      type: DataTypes.DOUBLE,
+    },
+    latitude: {
+      type: DataTypes.DOUBLE,
+    },
     easting: {
       type: DataTypes.DOUBLE,
     },

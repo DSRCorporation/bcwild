@@ -46,6 +46,12 @@ const Telemetry = db.sequelize.define(
     element_identified: {
       type: Sequelize.STRING(50),
     },
+    longitude: {
+      type: Sequelize.DOUBLE,
+    },
+    latitude: {
+      type: Sequelize.DOUBLE,
+    },
     easting: {
       type: Sequelize.DOUBLE,
     },

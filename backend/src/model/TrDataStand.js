@@ -18,6 +18,12 @@ const TrDataStand = db.sequelize.define("tr_data_stand", {
   Distance_along_transect: {
     type: DataTypes.REAL,
   },
+  Coordinate_Longitude: {
+    type: DataTypes.DOUBLE,
+  },
+  Coordinate_Latitude: {
+    type: DataTypes.DOUBLE,
+  },
   Coordinate_Northing: {
     type: DataTypes.DOUBLE,
   },
