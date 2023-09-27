@@ -212,21 +212,6 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Station UTM Northing:</Text>
-                <TextInput
-                  style={styles.inputField}
-                  value={entry.northing?.toString() ?? ''}
-                  keyboardType="numeric"
-                  onChangeText={value => {
-                    const {lat, lon} = utm10ToLatLon(entry.easting, value);
-                    handleInputChange(index, 'northing', value);
-                    handleInputChange(index, 'longitude', lon);
-                    handleInputChange(index, 'latitude', lat);
-                  }}
-                  placeholder="Enter station UTM northing"
-                />
-              </View>
-              <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Station UTM Easting:</Text>
                 <TextInput
                   style={styles.inputField}
@@ -239,6 +224,21 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                     handleInputChange(index, 'latitude', lat);
                   }}
                   placeholder="Enter station UTM easting"
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Station UTM Northing:</Text>
+                <TextInput
+                  style={styles.inputField}
+                  value={entry.northing?.toString() ?? ''}
+                  keyboardType="numeric"
+                  onChangeText={value => {
+                    const {lat, lon} = utm10ToLatLon(entry.easting, value);
+                    handleInputChange(index, 'northing', value);
+                    handleInputChange(index, 'longitude', lon);
+                    handleInputChange(index, 'latitude', lat);
+                  }}
+                  placeholder="Enter station UTM northing"
                 />
               </View>
               <BaseButton
