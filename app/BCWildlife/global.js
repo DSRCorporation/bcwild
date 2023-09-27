@@ -23,16 +23,12 @@ export const getTelemetryStr = async () => {
   return await RecordsRepo.getTriangulationState();
 };
 
-// isNew flag is used by the telemetry form on creation in order to keep or clear the data.
-// If the flag is true, the data comes from the triangulation screen, so it is fresh and must be used.  When the telemetry form sees it, it clears the flag.
-// If the flag is false, the data must originate from a previous edit, so it is cleared.
 export const setTriangulationResults = (
   easting,
   northing,
   eastingError,
   northingError,
   errorArea,
-  isNew,
 ) => {
   triangulationResults = {
     easting: easting,
@@ -40,8 +36,17 @@ export const setTriangulationResults = (
     eastingError: eastingError,
     northingError: northingError,
     errorArea: errorArea,
-    isNew: isNew,
   };
+};
+
+export const clearTriangulationResults = () => {
+  setTriangulationResults(
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  );
 };
 
 export const getTriangulationResults = () => {
