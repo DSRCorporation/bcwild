@@ -15,6 +15,13 @@ import {latLonToUtm10, utm10ToLatLon} from '../shared/utils/convertCoords';
 import {BaseButton} from '../shared/components/BaseButton';
 import {useLocation} from './Location';
 import LoadingOverlay from '../utility/LoadingOverlay';
+import {createTriangulationSolver} from '../shared/utils/triangulation';
+
+const solveTriangulation = createTriangulationSolver({
+  maxIterations: 100,
+  epsilon: 0.1,
+  angleError: 2.5, // as in test data
+});
 
 const TelemetryTriangulationScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
@@ -94,130 +101,43 @@ const TelemetryTriangulationScreen = ({navigation}) => {
   const handleTriangulate = () => {
     console.log('Triangulate button pressed');
     console.log(entries);
-    setTelemetryStr(entries);
-
-    // Define constants and variables
-    const speedOfLight = 299792458; // meters per second
-    const signalStrength = 0.5; // default signal strength if not available
-    const triangSD = 2.5; // default triangulation SD in degrees
-    let bearings = [];
-    let eastings = [];
-    let northings = [];
-    let signalStrengths = [];
-    let biases = [];
-
-    // Extract bearings, eastings, northings, and signal strengths from entries
-    for (let i = 0; i < entries.length; i++) {
-      const entry = entries[i];
-      bearings.push((parseFloat(entry.bearing) * Math.PI) / 180); // convert bearings to radians
-      eastings.push(parseFloat(entry.easting));
-      northings.push(parseFloat(entry.northing));
-      biases.push(
-        entry.bias === '--' ? signalStrength : parseFloat(entry.bias),
-      );
-      signalStrengths.push(0.001);
+    if (entries.length < 2) {
+      Alert.alert('Error', 'Triangulation requires at least two entries');
+      return;
     }
-
-    // Calculate weights based on signal strengths
-    const weights = signalStrengths.map(signal => 1 / (signal * signal));
-
-    // Calculate weighted means of eastings and northings
-    const wsum = weights.reduce((sum, weight) => sum + weight, 0);
-    const wxsum = eastings.reduce(
-      (sum, easting, index) => sum + weights[index] * easting,
-      0,
-    );
-    const wysum = northings.reduce(
-      (sum, northing, index) => sum + weights[index] * northing,
-      0,
-    );
-    const xmean = wxsum / wsum;
-    const ymean = wysum / wsum;
-
-    // Calculate relative coordinates of stations
-    const relCoords = eastings.map((easting, index) => ({
-      x: easting - xmean,
-      y: northings[index] - ymean,
+    const data = entries.map(({northing, easting, bearing}) => ({
+      northing: parseFloat(northing),
+      easting: parseFloat(easting),
+      bearing: parseFloat(bearing),
     }));
-
-    // Calculate unweighted bearing deviations from mean
-    const ubds = bearings.map((bearing, index) => {
-      const relX = relCoords[index].x;
-      const relY = relCoords[index].y;
-      return bearing - Math.atan2(relY, relX);
-    });
-
-    // Calculate weighted standard deviation of bearings
-    const bvarsum = ubds.reduce(
-      (sum, ubd, index) => sum + weights[index] * (ubd * ubd),
-      0,
-    );
-    const bmean =
-      bearings.reduce(
-        (sum, bearing, index) => sum + weights[index] * bearing,
-        0,
-      ) / wsum;
-
-    const bsdev = Math.sqrt(
-      bvarsum / wsum +
-        triangSD * triangSD -
-        2 *
-          triangSD *
-          Math.sqrt(bvarsum / wsum) *
-          Math.cos(bmean - Math.PI / 2),
-    );
-
-    // Calculate standard errors of easting and northing estimates
-    const sEx =
-      (bsdev * Math.sqrt(wxsum * wxsum + wysum * wysum)) /
-      (wsum *
-        Math.sqrt(weights.reduce((sum, weight) => sum + weight * weight, 0)));
-    const sEy =
-      (bsdev * Math.sqrt(wysum * wysum + wxsum * wxsum)) /
-      (wsum *
-        Math.sqrt(weights.reduce((sum, weight) => sum + weight * weight, 0)));
-
-    // Calculate triangulation error area in meters squared
-    const triangErrorArea =
-      (Math.pow(sEx, 2) + Math.pow(sEy, 2)) * Math.pow(speedOfLight / 1000, 2);
-
-    // Calculate triangulation results
-    const triangEasting = xmean;
-    const triangNorthing = ymean;
-    const triangCorr = 0.619693624719674; // default correlation coefficient
-    const numBearingsUsed = bearings.length;
-
-    setTriangulationResults(
-      triangEasting,
-      triangNorthing,
-      sEx,
-      sEy,
-      triangErrorArea,
-    );
-
-    // Log the triangulation results to console
-    console.log(`Triang_easting: ${triangEasting.toFixed(4)}`);
-    console.log(`Triang_northing: ${triangNorthing.toFixed(4)}`);
-    console.log(`Errror_area: ${triangErrorArea.toFixed(4)}`);
-    console.log(`Triang_SD: ${triangSD}`);
-    console.log(`Triang_SEx: ${sEx.toFixed(4)}`);
-    console.log(`Triang_SEy: ${sEy.toFixed(4)}`);
-    console.log(`Triang_corr: ${triangCorr}`);
-    console.log(`Number_bearings_used: ${numBearingsUsed}`);
-
-    Alert.alert(
-      'Result',
-      `Easting: ${triangEasting.toFixed(4)}
-      \nNorthing: ${triangNorthing.toFixed(4)}
-      \nError Easting: ${sEx.toFixed(4)}
-      \nError Northing: ${sEy.toFixed(4)}
-      \nError area: ${triangErrorArea}
-      \nNumber of bearings used: ${numBearingsUsed}`,
-      [
-        {text: 'Cancel', onPress: () => {}},
-        {text: 'Save', onPress: () => navigation.goBack()},
-      ],
-    );
+    console.log(data);
+    try {
+      const triangulationResult = solveTriangulation(data);
+      console.log(triangulationResult);
+      setTelemetryStr(entries);
+      setTriangulationResults(
+        triangulationResult.easting,
+        triangulationResult.northing,
+        triangulationResult.eastingError,
+        triangulationResult.northingError,
+        triangulationResult.errorArea,
+      );
+      Alert.alert(
+        'Result',
+        `Easting: ${triangulationResult.easting.toFixed(4)}
+      \nNorthing: ${triangulationResult.northing.toFixed(4)}
+      \nError Easting: ${triangulationResult.eastingError.toFixed(4)}
+      \nError Northing: ${triangulationResult.northingError.toFixed(4)}
+      \nError area: ${triangulationResult.errorArea}
+      \nNumber of bearings used: ${triangulationResult.nBearings}`,
+        [
+          {text: 'Cancel', onPress: () => {}},
+          {text: 'Save', onPress: () => navigation.goBack()},
+        ],
+      );
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
   };
 
   return (
@@ -280,6 +200,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 <TextInput
                   style={styles.inputField}
                   value={entry.northing?.toString() ?? ''}
+                  keyboardType="numeric"
                   onChangeText={value => {
                     const {lat, lon} = utm10ToLatLon(entry.easting, value);
                     handleInputChange(index, 'northing', value);
@@ -294,6 +215,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 <TextInput
                   style={styles.inputField}
                   value={entry.easting?.toString() ?? ''}
+                  keyboardType="numeric"
                   onChangeText={value => {
                     const {lat, lon} = utm10ToLatLon(value, entry.northing);
                     handleInputChange(index, 'easting', value);
@@ -315,6 +237,7 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                 <TextInput
                   style={styles.inputField}
                   value={entry.bearing}
+                  keyboardType="numeric"
                   onChangeText={value =>
                     handleInputChange(index, 'bearing', value)
                   }
