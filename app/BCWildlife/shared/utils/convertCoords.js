@@ -47,8 +47,8 @@ export const utm10ToLatLon = (easting, northing) => {
       northingParsed,
     ]);
     return {
-      lat: latlon[0],
-      lon: latlon[1],
+      lat: latlon[1],
+      lon: latlon[0],
     };
   } catch (e) {
     console.log(
