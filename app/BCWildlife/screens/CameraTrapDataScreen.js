@@ -646,7 +646,8 @@ const CameraTrapDataScreen = ({navigation}) => {
                     <TextInput
                       keyboardType="numeric"
                       placeholder="Enter easting"
-                      onChangeText={value => {
+                      onChangeText={newValue => {
+                        const value = newValue.replaceAll(',', '.');
                         const {lat, lon} = utm10ToLatLon(
                           value,
                           stationNorthing,
@@ -663,7 +664,8 @@ const CameraTrapDataScreen = ({navigation}) => {
                     <TextInput
                       keyboardType="numeric"
                       placeholder="Enter northing"
-                      onChangeText={value => {
+                      onChangeText={newValue => {
+                        const value = newValue.replaceAll(',', '.');
                         const {lat, lon} = utm10ToLatLon(stationEasting, value);
                         setStationNorthing(value);
                         setStationLat(lat ?? '');

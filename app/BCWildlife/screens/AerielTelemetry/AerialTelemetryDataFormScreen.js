@@ -263,7 +263,8 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                       <TextInput
                         value={form.easting?.toString() ?? ''}
                         keyboardType="numeric"
-                        onChangeText={value => {
+                        onChangeText={newValue => {
+                          const value = newValue.replaceAll(',', '.');
                           const {lat, lon} = utm10ToLatLon(
                             value,
                             form.northing,
@@ -282,7 +283,8 @@ const ArielTelemetryDataFormScreen = ({navigation}) => {
                       <TextInput
                         value={form.northing?.toString() ?? ''}
                         keyboardType="numeric"
-                        onChangeText={value => {
+                        onChangeText={newValue => {
+                          const value = newValue.replaceAll(',', '.');
                           const {lat, lon} = utm10ToLatLon(form.easting, value);
                           setForm(draft => {
                             draft.northing = value;
