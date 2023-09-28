@@ -19,8 +19,6 @@ const Animal = db.sequelize.define("animal", {
   },
 });
 
-Animal.sync();
-
 module.exports = {
   Animal,
 };
