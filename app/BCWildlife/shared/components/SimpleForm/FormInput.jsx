@@ -29,7 +29,11 @@ export const FormInput = ({ name, label, placeholder, multiline, numeric, suffix
     <TextInput
       editable={editable}
       value={value}
-      onChangeText={text => {
+      onChangeText={newText => {
+        let text = newText;
+        if (numeric) {
+          text = newText.replaceAll(',', '.');
+        }
         onChangeText(text);
         onChangeTextCustom && onChangeTextCustom(name, text, form, setForm);
       }}

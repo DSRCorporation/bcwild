@@ -648,7 +648,8 @@ const TelemetryFormScreen = ({navigation}) => {
                   <TextInput
                     keyboardType="numeric"
                     placeholder="Enter easting"
-                    onChangeText={value => {
+                    onChangeText={newValue => {
+                      const value = newValue.replaceAll(',', '.');
                       const {lat, lon} = utm10ToLatLon(value, northing);
                       setEastingCustom(value);
                       setLatitudeCustom(lat ?? '');
@@ -663,7 +664,8 @@ const TelemetryFormScreen = ({navigation}) => {
                   <TextInput
                     keyboardType="numeric"
                     placeholder="Enter northing"
-                    onChangeText={value => {
+                    onChangeText={newValue => {
+                      const value = newValue.replaceAll(',', '.');
                       const {lat, lon} = utm10ToLatLon(easting, value);
                       setNorthingCustom(value);
                       setLatitudeCustom(lat ?? '');

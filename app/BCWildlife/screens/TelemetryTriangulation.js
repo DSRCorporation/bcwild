@@ -271,7 +271,8 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                   style={styles.inputField}
                   value={entry.easting?.toString() ?? ''}
                   keyboardType="numeric"
-                  onChangeText={value => {
+                  onChangeText={newValue => {
+                    const value = newValue.replaceAll(',', '.');
                     const {lat, lon} = utm10ToLatLon(value, entry.northing);
                     handleInputChange(index, 'easting', value);
                     handleInputChange(index, 'longitude', lon);
@@ -288,7 +289,8 @@ const TelemetryTriangulationScreen = ({navigation}) => {
                   style={styles.inputField}
                   value={entry.northing?.toString() ?? ''}
                   keyboardType="numeric"
-                  onChangeText={value => {
+                  onChangeText={newValue => {
+                    const value = newValue.replaceAll(',', '.');
                     const {lat, lon} = utm10ToLatLon(entry.easting, value);
                     handleInputChange(index, 'northing', value);
                     handleInputChange(index, 'longitude', lon);

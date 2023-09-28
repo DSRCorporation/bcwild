@@ -230,7 +230,8 @@ const BridgeFormScreen = ({route, navigation}) => {
                     <TextInput
                       keyboardType="numeric"
                       placeholder="Enter easting"
-                      onChangeText={value => {
+                      onChangeText={newValue => {
+                        const value = newValue.replaceAll(',', '.');
                         const {lat, lon} = utm10ToLatLon(value, form.northing);
                         setForm(draft => {
                           draft.easting = value;
@@ -246,7 +247,8 @@ const BridgeFormScreen = ({route, navigation}) => {
                     <TextInput
                       keyboardType="numeric"
                       placeholder="Enter northing"
-                      onChangeText={value => {
+                      onChangeText={newValue => {
+                        const value = newValue.replaceAll(',', '.');
                         const {lat, lon} = utm10ToLatLon(form.easting, value);
                         setForm(draft => {
                           draft.northing = value;
