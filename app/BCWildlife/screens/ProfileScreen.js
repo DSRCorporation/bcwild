@@ -85,6 +85,7 @@ const multipleImagePusher = property => async record => {
         uri: compressedImage.uri,
         size: compressedImage.size,
         fileName: compressedImage.name,
+        type: 'image/jpeg',
       });
     } catch (e) {
       console.warn(
