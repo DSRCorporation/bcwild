@@ -70,8 +70,6 @@ BridgeObservation.hasMany(BBDataBatSignStandardLocation, {
   },
 });
 
-BBDataBatSignStandardLocation.sync();
-
 module.exports = {
   BBDataBatSignStandardLocation,
 };
