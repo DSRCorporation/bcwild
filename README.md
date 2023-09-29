@@ -199,6 +199,22 @@ and `docker-compose.yml` contains
 
 The IP address of the server is defined in `app/BCWildlife/network/path.js`.
 
+Deploy
+---
+
+The back-end is deployed on Digital Ocean.
+
+To successfully deploy a new version you need to:
+1. Go to `/root/backend/bcwild/backend`
+2. Execute `git pull`
+3. If you changed any dependencies, execute `npm install`
+4. Make sure you have the `.env` file with the following arguments:
+   1. EMAIL (for sending emails during sign up and account approval)
+   2. EMAIL_PASS
+5. Check `src/config/config.json`, `local` config and make sure the database parameters are correct.
+6. If an instance of the backend is already running, find it and kill it: `ps -aux | grep index.js` -> find pid (for example `3360100`) -> `kill <pid>`
+7. A new instance of the backend will start automatically, you check by executing `ps -aux | grep index.js` again and checking the pid, it should be different.
+   1. If a new instance did not start automatically, execute `node /root/backend/bcwild/backend/index.js`.
 
 API
 ---
@@ -214,3 +230,34 @@ Code
 Both the back end and the app are built with node 20.4.0.
  
 The app can be built for Android and iOS.
+
+Building mobile apps
+---
+
+### Android
+
+To launch the app for debug execute `npm run android` in `app/BCWildlife`.
+
+To assemble a release APK execute script `buildAndroidRelease.sh`. Be aware that for uploading the build to Google Play you need to assemble an App Bundle instead of APK, and it should be signed by the upload key. See `Certificates` section to find out where to find the keys.
+
+Assembled APK are stored in `app/BCWildlife/android/app/build/outputs/apk`, then `release` or `debug` depending on what variant you assembled.
+
+Assembled App Bundles are stored in `app/BCWildlife/android/app/build/outputs/bundle`.
+
+### iOS
+
+To launch the app for debug go to `app/BCWildlife/ios` and execute `pod install`. After that go to `app/BCWildlife` and execute `npm run ios`. Alternatively instead of the last step open Xcode and launch the app normally from there.
+
+To assemble a release ipa push any commit to the repo https://github.com/bcgov/bcwild. An action will be invoked, assembling an ipa signed for uploading to the App Store. To upload the ipa to the App Store, use `app/BCWildlife/uploadIpa.sh` script.
+
+Usage: `./uploadIpa.sh <path to ipa> <apple developer account email> <apple app specific password>`. 
+
+Read more about app specific passwords here https://support.apple.com/en-us/102654.
+
+### Certificates
+
+The code itself does not contain any sensitive information. The certificates for building ios and android release builds are stores in github secrets. Main contact for that is Monica Granbois. 
+
+The passwords for the database and the email account are stored in the deployed code on Digital Ocean.
+
+The back-end currently does not have a valid SSL certificates and all the communication between the back-end and the app is done in cleartext.
